@@ -1,0 +1,8 @@
+BitBlt
+CreateCompatibleBitmap
+CreateCompatibleDC
+DeleteDC
+GetCursorPos
+GetDC
+ReleaseDC
+SelectObject

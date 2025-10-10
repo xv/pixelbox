@@ -1,0 +1,13 @@
+﻿<Window x:Class="PixelBox.Demo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PixelBox.Demo"
+        xmlns:PixelBox="clr-namespace:PixelBox;assembly=PixelBox"
+        mc:Ignorable="d"
+        Title="MainWindow" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" KeyDown="Window_KeyDown">
+    <Grid Background="#111">
+        <PixelBox:PixelMagnifier x:Name="PixelMag" PixelColumns="5" PixelSize="50"  RefreshInterval="15" PixelChanged="PixelMag_PixelChanged"/>
+    </Grid>
+</Window>
