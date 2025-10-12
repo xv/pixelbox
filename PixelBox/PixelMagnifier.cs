@@ -8,7 +8,6 @@ using System.Windows.Threading;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32;
-using System.Diagnostics;
 
 namespace PixelBox;
 
@@ -468,6 +467,11 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
         var dpi = VisualTreeHelper.GetDpi(this);
 
+        var invScaleX = 1.0 / dpi.DpiScaleX;
+        var invScaleY = 1.0 / dpi.DpiScaleY;
+
+        dc.PushTransform(new ScaleTransform(invScaleX, invScaleY));
+
         var gridGap = ShowGrid ? _gridGap : 0;
         var pxDev = (int)Math.Round(PixelSize * dpi.DpiScaleX);
 
@@ -483,16 +487,18 @@ public class PixelMagnifier : FrameworkElement, IDisposable
                 var brush = new SolidColorBrush(Color.FromRgb(r, g, b));
                 brush.Freeze();
 
-                var xDev = ((pxDev + gridGap) * x) / dpi.DpiScaleX;
-                var yDev = ((pxDev + gridGap) * y) / dpi.DpiScaleX;
+                var xDev = ((pxDev + gridGap) * x);
+                var yDev = ((pxDev + gridGap) * y);
 
                 var rectDip = new Rect(
                     xDev, yDev,
-                    pxDev / dpi.DpiScaleX, pxDev / dpi.DpiScaleY);
+                    pxDev, pxDev);
 
                 dc.DrawRectangle(brush, null, rectDip);
             }
         }
+
+        dc.Pop();
     }
 
     public void Dispose()
