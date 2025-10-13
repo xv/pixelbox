@@ -24,10 +24,12 @@ public partial class MainWindow : Window
     {
         if (e.Key == System.Windows.Input.Key.Space)
             PixelMag.ToggleCapture();
-        else if (e.Key == System.Windows.Input.Key.Q)
+        else if (e.Key == System.Windows.Input.Key.D1)
             PixelMag.SamplingMode = PixelSamplingMode.Single;
-        else if (e.Key == System.Windows.Input.Key.W)
+        else if (e.Key == System.Windows.Input.Key.D2)
             PixelMag.SamplingMode = PixelSamplingMode.ThreeByThree;
+        else if (e.Key == System.Windows.Input.Key.D3)
+            PixelMag.SamplingMode = PixelSamplingMode.FiveByFive;
         else if (e.Key == System.Windows.Input.Key.G)
             PixelMag.ShowGrid = !PixelMag.ShowGrid;
         else if (e.Key == System.Windows.Input.Key.C)

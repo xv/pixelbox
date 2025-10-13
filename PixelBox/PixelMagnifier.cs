@@ -23,7 +23,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     private int _pixelColumns;
     private int _pixelColumnsHalf;
-    private int _gridGap = 1;
 
     private Color _centerPixelColor;
     private Point _lastMousePos = new(-1, -1);
@@ -38,6 +37,11 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     private int _expandedDevSize = 0;
 
     public event EventHandler<PixelChangedEventArgs>? PixelChanged;
+
+    private readonly Rect[] _centerRects = new Rect[2];
+
+    static readonly Pen s_penWhite = new(Brushes.White, 1);
+    static readonly Pen s_penBlack = new(Brushes.Black, 1);
 
     #endregion
     #region Dependency Properties
@@ -190,6 +194,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
             mag.SetPixelGrid(value);
             mag.InvalidateMeasure();
+            mag.SetCenterRectangles();
         }
     }
 
@@ -202,6 +207,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
                 throw new ArgumentOutOfRangeException(null, nameof(PixelColumns));
 
             mag.InvalidateMeasure();
+            mag.SetCenterRectangles();
         }
     }
 
@@ -209,7 +215,9 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     {
         if (sender is PixelMagnifier mag)
         {
+            mag.SetCenterRectangles();
             mag.InvalidateVisual();
+
             mag.PixelChanged?.Invoke(mag, new PixelChangedEventArgs(mag._centerPixelColor, mag._lastMousePos));
         }
     }
@@ -217,7 +225,10 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     private static void OnShowGridChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
         if (sender is PixelMagnifier mag)
+        {
             mag.InvalidateMeasure();
+            mag.SetCenterRectangles();
+        }
     }
 
     private static void OnRefreshIntervalChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
@@ -247,31 +258,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     }
 
     #endregion
-
-
-    public PixelMagnifier()
-    {
-        SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
-        RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
-
-        SnapsToDevicePixels = true;
-        Focusable = false;
-
-        SetPixelGrid(PixelColumns);
-
-        _refreshTimer = new DispatcherTimer(DispatcherPriority.Render)
-        {
-            Interval = TimeSpan.FromMilliseconds(RefreshInterval),
-            IsEnabled = false
-        };
-        _refreshTimer.Tick += OnRefreshTimerTick;
-    }
-
-    private void SetPixelGrid(int cols)
-    {
-        _pixelColumnsHalf = cols / 2;
-        _captureWidth = _captureHeight = cols;
-    }
+    #region Methods
 
     /// <summary>
     /// Begins capturing pixels.
@@ -304,19 +291,52 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// </summary>
     public void UnlockPosition() => _lockedPixelPos = new Point(-1, -1);
 
-    protected override Size MeasureOverride(Size availableSize)
+    /// <summary>
+    /// Sets the necessary pixel grid parameters for control drawing.
+    /// </summary>
+    private void SetPixelGrid(int cols)
+    {
+        _pixelColumnsHalf = cols / 2;
+        _captureWidth = _captureHeight = cols;
+    }
+
+    /// <summary>
+    /// Sets the the value of <see cref="_centerRects"/> which identifies the
+    /// position of center pixel.
+    /// </summary>
+    private void SetCenterRectangles()
     {
         var dpi = VisualTreeHelper.GetDpi(this);
 
         var pxSizeDev = (int)Math.Round(PixelSize * dpi.DpiScaleX);
-        var totalSizeDev = pxSizeDev * PixelColumns;
+        var pxCenterDev = (pxSizeDev + (ShowGrid ? 1 : 0)) * _pixelColumnsHalf;
 
-        if (ShowGrid)
-            totalSizeDev += (PixelColumns - 1) * _gridGap;
+        _centerRects[0] = new Rect(
+            pxCenterDev, pxCenterDev,
+            pxSizeDev + 1, pxSizeDev + 1);
 
-        // Convert device pixels to DIPs
-        var totalSizeDip = totalSizeDev / dpi.DpiScaleX;
-        return new Size(totalSizeDip, totalSizeDip);
+        var samplerSize = (int)SamplingMode;
+
+        if ((PixelSamplingMode)samplerSize != PixelSamplingMode.Single)
+        {
+            _centerRects[0].Inflate(
+                (_centerRects[0].Width * samplerSize),
+                (_centerRects[0].Height * samplerSize));
+        }
+
+        if (!ShowGrid)
+        {
+            _centerRects[0].Inflate(
+                -(samplerSize + 1), 
+                -(samplerSize + 1));
+        }
+
+        // The second rectangle should be drawn in a different pen color
+        // The idea here is creating contrast with the background the two
+        // rectangles are on so that at least one of the rectangles is
+        // always visible on screen
+        _centerRects[1] = _centerRects[0];
+        _centerRects[1].Inflate(-1, -1);
     }
 
     private static HBITMAP CaptureRectToHBitmap(int left, int top, int width, int height)
@@ -343,13 +363,12 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         var hOld = PInvoke.SelectObject(hdcMem, hBitmap);
 
         var result = PInvoke.BitBlt(
-            hdcMem, 
-            0, 0, width, height, 
-            hdcScreen, 
-            left, top, 
+            hdcMem,
+            0, 0, width, height,
+            hdcScreen,
+            left, top,
             ROP_CODE.SRCCOPY | ROP_CODE.CAPTUREBLT);
 
-        // restore and cleanup
         PInvoke.SelectObject(hdcMem, hOld);
         PInvoke.DeleteDC(hdcMem);
         PInvoke.ReleaseDC(HWND.Null, hdcScreen);
@@ -357,22 +376,10 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         return result ? hBitmap : HBITMAP.Null;
     }
 
-    private Color SampleColor(PixelSamplingMode mode, byte[] buffer, int stride)
+    private void CaptureAt(Point screenPt)
     {
-        var idx = (_pixelColumnsHalf * stride) + _pixelColumnsHalf * 4;
-
-        var b = buffer[idx + 0];
-        var g = buffer[idx + 1];
-        var r = buffer[idx + 2];
-
-        return Color.FromRgb(r, g, b);
-    }
-
-    private void CaptureAt(Point screenPoint)
-    {
-        // ensure integer screen coords
-        var cx = (int)Math.Round(screenPoint.X);
-        var cy = (int)Math.Round(screenPoint.Y);
+        var cx = (int)Math.Round(screenPt.X);
+        var cy = (int)Math.Round(screenPt.Y);
 
         var left = cx - _pixelColumnsHalf;
         var top = cy - _pixelColumnsHalf;
@@ -413,33 +420,16 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         }
     }
 
-    //private readonly Rect[] _centerRects = new Rect[2];
+    private Color SampleColor(PixelSamplingMode mode, byte[] buffer, int stride)
+    {
+        var idx = (_pixelColumnsHalf * stride) + _pixelColumnsHalf * 4;
 
-    //private void SetCenterRectangles()
-    //{
-    //    var centerX = (_pixelSizeInternal + Convert.ToInt32(_showGrid)) * _pixelColumnsHalf;
-    //    var centerY = (_pixelSizeInternal + Convert.ToInt32(_showGrid)) * _pixelColumnsHalf;
-    //
-    //    _centerRects[0] = new Rect(
-    //        centerX, centerY,
-    //        _pixelSizeInternal , _pixelSizeInternal );
-    //
-    //    if (_samplingMode != PixelSamplingMode.Single)
-    //    {
-    //        var samplerSize = (int)_samplingMode;
-    //
-    //        _centerRects[0].Inflate(
-    //            _centerRects[0].Width * samplerSize,
-    //            _centerRects[0].Height * samplerSize);
-    //    }
-    //
-    //    // The second rectangle should be drawn in a different pen color
-    //    // The idea here is creating contrast with the background the two
-    //    // rectangles are on so that at least one of the rectangles is
-    //    // always visible on screen
-    //    _centerRects[1] = _centerRects[0];
-    //    _centerRects[1].Inflate(-1, -1);
-    //}
+        var b = buffer[idx + 0];
+        var g = buffer[idx + 1];
+        var r = buffer[idx + 2];
+
+        return Color.FromRgb(r, g, b);
+    }
 
     private bool RenderDesignTimePlaceholder(DrawingContext dc, DpiScale dpi)
     {
@@ -456,6 +446,43 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         dc.DrawText(text, new Point(4, 4));
 
         return true;
+    }
+
+    #endregion
+
+    public PixelMagnifier()
+    {
+        RenderOptions.SetEdgeMode(this, EdgeMode.Aliased);
+        RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
+
+        SnapsToDevicePixels = true;
+        Focusable = false;
+
+        SetPixelGrid(PixelColumns);
+
+        _refreshTimer = new DispatcherTimer(DispatcherPriority.Render)
+        {
+            Interval = TimeSpan.FromMilliseconds(RefreshInterval),
+            IsEnabled = false
+        };
+        _refreshTimer.Tick += OnRefreshTimerTick;
+
+        s_penWhite.Freeze();
+        s_penBlack.Freeze();
+    }
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        var dpi = VisualTreeHelper.GetDpi(this);
+        var pxSizeDev = (int)Math.Round(PixelSize * dpi.DpiScaleX);
+        var totalSizeDev = pxSizeDev * PixelColumns;
+
+        if (ShowGrid)
+            totalSizeDev += PixelColumns - 1;
+
+        // Convert device pixels to DIPs
+        var totalSizeDip = totalSizeDev / dpi.DpiScaleX;
+        return new Size(totalSizeDip, totalSizeDip);
     }
 
     protected override void OnRender(DrawingContext dc)
@@ -478,7 +505,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             return;
 
         var pxDev = (int)Math.Round(PixelSize * dpi.DpiScaleX);
-        var gridGapDev = ShowGrid ? _gridGap : 0;
+        var gridGapDev = ShowGrid ? 1 : 0;
 
         // Expanded (destination) device pixel size including gaps
         var totalDev = pxDev * _captureWidth + gridGapDev * (_captureWidth - 1);
@@ -504,8 +531,8 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
         unsafe
         {
-            fixed (byte* srcBase = _captureBuffer)
-            fixed (byte* dstBase = _expandedBuffer)
+            fixed (byte* srcBuf = _captureBuffer)
+            fixed (byte* dstBuf = _expandedBuffer)
             {
                 // Reusable single horizontal line block of one pixel's width
                 var lineBytes = pxDev * 4;
@@ -513,7 +540,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
                 for (var srcY = 0; srcY < _captureHeight; srcY++)
                 {
-                    byte* srcRow = srcBase + srcY * srcStride;
+                    byte* srcRow = srcBuf + srcY * srcStride;
                     var destBlockY = srcY * (pxDev + gridGapDev);
 
                     for (var srcX = 0; srcX < _captureWidth; srcX++)
@@ -528,14 +555,14 @@ public class PixelMagnifier : FrameworkElement, IDisposable
                             lineBlock[bx * 4 + 0] = b;
                             lineBlock[bx * 4 + 1] = g;
                             lineBlock[bx * 4 + 2] = r;
-                            lineBlock[bx * 4 + 3] = 255;
+                            lineBlock[bx * 4 + 3] = 255; // Alpha is irrelevant
                         }
 
                         var destBlockX = srcX * (pxDev + gridGapDev);
 
                         for (var by = 0; by < pxDev; by++)
                         {
-                            byte* pDstRow = dstBase + (destBlockY + by) * destStride + destBlockX * 4;
+                            byte* pDstRow = dstBuf + (destBlockY + by) * destStride + destBlockX * 4;
                             Buffer.MemoryCopy(lineBlock, pDstRow, lineBytes, lineBytes);
                         }
                     }
@@ -547,13 +574,17 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             new Int32Rect(0, 0, _expandedDevSize, _expandedDevSize),
             _expandedBuffer, destStride, 0);
 
-        // Map device pixels to DIPs once with a scale transform to avoid repeated
-        // divisions when DPI scaling is > 96
+        // Map device pixels to DIPs once with a scale transform to avoid having to
+        // repeatedly apply divisions when DPI scaling is > 96
         dc.PushTransform(new ScaleTransform(
             1.0 / dpi.DpiScaleX, 
             1.0 / dpi.DpiScaleY));
 
         dc.DrawImage(_expandedBitmap, new Rect(0, 0, _expandedDevSize, _expandedDevSize));
+
+        // The center pixel 'crosshair' contrasting rectangles
+        dc.DrawRectangle(null, s_penWhite, _centerRects[0]);
+        dc.DrawRectangle(null, s_penBlack, _centerRects[1]);
 
         dc.Pop();
     }
