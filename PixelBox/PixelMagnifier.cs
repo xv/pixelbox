@@ -307,16 +307,15 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     {
         var dpi = VisualTreeHelper.GetDpi(this);
 
-        var pxSize = (int)Math.Round(PixelSize * dpi.DpiScaleX);
-        var pxSizeDev = pxSize * PixelColumns;
+        var pxSizeDev = (int)Math.Round(PixelSize * dpi.DpiScaleX);
+        var totalSizeDev = pxSizeDev * PixelColumns;
 
         if (ShowGrid)
-            pxSizeDev += (PixelColumns - 1) * _gridGap;
+            totalSizeDev += (PixelColumns - 1) * _gridGap;
 
-        // Convert device pixels back to DIPs
-        var sizeDip = pxSizeDev / dpi.DpiScaleX;
-
-        return new Size(sizeDip, sizeDip);
+        // Convert device pixels to DIPs
+        var totalSizeDip = totalSizeDev / dpi.DpiScaleX;
+        return new Size(totalSizeDip, totalSizeDip);
     }
 
     private static HBITMAP CaptureRectToHBitmap(int left, int top, int width, int height)
@@ -441,24 +440,30 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     //    _centerRects[1].Inflate(-1, -1);
     //}
 
+    private bool RenderDesignTimePlaceholder(DrawingContext dc, DpiScale dpi)
+    {
+        if (!DesignerProperties.GetIsInDesignMode(this))
+            return false;
+
+        var text = new FormattedText(
+            $"{nameof(PixelMagnifier)}",
+            System.Globalization.CultureInfo.InvariantCulture,
+            FlowDirection.LeftToRight,
+            new Typeface("Segoe UI"), 12, Brushes.Gray, dpi.PixelsPerDip);
+
+        dc.DrawRectangle(Brushes.Black, null, new Rect(RenderSize));
+        dc.DrawText(text, new Point(4, 4));
+
+        return true;
+    }
+
     protected override void OnRender(DrawingContext dc)
     {
         base.OnRender(dc);
         var dpi = VisualTreeHelper.GetDpi(this);
 
-        if (DesignerProperties.GetIsInDesignMode(this))
-        {
-            var placeholderText = new FormattedText(
-                $"{nameof(PixelMagnifier)} (design-time)",
-                System.Globalization.CultureInfo.InvariantCulture,
-                FlowDirection.LeftToRight,
-                new Typeface("Segoe UI"), 12, Brushes.Gray,
-                dpi.PixelsPerDip);
-
-            dc.DrawRectangle(Brushes.Black, null, new Rect(RenderSize));
-            dc.DrawText(placeholderText, new Point(4, 4));
+        if (RenderDesignTimePlaceholder(dc, dpi))
             return;
-        }
 
         // If we don't have a capture yet (e.g., StartCapture() isn't called, then
         // capture once at cursor
