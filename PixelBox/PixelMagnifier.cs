@@ -31,6 +31,10 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     private byte[]? _captureBuffer;
     private int _captureStride;
 
+    private WriteableBitmap? _expandedBitmap;
+    private byte[]? _expandedBuffer;
+    private int _expandedDevSize = 0;
+
     public event EventHandler<PixelChangedEventArgs>? PixelChanged;
 
     #endregion
@@ -249,6 +253,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     public PixelMagnifier()
     {
         SetValue(RenderOptions.EdgeModeProperty, EdgeMode.Aliased);
+        RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
 
         SnapsToDevicePixels = true;
         Focusable = false;
@@ -437,6 +442,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     protected override void OnRender(DrawingContext dc)
     {
         base.OnRender(dc);
+        var dpi = VisualTreeHelper.GetDpi(this);
 
         if (DesignerProperties.GetIsInDesignMode(this))
         {
@@ -445,14 +451,15 @@ public class PixelMagnifier : FrameworkElement, IDisposable
                 System.Globalization.CultureInfo.InvariantCulture,
                 FlowDirection.LeftToRight,
                 new Typeface("Segoe UI"), 12, Brushes.Gray,
-                VisualTreeHelper.GetDpi(this).PixelsPerDip);
+                dpi.PixelsPerDip);
 
             dc.DrawRectangle(Brushes.Black, null, new Rect(RenderSize));
             dc.DrawText(placeholderText, new Point(4, 4));
             return;
         }
 
-        // If we don't have a captured buffer yet, do a capture once centered on cursor
+        // If we don't have a capture yet (e.g., StartCapture() isn't called, then
+        // capture once at cursor
         if (_captureBuffer == null)
         {
             _lastMousePos = MousePosition;
@@ -460,43 +467,84 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         }
 
         if (_captureBuffer == null)
-        {
-            // Nothing to draw
             return;
+
+        var pxDev = (int)Math.Round(PixelSize * dpi.DpiScaleX);
+        var gridGapDev = ShowGrid ? _gridGap : 0;
+
+        // Expanded (destination) device pixel size including gaps
+        var totalDev = pxDev * _captureWidth + gridGapDev * (_captureWidth - 1);
+        if (totalDev <= 0)
+            return;
+
+        if (_expandedDevSize != totalDev)
+        {
+            _expandedDevSize = totalDev;
+            _expandedBuffer = new byte[_expandedDevSize * _expandedDevSize * 4];
+
+            _expandedBitmap = new WriteableBitmap(
+                _expandedDevSize, _expandedDevSize,
+                dpi.PixelsPerInchX, dpi.PixelsPerInchY,
+                PixelFormats.Bgra32, null);
         }
 
-        var dpi = VisualTreeHelper.GetDpi(this);
+        var srcStride = _captureStride;
+        var destStride = _expandedDevSize * 4;
 
-        var invScaleX = 1.0 / dpi.DpiScaleX;
-        var invScaleY = 1.0 / dpi.DpiScaleY;
+        Array.Clear(_expandedBuffer!, 0, _expandedBuffer!.Length);
 
-        dc.PushTransform(new ScaleTransform(invScaleX, invScaleY));
-
-        var gridGap = ShowGrid ? _gridGap : 0;
-        var pxDev = (int)Math.Round(PixelSize * dpi.DpiScaleX);
-
-        for (var y = 0; y < _captureHeight; y++)
+        unsafe
         {
-            for (var x = 0; x < _captureWidth; x++)
+            fixed (byte* srcBase = _captureBuffer)
+            fixed (byte* dstBase = _expandedBuffer)
             {
-                var idx = y * _captureStride + x * 4;
-                var b = _captureBuffer[idx + 0];
-                var g = _captureBuffer[idx + 1];
-                var r = _captureBuffer[idx + 2];
+                // Reusable single horizontal line block of one pixel's width
+                var lineBytes = pxDev * 4;
+                byte* lineBlock = stackalloc byte[lineBytes];
 
-                var brush = new SolidColorBrush(Color.FromRgb(r, g, b));
-                brush.Freeze();
+                for (var srcY = 0; srcY < _captureHeight; srcY++)
+                {
+                    byte* srcRow = srcBase + srcY * srcStride;
+                    var destBlockY = srcY * (pxDev + gridGapDev);
 
-                var xDev = ((pxDev + gridGap) * x);
-                var yDev = ((pxDev + gridGap) * y);
+                    for (var srcX = 0; srcX < _captureWidth; srcX++)
+                    {
+                        byte* pSrc = srcRow + srcX * 4;
+                        var b = pSrc[0];
+                        var g = pSrc[1];
+                        var r = pSrc[2];
 
-                var rectDip = new Rect(
-                    xDev, yDev,
-                    pxDev, pxDev);
+                        for (var bx = 0; bx < pxDev; bx++)
+                        {
+                            lineBlock[bx * 4 + 0] = b;
+                            lineBlock[bx * 4 + 1] = g;
+                            lineBlock[bx * 4 + 2] = r;
+                            lineBlock[bx * 4 + 3] = 255;
+                        }
 
-                dc.DrawRectangle(brush, null, rectDip);
+                        var destBlockX = srcX * (pxDev + gridGapDev);
+
+                        for (var by = 0; by < pxDev; by++)
+                        {
+                            byte* pDstRow = dstBase + (destBlockY + by) * destStride + destBlockX * 4;
+                            Buffer.MemoryCopy(lineBlock, pDstRow, lineBytes, lineBytes);
+                        }
+                    }
+                }
             }
         }
+
+        _expandedBitmap!.WritePixels(
+            new Int32Rect(0, 0, _expandedDevSize, _expandedDevSize),
+            _expandedBuffer, destStride, 0);
+
+        // Map device pixels to DIPs once with a scale transform to avoid repeated
+        // divisions when DPI scaling is > 96
+        dc.PushTransform(new ScaleTransform(
+            1.0 / dpi.DpiScaleX, 
+            1.0 / dpi.DpiScaleY));
+
+        dc.DrawImage(_expandedBitmap, new Rect(0, 0, _expandedDevSize, _expandedDevSize));
 
         dc.Pop();
     }
