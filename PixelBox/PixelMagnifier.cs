@@ -20,6 +20,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     private readonly DispatcherTimer _refreshTimer;
 
+    private int _pixelColumns;
     private int _pixelColumnsHalf;
     private int _gridGap = 1;
 
@@ -186,10 +187,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             if (value < 1)
                 throw new ArgumentOutOfRangeException(null, nameof(PixelColumns));
 
-            mag._captureWidth = value;
-            mag._captureHeight = value;
-            mag._pixelColumnsHalf = value / 2;
-
+            mag.SetPixelGrid(value);
             mag.InvalidateMeasure();
         }
     }
@@ -258,9 +256,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         SnapsToDevicePixels = true;
         Focusable = false;
 
-        _captureWidth = PixelColumns;
-        _captureHeight = PixelColumns;
-        _pixelColumnsHalf = PixelColumns / 2;
+        SetPixelGrid(PixelColumns);
 
         _refreshTimer = new DispatcherTimer(DispatcherPriority.Render)
         {
@@ -268,6 +264,12 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             IsEnabled = false
         };
         _refreshTimer.Tick += OnRefreshTimerTick;
+    }
+
+    private void SetPixelGrid(int cols)
+    {
+        _pixelColumnsHalf = cols / 2;
+        _captureWidth = _captureHeight = cols;
     }
 
     /// <summary>
@@ -306,13 +308,13 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         var dpi = VisualTreeHelper.GetDpi(this);
 
         var pxSize = (int)Math.Round(PixelSize * dpi.DpiScaleX);
-        var devPxSize = pxSize * PixelColumns;
+        var pxSizeDev = pxSize * PixelColumns;
 
         if (ShowGrid)
-            devPxSize += (PixelColumns - 1) * _gridGap;
+            pxSizeDev += (PixelColumns - 1) * _gridGap;
 
         // Convert device pixels back to DIPs
-        var sizeDip = devPxSize / dpi.DpiScaleX;
+        var sizeDip = pxSizeDev / dpi.DpiScaleX;
 
         return new Size(sizeDip, sizeDip);
     }
