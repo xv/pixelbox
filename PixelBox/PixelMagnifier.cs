@@ -8,6 +8,7 @@ using System.Windows.Threading;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32;
+using System.Diagnostics;
 
 namespace PixelBox;
 
@@ -481,8 +482,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
         // Expanded (destination) device pixel size including gaps
         var totalDev = pxDev * _captureWidth + gridGapDev * (_captureWidth - 1);
-        if (totalDev <= 0)
-            return;
 
         if (_expandedDevSize != totalDev)
         {
@@ -493,6 +492,9 @@ public class PixelMagnifier : FrameworkElement, IDisposable
                 _expandedDevSize, _expandedDevSize,
                 dpi.PixelsPerInchX, dpi.PixelsPerInchY,
                 PixelFormats.Bgra32, null);
+
+            // Recapture if grid columns are dynamically increased
+            CaptureAt(_lastMousePos);
         }
 
         var srcStride = _captureStride;
