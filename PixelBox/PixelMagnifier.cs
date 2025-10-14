@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel;
-using System.Windows;
 using System.Windows.Interop;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media;
 using System.Windows.Threading;
+using System.Windows;
 
+using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
-using Windows.Win32;
-using System.Diagnostics;
 
 namespace PixelBox;
 
@@ -216,9 +215,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         if (sender is PixelMagnifier mag)
         {
             mag.SetCenterRectangles();
-            mag.InvalidateVisual();
-
-            mag.PixelChanged?.Invoke(mag, new PixelChangedEventArgs(mag._centerPixelColor, mag._lastMousePos));
+            mag.CaptureAt(mag._lastMousePos);
         }
     }
 
@@ -422,13 +419,39 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     private Color SampleColor(PixelSamplingMode mode, byte[] buffer, int stride)
     {
-        var idx = (_pixelColumnsHalf * stride) + _pixelColumnsHalf * 4;
+        if (mode == PixelSamplingMode.Single)
+        {
+            var idx = (_pixelColumnsHalf * stride) + _pixelColumnsHalf * 4;
+            return Color.FromRgb(
+                /* R */ buffer[idx + 2],
+                /* G */ buffer[idx + 1],
+                /* B */ buffer[idx]);
+        }
 
-        var b = buffer[idx + 0];
-        var g = buffer[idx + 1];
-        var r = buffer[idx + 2];
+        var kSize = (mode == PixelSamplingMode.ThreeByThree) ? 3 : 5;
+        var kHalf = kSize / 2;
+        var kTotal = kSize * kSize; // Total number of pixels inside the kernel
 
-        return Color.FromRgb(r, g, b);
+        var first = _pixelColumnsHalf - kHalf;
+
+        int rSum = 0, gSum = 0, bSum = 0;
+
+        for (int y = 0; y < kSize; y++)
+        {
+            for (int x = 0; x < kSize; x++)
+            {
+                var idx = (first + y) * stride + (first + x) * 4;
+                bSum += buffer[idx];
+                gSum += buffer[idx + 1];
+                rSum += buffer[idx + 2];
+            }
+        }
+
+        // Mean of the RGB components
+        return Color.FromRgb(
+            (byte)(rSum / kTotal), 
+            (byte)(gSum / kTotal), 
+            (byte)(bSum / kTotal));
     }
 
     private bool RenderDesignTimePlaceholder(DrawingContext dc, DpiScale dpi)
