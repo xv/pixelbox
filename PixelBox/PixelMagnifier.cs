@@ -5,9 +5,9 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Windows;
 
-using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
+using Windows.Win32;
 
 namespace PixelBox;
 
@@ -27,7 +27,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     private Point _lastMousePos = new(-1, -1);
     private Point _lockedPixelPos = new(-1, -1);
 
-    private int _captureWidth, _captureHeight;
     private byte[]? _captureBuffer;
     private int _captureStride;
 
@@ -293,8 +292,8 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// </summary>
     private void SetPixelGrid(int cols)
     {
+        _pixelColumns = cols;
         _pixelColumnsHalf = cols / 2;
-        _captureWidth = _captureHeight = cols;
     }
 
     /// <summary>
@@ -384,7 +383,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         if (left < 0) left = 0;
         if (top < 0) top = 0;
 
-        var hBitmap = CaptureRectToHBitmap(left, top, _captureWidth, _captureHeight);
+        var hBitmap = CaptureRectToHBitmap(left, top, _pixelColumns, _pixelColumns);
         if (hBitmap == HBITMAP.Null)
         {
             _captureBuffer = null;
@@ -531,7 +530,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         var gridGapDev = ShowGrid ? 1 : 0;
 
         // Expanded (destination) device pixel size including gaps
-        var totalDev = pxDev * _captureWidth + gridGapDev * (_captureWidth - 1);
+        var totalDev = pxDev * _pixelColumns + gridGapDev * (_pixelColumns - 1);
 
         if (_expandedDevSize != totalDev)
         {
@@ -561,12 +560,12 @@ public class PixelMagnifier : FrameworkElement, IDisposable
                 var lineBytes = pxDev * 4;
                 byte* lineBlock = stackalloc byte[lineBytes];
 
-                for (var srcY = 0; srcY < _captureHeight; srcY++)
+                for (var srcY = 0; srcY < _pixelColumns; srcY++)
                 {
                     byte* srcRow = srcBuf + srcY * srcStride;
                     var destBlockY = srcY * (pxDev + gridGapDev);
 
-                    for (var srcX = 0; srcX < _captureWidth; srcX++)
+                    for (var srcX = 0; srcX < _pixelColumns; srcX++)
                     {
                         byte* pSrc = srcRow + srcX * 4;
                         var b = pSrc[0];
