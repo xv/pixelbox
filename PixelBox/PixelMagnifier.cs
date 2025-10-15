@@ -190,7 +190,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             if (value < 1)
                 throw new ArgumentOutOfRangeException(null, nameof(PixelColumns));
 
-            mag.SetPixelGrid(value);
+            mag.UpdateGridMetrics(value);
             mag.InvalidateMeasure();
             mag.SetCenterRectangles();
         }
@@ -288,9 +288,13 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     public void UnlockPosition() => _lockedPixelPos = new Point(-1, -1);
 
     /// <summary>
-    /// Sets the necessary pixel grid parameters for control drawing.
+    /// Updates the grid metrics based on the specified number of columns.
     /// </summary>
-    private void SetPixelGrid(int cols)
+    /// 
+    /// <param name="cols">
+    /// Total number of columns in the grid.
+    /// </param>
+    private void UpdateGridMetrics(int cols)
     {
         _pixelColumns = cols;
         _pixelColumnsHalf = cols / 2;
@@ -480,7 +484,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         SnapsToDevicePixels = true;
         Focusable = false;
 
-        SetPixelGrid(PixelColumns);
+        UpdateGridMetrics(PixelColumns);
 
         _refreshTimer = new DispatcherTimer(DispatcherPriority.Render)
         {
