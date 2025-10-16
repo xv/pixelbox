@@ -277,7 +277,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// </summary>
     /// 
     /// <param name="pos">
-    /// The coordinate to lock.
+    /// The screen coordinate to lock.
     /// </param>
     public void LockPosition(Point pos) => _lockedPixelPos = pos;
 
@@ -418,6 +418,29 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         }
     }
 
+    /// <summary>
+    /// Samples the color of thr pixel.
+    /// </summary>
+    /// 
+    /// <param name="mode">
+    /// The pixel sampling mode to use, which determines the size of the
+    /// sampling kernel.
+    /// </param>
+    /// 
+    /// <param name="buffer">
+    /// Byte array containig the pixel data.
+    /// </param>
+    /// 
+    /// <param name="stride">
+    /// The stride of a single row of pixels in the buffer.
+    /// </param>
+    /// 
+    /// <returns>
+    /// The sampled color. If <paramref name="mode"/> is set to
+    /// <see cref="PixelSamplingMode.Single"/>, then the exact color of the
+    /// pixel is returned; otherwise, the average color of nearby pixels is
+    /// calculated and returned.
+    /// </returns>
     private Color SampleColor(PixelSamplingMode mode, byte[] buffer, int stride)
     {
         if (mode == PixelSamplingMode.Single)
@@ -455,18 +478,41 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             (byte)(bSum / kTotal));
     }
 
+    /// <summary>
+    /// Renders a placeholder string containing the control name when in
+    /// design mode.
+    /// </summary>
+    /// 
+    /// <param name="dc">
+    /// The drawing context.
+    /// </param>
+    /// 
+    /// <param name="dpi">
+    /// DPI scale information.
+    /// </param>
+    /// 
+    /// <returns>
+    /// <see langword="true"/> if in design mode and the placeholder was
+    /// rendered; false otherwise
+    /// </returns>
     private bool RenderDesignTimePlaceholder(DrawingContext dc, DpiScale dpi)
     {
         if (!DesignerProperties.GetIsInDesignMode(this))
             return false;
 
+        var rect = new Rect(RenderSize);
+
         var text = new FormattedText(
             $"{nameof(PixelMagnifier)}",
             System.Globalization.CultureInfo.InvariantCulture,
             FlowDirection.LeftToRight,
-            new Typeface("Segoe UI"), 12, Brushes.Gray, dpi.PixelsPerDip);
+            new Typeface("Segoe UI"), 12, Brushes.Gray, dpi.PixelsPerDip)
+        {
+            MaxTextWidth = rect.Width - 10,
+            MaxTextHeight = rect.Height
+        };
 
-        dc.DrawRectangle(Brushes.Black, null, new Rect(RenderSize));
+        dc.DrawRectangle(Brushes.Black, null, rect);
         dc.DrawText(text, new Point(4, 4));
 
         return true;
@@ -474,6 +520,9 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     #endregion
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PixelMagnifier"/> class.
+    /// </summary>
     public PixelMagnifier()
     {
         RenderOptions.SetEdgeMode(this, EdgeMode.Aliased);

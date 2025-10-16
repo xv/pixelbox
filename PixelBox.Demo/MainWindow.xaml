@@ -8,6 +8,6 @@
         mc:Ignorable="d"
         Title="MainWindow" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" KeyDown="Window_KeyDown">
     <Grid Background="#111">
-        <PixelBox:PixelMagnifier x:Name="PixelMag" PixelColumns="5" PixelSize="50"  RefreshInterval="15" PixelChanged="PixelMag_PixelChanged"/>
+        <PixelBox:PixelMagnifier x:Name="PixelMag" PixelColumns="25" PixelSize="11"  RefreshInterval="30" PixelChanged="PixelMag_PixelChanged"/>
     </Grid>
 </Window>
