@@ -381,11 +381,9 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         var cx = (int)Math.Round(screenPt.X);
         var cy = (int)Math.Round(screenPt.Y);
 
+        // Possible negative coordinates here are valid
         var left = cx - _pixelColumnsHalf;
         var top = cy - _pixelColumnsHalf;
-
-        if (left < 0) left = 0;
-        if (top < 0) top = 0;
 
         var hBitmap = CaptureRectToHBitmap(left, top, _pixelColumns, _pixelColumns);
         if (hBitmap == HBITMAP.Null)
