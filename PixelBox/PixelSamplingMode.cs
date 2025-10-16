@@ -8,13 +8,13 @@ public enum PixelSamplingMode
     /// <summary>
     /// The exact color of a single pixel.
     /// </summary>
-    Single,
+    Single = 1,
     /// <summary>
     /// The average color of 9 pixels in a 3x3 kernel.
     /// </summary>
-    ThreeByThree,
+    ThreeByThree = 3,
     /// <summary>
     /// The average color of 25 pixels in a 5x5 kernel.
     /// </summary>
-    FiveByFive
+    FiveByFive = 5
 }

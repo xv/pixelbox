@@ -315,9 +315,9 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             pxCenterDev, pxCenterDev,
             pxSizeDev + 1, pxSizeDev + 1);
 
-        var samplerSize = (int)SamplingMode;
+        var samplerSize = (int)SamplingMode / 2;
 
-        if ((PixelSamplingMode)samplerSize != PixelSamplingMode.Single)
+        if (SamplingMode != PixelSamplingMode.Single)
         {
             _centerRects[0].Inflate(
                 (_centerRects[0].Width * samplerSize),
@@ -418,14 +418,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         }
     }
 
-    private static int GetSamplingKernelSize(PixelSamplingMode mode) => mode switch
-    {
-        PixelSamplingMode.Single => 1,
-        PixelSamplingMode.ThreeByThree => 3,
-        PixelSamplingMode.FiveByFive => 5,
-        _ => throw new ArgumentOutOfRangeException(nameof(mode))
-    };
-
     /// <summary>
     /// Samples the color of thr pixel.
     /// </summary>
@@ -460,7 +452,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
                 /* B */ buffer[idx]);
         }
 
-        var kSize = GetSamplingKernelSize(mode);
+        var kSize = (int)mode;
         var kHalf = kSize / 2;
         var kTotal = kSize * kSize; // Total number of pixels inside the kernel
 
