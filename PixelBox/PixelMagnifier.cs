@@ -191,7 +191,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
                 throw new ArgumentOutOfRangeException(null, nameof(PixelColumns));
 
             mag.UpdateGridMetrics(value);
-            mag.InvalidateMeasure();
             mag.SetCenterRectangles();
         }
     }
@@ -204,7 +203,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             if (value < 1 || value > 100)
                 throw new ArgumentOutOfRangeException(null, nameof(PixelColumns));
 
-            mag.InvalidateMeasure();
             mag.SetCenterRectangles();
         }
     }
@@ -221,10 +219,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     private static void OnShowGridChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
         if (sender is PixelMagnifier mag)
-        {
-            mag.InvalidateMeasure();
             mag.SetCenterRectangles();
-        }
     }
 
     private static void OnRefreshIntervalChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
@@ -458,7 +453,9 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
         var first = _pixelColumnsHalf - kHalf;
 
-        int rSum = 0, gSum = 0, bSum = 0;
+        int rSum = 0, 
+            gSum = 0, 
+            bSum = 0;
 
         for (int y = 0; y < kSize; y++)
         {
