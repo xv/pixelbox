@@ -344,7 +344,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
         var hOld = PInvoke.SelectObject(hdcMem, hBitmap);
 
-        var result = PInvoke.BitBlt(
+        var success = PInvoke.BitBlt(
             hdcMem,
             0, 0, width, height,
             hdcScreen,
@@ -355,7 +355,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         PInvoke.DeleteDC(hdcMem);
         PInvoke.ReleaseDC(HWND.Null, hdcScreen);
 
-        if (!result)
+        if (!success)
         {
             PInvoke.DeleteObject(hBitmap);
             hBitmap = HBITMAP.Null;
@@ -370,7 +370,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         var cy = (int)screenPt.Y;
 
         // Possible negative coordinates here when the cursor is at the boundary
-        //  of the screen are valid!
+        // of the screen are valid!
         var left = cx - _pixelColumnsHalf;
         var top = cy - _pixelColumnsHalf;
 
