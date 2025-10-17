@@ -368,7 +368,13 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         PInvoke.DeleteDC(hdcMem);
         PInvoke.ReleaseDC(HWND.Null, hdcScreen);
 
-        return result ? hBitmap : HBITMAP.Null;
+        if (!result)
+        {
+            PInvoke.DeleteObject(hBitmap);
+            hBitmap = HBITMAP.Null;
+        }
+
+        return hBitmap;
     }
 
     private void CaptureAt(Point screenPt)
