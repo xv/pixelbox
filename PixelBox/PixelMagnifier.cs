@@ -49,14 +49,16 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             nameof(PixelColumns),
             typeof(int),
             typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(11, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, OnPixelColumnsChanged));
+            new FrameworkPropertyMetadata(11, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, OnPixelColumnsChanged),
+            v => (v is int i) && (i >= 1) && (i % 2 == 1));
 
     public static readonly DependencyProperty PixelSizeProperty =
         DependencyProperty.Register(
             nameof(PixelSize),
             typeof(int),
             typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(9, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, OnPixelSizeChanged));
+            new FrameworkPropertyMetadata(9, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, OnPixelSizeChanged),
+            v => (v is int i) && (i >= 1) && (i <= 100));
 
     public static readonly DependencyProperty ShowGridProperty =
         DependencyProperty.Register(
@@ -77,7 +79,8 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             nameof(RefreshInterval),
             typeof(int),
             typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(30, OnRefreshIntervalChanged));
+            new FrameworkPropertyMetadata(30, OnRefreshIntervalChanged),
+            v => (v is int i) && (i >= 1) && (i <= 1000));
 
     #endregion
     #region Properties
@@ -104,11 +107,11 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// </summary>
     /// 
     /// <remarks>
-    /// It is recommended to use odd values so that the position of center
-    /// pixel is symmetric horizontally and vertically.
+    /// Only odd values are accepted, so that the position of center pixel is
+    /// symmetric horizontally and vertically.
     /// </remarks>
     [Category("Appearance")]
-    [Description("Sets the number of pixel columns in the grid.")]
+    [Description("Sets the number of pixel columns in the grid. Uses odd values.")]
     public int PixelColumns
     {
         get => (int)GetValue(PixelColumnsProperty);
@@ -186,11 +189,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     {
         if (sender is PixelMagnifier mag)
         {
-            var value = (int)e.NewValue;
-            if (value < 1)
-                throw new ArgumentOutOfRangeException(null, nameof(PixelColumns));
-
-            mag.UpdateGridMetrics(value);
+            mag.UpdateGridMetrics((int)e.NewValue);
             mag.SetCenterRectangles();
         }
     }
@@ -198,13 +197,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     private static void OnPixelSizeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
         if (sender is PixelMagnifier mag)
-        {
-            var value = (int)e.NewValue;
-            if (value < 1 || value > 100)
-                throw new ArgumentOutOfRangeException(null, nameof(PixelColumns));
-
             mag.SetCenterRectangles();
-        }
     }
 
     private static void OnSamplingModeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
@@ -225,13 +218,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     private static void OnRefreshIntervalChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
         if (sender is PixelMagnifier mag)
-        {
-            var value = (int)e.NewValue;
-            if (value < 1 || value > 1000)
-                throw new ArgumentOutOfRangeException(null, nameof(RefreshInterval));
-
-            mag._refreshTimer.Interval = TimeSpan.FromMilliseconds(value);
-        }
+            mag._refreshTimer.Interval = TimeSpan.FromMilliseconds((int)e.NewValue);
     }
 
     private void OnRefreshTimerTick(object? sender, EventArgs e)
