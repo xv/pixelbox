@@ -373,10 +373,11 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     private void CaptureAt(Point screenPt)
     {
-        var cx = (int)Math.Round(screenPt.X);
-        var cy = (int)Math.Round(screenPt.Y);
+        var cx = (int)screenPt.X;
+        var cy = (int)screenPt.Y;
 
-        // Possible negative coordinates here are valid
+        // Possible negative coordinates here when the cursor is at the boundary
+        //  of the screen are valid!
         var left = cx - _pixelColumnsHalf;
         var top = cy - _pixelColumnsHalf;
 
@@ -423,7 +424,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// </param>
     /// 
     /// <param name="buffer">
-    /// Byte array containig the pixel data.
+    /// Byte array containing the pixel data.
     /// </param>
     /// 
     /// <param name="stride">
@@ -563,14 +564,15 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         if (RenderDesignTimePlaceholder(dc, dpi))
             return;
 
-        // If we don't have a capture yet (e.g., StartCapture() isn't called, then
-        // capture once at cursor
+        // If we don't have a capture yet (e.g., StartCapture() isn't called,
+        // then capture once at cursor
         if (_captureBuffer == null)
         {
             _lastMousePos = MousePosition;
             CaptureAt(_lastMousePos);
         }
 
+        // Do nothing if the capture attempt somehow failed
         if (_captureBuffer == null)
             return;
 
