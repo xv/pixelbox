@@ -36,5 +36,7 @@ public partial class MainWindow : Window
             PixelMag.PixelColumns +=2;
         else if (e.Key == System.Windows.Input.Key.S)
             PixelMag.PixelSize += 1;
+        else if (e.Key == System.Windows.Input.Key.L)
+            PixelMag.LockPixelPosition = !PixelMag.LockPixelPosition;
     }
 }

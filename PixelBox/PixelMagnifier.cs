@@ -434,7 +434,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     {
         if (mode == PixelSamplingMode.Single)
         {
-            var idx = (_pixelColumnsHalf * stride) + _pixelColumnsHalf * 4;
+            var idx = (_pixelColumnsHalf * stride) + (_pixelColumnsHalf * 4);
             return Color.FromRgb(
                 /* R */ buffer[idx + 2],
                 /* G */ buffer[idx + 1],
@@ -442,10 +442,10 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         }
 
         var kSize = (int)mode;
-        var kHalf = kSize / 2;
-        var kTotal = kSize * kSize; // Total number of pixels inside the kernel
+        var kTotal = kSize * kSize;
 
-        var first = _pixelColumnsHalf - kHalf;
+        // Index of the first cell (top-left corner) of the kernel
+        var first = _pixelColumnsHalf - (kSize / 2);
 
         int rSum = 0, 
             gSum = 0, 
