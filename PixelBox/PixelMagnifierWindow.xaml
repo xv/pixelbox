@@ -1,0 +1,230 @@
+﻿<Window
+    x:Class="PixelBox.PixelMagnifierWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:PixelBox"
+    xmlns:converter="clr-namespace:PixelBox.BindingConverters"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=local:PixelMagnifierWindow, IsDesignTimeCreatable=False}"
+    WindowStyle="None"
+    ShowInTaskbar="False"
+    Topmost="True"
+    WindowState="Maximized"
+    ResizeMode="NoResize"
+    Cursor="Cross">
+
+    <Window.Resources>
+        <converter:CenterPointConverter x:Key="CenterPointConverter"/>
+        <converter:EllipseRadiusConverter x:Key="EllipseRadiusConverter"/>
+        <DropShadowEffect
+            x:Key="DropShadowEffect"
+            BlurRadius="1"
+            Opacity=".4"
+            ShadowDepth="0"
+            Color="Black"/>
+    </Window.Resources>
+
+    <Window.InputBindings>
+        <KeyBinding
+            Key="G"
+            Command="{x:Static local:PixelMagnifierUICommands.ToggleGrid}"/>
+        <KeyBinding
+            Key="OemPlus"
+            Modifiers="Shift"
+            Command="{x:Static local:PixelMagnifierUICommands.ExpandView}"/>
+        <KeyBinding
+            Key="OemMinus"
+            Modifiers="Shift"
+            Command="{x:Static local:PixelMagnifierUICommands.ShrinkView}"/>
+        <KeyBinding
+            Key="OemPlus"
+            Modifiers="Ctrl"
+            Command="{x:Static local:PixelMagnifierUICommands.ZoomIn}"/>
+        <KeyBinding
+            Key="OemMinus"
+            Modifiers="Ctrl"
+            Command="{x:Static local:PixelMagnifierUICommands.ZoomOut}"/>
+        <KeyBinding
+            Key="OemPlus"
+            Command="{x:Static local:PixelMagnifierUICommands.IncreaseColorSamplingArea}"/>
+        <KeyBinding
+            Key="OemMinus"
+            Command="{x:Static local:PixelMagnifierUICommands.DecreaseColorSamplingArea}"/>
+        <KeyBinding
+            Key="Space"
+            Command="{x:Static local:PixelMagnifierUICommands.Close}"/>
+        <KeyBinding
+            Key="Enter"
+            Command="{x:Static local:PixelMagnifierUICommands.Close}"/>
+        <MouseBinding
+            MouseAction="LeftClick"
+            Command="{x:Static local:PixelMagnifierUICommands.Close}"/>
+        <KeyBinding
+            Key="Escape"
+            Command="ApplicationCommands.Close"/>
+    </Window.InputBindings>
+
+    <Window.CommandBindings>
+        <CommandBinding
+            Command="{x:Static local:PixelMagnifierUICommands.ToggleGrid}"
+            Executed="OnToggleGridExecuted"/>
+        <CommandBinding
+            Command="{x:Static local:PixelMagnifierUICommands.ExpandView}"
+            Executed="OnExpandViewExecuted"/>
+        <CommandBinding
+            Command="{x:Static local:PixelMagnifierUICommands.ShrinkView}"
+            Executed="OnShrinkViewExecuted"/>
+        <CommandBinding
+            Command="{x:Static local:PixelMagnifierUICommands.ZoomIn}"
+            Executed="OnZoomInExecuted"/>
+        <CommandBinding
+            Command="{x:Static local:PixelMagnifierUICommands.ZoomOut}"
+            Executed="OnZoomOutExecuted"/>
+        <CommandBinding
+            Command="{x:Static local:PixelMagnifierUICommands.IncreaseColorSamplingArea}"
+            Executed="OnIncreaseColorSamplingAreaExecuted"/>
+        <CommandBinding
+            Command="{x:Static local:PixelMagnifierUICommands.DecreaseColorSamplingArea}"
+            Executed="OnDecreaseColorSamplingAreaExecuted"/>
+        <CommandBinding
+            Command="ApplicationCommands.Close"
+            Executed="OnCloseExecuted"/>
+        <CommandBinding
+            Command="{x:Static local:PixelMagnifierUICommands.Close}"
+            Executed="OnCloseExecuted"/>
+    </Window.CommandBindings>
+
+    <Canvas
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+        <Canvas.Background>
+            <ImageBrush
+                ImageSource="{Binding OverlayImage}"
+                Stretch="Fill"
+                AlignmentX="Center"
+                AlignmentY="Center"/>
+        </Canvas.Background>
+
+        <Grid
+            x:Name="MagnifierHost"
+            RenderTransformOrigin=".5,.5">
+            <Grid.RenderTransform>
+                <TranslateTransform
+                    X="{Binding MagnifierX}"
+                    Y="{Binding MagnifierY}"/>
+            </Grid.RenderTransform>
+                
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Magnifier -->
+            <Grid
+                Grid.Row="0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+                <local:PixelMagnifier
+                    x:Name="Magnifier"
+                    PixelColumns="15"
+                    PixelSize="7"
+                    SamplingMode="Single">
+                    <local:PixelMagnifier.Clip>
+                        <EllipseGeometry>
+                            <EllipseGeometry.Center>
+                                <MultiBinding Converter="{StaticResource CenterPointConverter}">
+                                    <Binding Path="ActualWidth" ElementName="Magnifier"/>
+                                    <Binding Path="ActualHeight" ElementName="Magnifier"/>
+                                </MultiBinding>
+                            </EllipseGeometry.Center>
+                            <EllipseGeometry.RadiusX>
+                                <MultiBinding Converter="{StaticResource EllipseRadiusConverter}">
+                                    <Binding Path="ActualWidth" ElementName="Magnifier"/>
+                                    <Binding Path="ActualHeight" ElementName="Magnifier"/>
+                                </MultiBinding>
+                            </EllipseGeometry.RadiusX>
+                            <EllipseGeometry.RadiusY>
+                                <MultiBinding Converter="{StaticResource EllipseRadiusConverter}">
+                                    <Binding Path="ActualWidth" ElementName="Magnifier"/>
+                                    <Binding Path="ActualHeight" ElementName="Magnifier"/>
+                                </MultiBinding>
+                            </EllipseGeometry.RadiusY>
+                        </EllipseGeometry>
+                    </local:PixelMagnifier.Clip>
+                </local:PixelMagnifier>
+
+                <!-- Magnifier frame -->
+                <Ellipse
+                    IsHitTestVisible="False"
+                    Stroke="#FFF"
+                    StrokeThickness="2.5"
+                    Effect="{StaticResource DropShadowEffect}"
+                    RenderTransformOrigin=".5,.5">
+                    <Ellipse.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="1.005" ScaleY="1.005"/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+            </Grid>
+
+            <!-- Info panel -->
+            <Border
+                x:Name="InfoPanelHost"
+                Grid.Row="1"
+                Margin="0,15,0,0"
+                Padding="6,6"
+                MinWidth="150"
+                HorizontalAlignment="Center"
+                Background="#DD000000"
+                BorderThickness="0"
+                BorderBrush="#333"
+                CornerRadius="20">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Rectangle
+                        Grid.Column="0"
+                        Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"
+                        RadiusX="20"
+                        RadiusY="20"
+                        Stroke="White"
+                        StrokeThickness="1.5"
+                        Fill="{Binding ColorPreviewBrush}"/>
+
+                    <Grid Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock
+                            Grid.Row="0"
+                            Padding="0,0,6,0"
+                            TextAlignment="Left"
+                            Foreground="White"
+                            FontFamily="Consolas"
+                            FontSize="12"
+                            Text="{Binding PixelColorString}"/>
+                        <TextBlock
+                            Grid.Row="1"
+                            Padding="0,0,6,0"
+                            TextAlignment="Left"
+                            Foreground="White"
+                            FontFamily="Consolas"
+                            FontSize="12"
+                            Text="{Binding PixelPositionString}"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Canvas>
+</Window>

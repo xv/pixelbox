@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Windows;
 
-using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32;
 
@@ -18,6 +16,8 @@ namespace PixelBox;
 public class PixelMagnifier : FrameworkElement
 {
     #region Fields
+
+    private DpiScale _dpi;
 
     private readonly DispatcherTimer _refreshTimer;
 
@@ -39,8 +39,8 @@ public class PixelMagnifier : FrameworkElement
 
     private readonly Rect[] _centerRects = new Rect[2];
 
-    static readonly Pen s_penWhite = new(Brushes.White, 1);
-    static readonly Pen s_penBlack = new(Brushes.Black, 1);
+    private static readonly Pen s_penWhite = new(Brushes.White, 1);
+    private static readonly Pen s_penBlack = new(Brushes.Black, 1);
 
     #endregion
     #region Dependency Properties
@@ -156,6 +156,14 @@ public class PixelMagnifier : FrameworkElement
         get => (int)GetValue(PixelColumnsProperty);
         set => SetValue(PixelColumnsProperty, value);
     }
+
+    /// <summary>
+    /// Gets the color of the pixel located at the center of the grid.
+    /// </summary>
+    [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [EditorBrowsable(EditorBrowsableState.Always)]
+    public Color PixelColor => _centerPixelColor;
 
     /// <summary>
     /// Gets the screen coordinates corresponding to the pixel located at
@@ -317,9 +325,7 @@ public class PixelMagnifier : FrameworkElement
     /// </summary>
     private void SetCenterRectangles()
     {
-        var dpi = VisualTreeHelper.GetDpi(this);
-
-        var pxSizeDev = (int)Math.Round(PixelSize * dpi.DpiScaleX);
+        var pxSizeDev = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
         var pxCenterDev = (pxSizeDev + (ShowGrid ? 1 : 0)) * _pixelColumnsHalf;
 
         _centerRects[0] = new Rect(
@@ -350,53 +356,6 @@ public class PixelMagnifier : FrameworkElement
         _centerRects[1].Inflate(-1, -1);
     }
 
-    [SuppressMessage(
-        "Performance", 
-        "CA1806:Do not ignore method results", 
-        Justification = "Unnecessary ReleaseDC() return results.")]
-    private static HBITMAP CaptureRectToHBitmap(int left, int top, int width, int height)
-    {
-        var hdcScreen = PInvoke.GetDC(HWND.Null);
-        if (hdcScreen == HDC.Null)
-            return HBITMAP.Null;
-
-        var hdcMem = PInvoke.CreateCompatibleDC(hdcScreen);
-        if (hdcMem == HDC.Null)
-        {
-            PInvoke.ReleaseDC(HWND.Null, hdcScreen);
-            return HBITMAP.Null;
-        }
-
-        var hBitmap = PInvoke.CreateCompatibleBitmap(hdcScreen, width, height);
-        if (hBitmap == HBITMAP.Null)
-        {
-            PInvoke.DeleteDC(hdcMem);
-            PInvoke.ReleaseDC(HWND.Null, hdcScreen);
-            return HBITMAP.Null;
-        }
-
-        var hOld = PInvoke.SelectObject(hdcMem, hBitmap);
-
-        var success = PInvoke.BitBlt(
-            hdcMem,
-            0, 0, width, height,
-            hdcScreen,
-            left, top,
-            ROP_CODE.SRCCOPY | ROP_CODE.CAPTUREBLT);
-
-        PInvoke.SelectObject(hdcMem, hOld);
-        PInvoke.DeleteDC(hdcMem);
-        PInvoke.ReleaseDC(HWND.Null, hdcScreen);
-
-        if (!success)
-        {
-            PInvoke.DeleteObject(hBitmap);
-            hBitmap = HBITMAP.Null;
-        }
-
-        return hBitmap;
-    }
-
     private void CaptureAt(Point screenPt)
     {
         var cx = (int)screenPt.X;
@@ -407,7 +366,7 @@ public class PixelMagnifier : FrameworkElement
         var left = cx - _pixelColumnsHalf;
         var top = cy - _pixelColumnsHalf;
 
-        var hBitmap = CaptureRectToHBitmap(left, top, _pixelColumns, _pixelColumns);
+        var hBitmap = BitmapInterop.CaptureRectToHBitmap(left, top, _pixelColumns, _pixelColumns);
         if (hBitmap == HBITMAP.Null)
         {
             _captureBuffer = null;
@@ -417,11 +376,7 @@ public class PixelMagnifier : FrameworkElement
 
         try
         {
-            var bsrc = Imaging.CreateBitmapSourceFromHBitmap(
-                hBitmap,
-                IntPtr.Zero,
-                Int32Rect.Empty,
-                BitmapSizeOptions.FromEmptyOptions());
+            var bsrc = hBitmap.ToBitmapSource(true);
 
             _captureStride = bsrc.PixelWidth * 4;
 
@@ -548,6 +503,12 @@ public class PixelMagnifier : FrameworkElement
 
     #endregion
 
+    static PixelMagnifier()
+    {
+        s_penWhite.Freeze();
+        s_penBlack.Freeze();
+    }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PixelMagnifier"/> class.
     /// </summary>
@@ -559,6 +520,8 @@ public class PixelMagnifier : FrameworkElement
         SnapsToDevicePixels = true;
         Focusable = false;
 
+        _dpi = VisualTreeHelper.GetDpi(this);
+
         UpdateGridMetrics(PixelColumns);
 
         _refreshTimer = new DispatcherTimer(DispatcherPriority.Render)
@@ -567,38 +530,43 @@ public class PixelMagnifier : FrameworkElement
             IsEnabled = false
         };
 
-        Loaded += (s, e) => _refreshTimer.Tick += OnRefreshTimerTick;
-        Unloaded += (s, e) =>
+        _refreshTimer.Tick += OnRefreshTimerTick;
+
+        Unloaded += (_, _) =>
         {
             _refreshTimer.Tick -= OnRefreshTimerTick;
             _refreshTimer.Stop();
         };
-
-        s_penWhite.Freeze();
-        s_penBlack.Freeze();
     }
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        var dpi = VisualTreeHelper.GetDpi(this);
-        var pxSizeDev = (int)Math.Round(PixelSize * dpi.DpiScaleX);
+        var pxSizeDev = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
         var totalSizeDev = pxSizeDev * PixelColumns;
 
         if (ShowGrid)
             totalSizeDev += PixelColumns - 1;
 
         // Convert device pixels to DIPs
-        var totalSizeDip = totalSizeDev / dpi.DpiScaleX;
+        var totalSizeDip = totalSizeDev / _dpi.DpiScaleX;
         return new Size(totalSizeDip, totalSizeDip);
     }
 
     protected override void OnRender(DrawingContext dc)
     {
         base.OnRender(dc);
-        var dpi = VisualTreeHelper.GetDpi(this);
 
-        if (RenderDesignTimePlaceholder(dc, dpi))
+        if (RenderDesignTimePlaceholder(dc, _dpi))
             return;
+
+        // Since the "grid" is really nothing more than gaps between pixels,
+        // We simply draw a background behind to simulate grid lines
+        var drawGrid = ShowGrid;
+        if (drawGrid)
+        {
+            dc.DrawRectangle(Brushes.Black, null,
+                new Rect(0, 0, ActualWidth, ActualHeight));
+        }
 
         // If we don't have a capture yet (e.g., StartCapture() isn't called,
         // then capture once at cursor
@@ -612,8 +580,8 @@ public class PixelMagnifier : FrameworkElement
         if (_captureBuffer == null)
             return;
 
-        var pxDev = (int)Math.Round(PixelSize * dpi.DpiScaleX);
-        var gridGapDev = ShowGrid ? 1 : 0;
+        var pxDev = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
+        var gridGapDev = drawGrid ? 1 : 0;
 
         // Expanded (destination) device pixel size including gaps
         var totalDev = pxDev * _pixelColumns + gridGapDev * (_pixelColumns - 1);
@@ -625,7 +593,7 @@ public class PixelMagnifier : FrameworkElement
 
             _expandedBitmap = new WriteableBitmap(
                 _expandedDevSize, _expandedDevSize,
-                dpi.PixelsPerInchX, dpi.PixelsPerInchY,
+                _dpi.PixelsPerInchX, _dpi.PixelsPerInchY,
                 PixelFormats.Bgra32, null);
 
             // Recapture if grid columns are dynamically increased
@@ -685,12 +653,12 @@ public class PixelMagnifier : FrameworkElement
         // Map device pixels to DIPs once with a scale transform to avoid having to
         // repeatedly apply divisions when DPI scaling is > 96
         dc.PushTransform(new ScaleTransform(
-            1.0 / dpi.DpiScaleX, 
-            1.0 / dpi.DpiScaleY));
+            1.0 / _dpi.DpiScaleX, 
+            1.0 / _dpi.DpiScaleY));
 
         dc.DrawImage(_expandedBitmap, new Rect(0, 0, _expandedDevSize, _expandedDevSize));
 
-        // The center pixel 'crosshair' contrasting rectangles
+        // Contrasting rectangles around center pixel
         dc.DrawRectangle(null, s_penWhite, _centerRects[0]);
         dc.DrawRectangle(null, s_penBlack, _centerRects[1]);
 

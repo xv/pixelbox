@@ -4,5 +4,7 @@ CreateCompatibleDC
 DeleteDC
 GetCursorPos
 GetDC
+GetSystemMetrics
 ReleaseDC
 SelectObject
+SetCursorPos

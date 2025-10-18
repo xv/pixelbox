@@ -6,8 +6,47 @@
         xmlns:local="clr-namespace:PixelBox.Demo"
         xmlns:PixelBox="clr-namespace:PixelBox;assembly=PixelBox"
         mc:Ignorable="d"
-        Title="MainWindow" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" KeyDown="Window_KeyDown">
+        Title="MainWindow"
+        WindowStartupLocation="CenterScreen"
+        Width="300" SizeToContent="Height">
+
     <Grid Background="#111">
-        <PixelBox:PixelMagnifier x:Name="PixelMag" PixelColumns="25" PixelSize="11"  RefreshInterval="30" PixelChanged="PixelMag_PixelChanged"/>
+
+        <Grid Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Rectangle
+                x:Name="ColorBox"
+                RenderOptions.EdgeMode="Aliased"
+                Width="{Binding Height, ElementName=ColorBox}"
+                Height="20"
+                Margin="0,0,10,0"
+                Fill="Transparent"
+                Stroke="White"
+                StrokeThickness="1"/>
+
+            <TextBlock
+                x:Name="Color"
+                Grid.Column="1"
+                Text="#" 
+                FontSize="14"
+                Foreground="White" />
+
+            <TextBlock 
+                x:Name="Coord" 
+                Grid.Row="1"
+                Grid.Column="2" 
+                Text="X: ? Y: ?"
+                FontSize="14" 
+                Foreground="White"/>
+        </Grid>
     </Grid>
 </Window>
