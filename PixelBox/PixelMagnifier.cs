@@ -51,7 +51,8 @@ public class PixelMagnifier : FrameworkElement
             typeof(int),
             typeof(PixelMagnifier),
             new FrameworkPropertyMetadata(11, 
-                FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, 
+                FrameworkPropertyMetadataOptions.AffectsMeasure |
+                FrameworkPropertyMetadataOptions.AffectsRender, 
                 OnPixelColumnsChanged, CoercePixelColumns),
             v => (v is int i) && (i >= 1));
 
@@ -60,7 +61,10 @@ public class PixelMagnifier : FrameworkElement
             nameof(PixelSize),
             typeof(int),
             typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(9, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, OnPixelSizeChanged),
+            new FrameworkPropertyMetadata(9, 
+                FrameworkPropertyMetadataOptions.AffectsMeasure | 
+                FrameworkPropertyMetadataOptions.AffectsRender, 
+                OnPixelSizeChanged),
             v => (v is int i) && (i >= 1) && (i <= 100));
 
     public static readonly DependencyProperty ShowGridProperty =
@@ -68,14 +72,19 @@ public class PixelMagnifier : FrameworkElement
             nameof(ShowGrid),
             typeof(bool),
             typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, OnShowGridChanged));
+            new FrameworkPropertyMetadata(true, 
+                FrameworkPropertyMetadataOptions.AffectsMeasure | 
+                FrameworkPropertyMetadataOptions.AffectsRender, 
+                OnShowGridChanged));
 
     public static readonly DependencyProperty SamplingModeProperty =
         DependencyProperty.Register(
             nameof(SamplingMode),
             typeof(PixelSamplingMode),
             typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(PixelSamplingMode.Single, FrameworkPropertyMetadataOptions.AffectsRender, OnSamplingModeChanged));
+            new FrameworkPropertyMetadata(PixelSamplingMode.Single, 
+                FrameworkPropertyMetadataOptions.AffectsRender, 
+                OnSamplingModeChanged));
 
     public static readonly DependencyProperty RefreshIntervalProperty =
         DependencyProperty.Register(
@@ -153,6 +162,7 @@ public class PixelMagnifier : FrameworkElement
     /// the center of the grid.
     /// </summary>
     [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     [EditorBrowsable(EditorBrowsableState.Always)]
     public Point PixelPosition => _lastMousePos;
 
