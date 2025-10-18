@@ -513,11 +513,15 @@ public class PixelMagnifier : FrameworkElement
             new Typeface("Segoe UI"), 12, Brushes.Gray, dpi.PixelsPerDip)
         {
             MaxTextWidth = rect.Width - 10,
-            MaxTextHeight = rect.Height
+            MaxTextHeight = rect.Height - 10
         };
 
         dc.DrawRectangle(Brushes.Black, null, rect);
-        dc.DrawText(text, new Point(4, 4));
+
+        var x = rect.Left + (rect.Width - text.Width) / 2;
+        var y = rect.Top + (rect.Height - text.Height) / 2;
+
+        dc.DrawText(text, new Point(x, y));
 
         return true;
     }
