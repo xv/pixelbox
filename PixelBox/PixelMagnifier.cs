@@ -14,7 +14,7 @@ namespace PixelBox;
 /// <summary>
 /// Represents a pixel magnification control.
 /// </summary>
-public class PixelMagnifier : FrameworkElement, IDisposable
+public class PixelMagnifier : FrameworkElement
 {
     #region Fields
 
@@ -542,10 +542,16 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             Interval = TimeSpan.FromMilliseconds(RefreshInterval),
             IsEnabled = false
         };
-        _refreshTimer.Tick += OnRefreshTimerTick;
 
         s_penWhite.Freeze();
         s_penBlack.Freeze();
+
+        Loaded += (s, e) => _refreshTimer.Tick += OnRefreshTimerTick;
+        Unloaded += (s, e) =>
+        {
+            _refreshTimer.Tick -= OnRefreshTimerTick;
+            _refreshTimer.Stop();
+        };
     }
 
     protected override Size MeasureOverride(Size availableSize)
@@ -665,23 +671,5 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         dc.DrawRectangle(null, s_penBlack, _centerRects[1]);
 
         dc.Pop();
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            if (_refreshTimer != null)
-            {
-                _refreshTimer.Stop();
-                _refreshTimer.Tick -= OnRefreshTimerTick;
-            }
-        }
     }
 }
