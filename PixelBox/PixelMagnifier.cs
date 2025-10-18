@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
@@ -84,10 +85,15 @@ public class PixelMagnifier : FrameworkElement
             new FrameworkPropertyMetadata(30, OnRefreshIntervalChanged),
             v => (v is int i) && (i >= 1) && (i <= 1000));
 
+
+    [SuppressMessage(
+        "Performance",
+        "CA1859:Use concrete types when possible for improved performance",
+        Justification = "Returning type <object> is required.")]
     private static object CoercePixelColumns(DependencyObject d, object value)
     {
         var cols = (int)value;
-
+            
         if (cols % 2 != 1)
             cols++;
 
@@ -334,6 +340,10 @@ public class PixelMagnifier : FrameworkElement
         _centerRects[1].Inflate(-1, -1);
     }
 
+    [SuppressMessage(
+        "Performance", 
+        "CA1806:Do not ignore method results", 
+        Justification = "Unnecessary ReleaseDC() return results.")]
     private static HBITMAP CaptureRectToHBitmap(int left, int top, int width, int height)
     {
         var hdcScreen = PInvoke.GetDC(HWND.Null);
@@ -547,15 +557,15 @@ public class PixelMagnifier : FrameworkElement
             IsEnabled = false
         };
 
-        s_penWhite.Freeze();
-        s_penBlack.Freeze();
-
         Loaded += (s, e) => _refreshTimer.Tick += OnRefreshTimerTick;
         Unloaded += (s, e) =>
         {
             _refreshTimer.Tick -= OnRefreshTimerTick;
             _refreshTimer.Stop();
         };
+
+        s_penWhite.Freeze();
+        s_penBlack.Freeze();
     }
 
     protected override Size MeasureOverride(Size availableSize)
