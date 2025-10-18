@@ -633,7 +633,7 @@ public class PixelMagnifier : FrameworkElement
         }
 
         var srcStride = _captureStride;
-        var destStride = _expandedDevSize * 4;
+        var dstStride = _expandedDevSize * 4;
 
         Array.Clear(_expandedBuffer!, 0, _expandedBuffer!.Length);
 
@@ -649,7 +649,7 @@ public class PixelMagnifier : FrameworkElement
                 for (var srcY = 0; srcY < _pixelColumns; srcY++)
                 {
                     byte* srcRow = srcBuf + srcY * srcStride;
-                    var destBlockY = srcY * (pxDev + gridGapDev);
+                    var dstBlockY = srcY * (pxDev + gridGapDev);
 
                     for (var srcX = 0; srcX < _pixelColumns; srcX++)
                     {
@@ -666,11 +666,11 @@ public class PixelMagnifier : FrameworkElement
                             lineBlock[bx * 4 + 3] = 255; // Alpha is irrelevant
                         }
 
-                        var destBlockX = srcX * (pxDev + gridGapDev);
+                        var dstBlockX = srcX * (pxDev + gridGapDev);
 
                         for (var by = 0; by < pxDev; by++)
                         {
-                            byte* pDstRow = dstBuf + (destBlockY + by) * destStride + destBlockX * 4;
+                            byte* pDstRow = dstBuf + (dstBlockY + by) * dstStride + dstBlockX * 4;
                             Buffer.MemoryCopy(lineBlock, pDstRow, lineBytes, lineBytes);
                         }
                     }
@@ -680,7 +680,7 @@ public class PixelMagnifier : FrameworkElement
 
         _expandedBitmap!.WritePixels(
             new Int32Rect(0, 0, _expandedDevSize, _expandedDevSize),
-            _expandedBuffer, destStride, 0);
+            _expandedBuffer, dstStride, 0);
 
         // Map device pixels to DIPs once with a scale transform to avoid having to
         // repeatedly apply divisions when DPI scaling is > 96
