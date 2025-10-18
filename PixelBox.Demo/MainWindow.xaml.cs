@@ -33,10 +33,10 @@ public partial class MainWindow : Window
         else if (e.Key == System.Windows.Input.Key.G)
             PixelMag.ShowGrid = !PixelMag.ShowGrid;
         else if (e.Key == System.Windows.Input.Key.C)
-            PixelMag.PixelColumns +=2;
+            PixelMag.PixelColumns += 1;
         else if (e.Key == System.Windows.Input.Key.S)
             PixelMag.PixelSize += 1;
         else if (e.Key == System.Windows.Input.Key.L)
-            PixelMag.LockPixelPosition = !PixelMag.LockPixelPosition;
+            PixelMag.IsPixelPositionLocked = !PixelMag.IsPixelPositionLocked;
     }
 }

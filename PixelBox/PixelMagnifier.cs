@@ -49,8 +49,10 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             nameof(PixelColumns),
             typeof(int),
             typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(11, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, OnPixelColumnsChanged),
-            v => (v is int i) && (i >= 1) && (i % 2 == 1));
+            new FrameworkPropertyMetadata(11, 
+                FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender, 
+                OnPixelColumnsChanged, CoercePixelColumns),
+            v => (v is int i) && (i >= 1));
 
     public static readonly DependencyProperty PixelSizeProperty =
         DependencyProperty.Register(
@@ -82,58 +84,34 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             new FrameworkPropertyMetadata(30, OnRefreshIntervalChanged),
             v => (v is int i) && (i >= 1) && (i <= 1000));
 
+    private static object CoercePixelColumns(DependencyObject d, object value)
+    {
+        var cols = (int)value;
+
+        if (cols % 2 != 1)
+            cols++;
+
+        return cols;
+    }
+
     #endregion
     #region Properties
 
     /// <summary>
-    /// Gets whether the control can capture pixels and redraw.
+    /// Gets whether the control is currently capturing pixels.
     /// </summary>
     [Browsable(false)]
-    public bool CanCapture => _refreshTimer.IsEnabled;
+    public bool IsCapturing => _refreshTimer.IsEnabled;
 
     /// <summary>
-    /// Gets or sets whether the current coordinate should be locked,
-    /// preventing further mouse movement from tracking new pixels.
+    /// Gets or sets whether the current screen coordinate is locked, preventing
+    /// further mouse movement from tracking new pixels.
     /// </summary>
     [Browsable(false)]
-    public bool LockPixelPosition
+    public bool IsPixelPositionLocked
     {
         get => _lockedPixelPos.X >= 0 && _lockedPixelPos.Y >= 0;
         set => _lockedPixelPos = value ? _lastMousePos : new Point(-1, -1);
-    }
-
-    /// <summary>
-    /// Gets or sets the number of pixel columns.
-    /// </summary>
-    /// 
-    /// <remarks>
-    /// Only odd values are accepted, so that the position of center pixel is
-    /// symmetric horizontally and vertically.
-    /// </remarks>
-    [Category("Appearance")]
-    [Description("Sets the number of pixel columns in the grid. Uses odd values.")]
-    public int PixelColumns
-    {
-        get => (int)GetValue(PixelColumnsProperty);
-        set => SetValue(PixelColumnsProperty, value);
-    }
-
-    /// <summary>
-    /// Gets the screen coordinates corresponding to the pixel located at
-    /// the center of the grid.
-    /// </summary>
-    [Browsable(false)]
-    public Point PixelPosition => _lastMousePos;
-
-    /// <summary>
-    /// Gets or sets the size of the pixel cells.
-    /// </summary>
-    [Category("Appearance")]
-    [Description("Sets the size (in px) of individual pixel cells in the grid.")]
-    public int PixelSize
-    {
-        get => (int)GetValue(PixelSizeProperty);
-        set => SetValue(PixelSizeProperty, value);
     }
 
     /// <summary>
@@ -146,6 +124,41 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             PInvoke.GetCursorPos(out System.Drawing.Point p);
             return new Point(p.X, p.Y);
         }
+    }
+
+    /// <summary>
+    /// Gets or sets the number of pixel columns.
+    /// </summary>
+    /// 
+    /// <remarks>
+    /// Only odd values are accepted, so that the position of center pixel is
+    /// symmetric horizontally and vertically.
+    /// </remarks>
+    [Category("Appearance")]
+    [Description("Sets the number of pixel columns in the grid. Uses odd values only.")]
+    public int PixelColumns
+    {
+        get => (int)GetValue(PixelColumnsProperty);
+        set => SetValue(PixelColumnsProperty, value);
+    }
+
+    /// <summary>
+    /// Gets the screen coordinates corresponding to the pixel located at
+    /// the center of the grid.
+    /// </summary>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Always)]
+    public Point PixelPosition => _lastMousePos;
+
+    /// <summary>
+    /// Gets or sets the size of the pixel cells.
+    /// </summary>
+    [Category("Appearance")]
+    [Description("Sets the size (in px) of individual pixel cells in the grid.")]
+    public int PixelSize
+    {
+        get => (int)GetValue(PixelSizeProperty);
+        set => SetValue(PixelSizeProperty, value);
     }
 
     /// <summary>
@@ -223,7 +236,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     private void OnRefreshTimerTick(object? sender, EventArgs e)
     {
-        var isLocked = LockPixelPosition;
+        var isLocked = IsPixelPositionLocked;
         var currentPos = isLocked ? _lockedPixelPos : MousePosition;
 
         if (!isLocked && currentPos == _lastMousePos)
@@ -265,7 +278,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     /// <summary>
     /// Unlocks a previously locked coordinate via <see cref="LockPosition"/>
-    /// or <see cref="LockPixelPosition"/>.
+    /// or <see cref="IsPixelPositionLocked"/>.
     /// </summary>
     public void UnlockPosition() => _lockedPixelPos = new Point(-1, -1);
 
