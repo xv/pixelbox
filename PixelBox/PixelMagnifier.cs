@@ -8,6 +8,8 @@ using System.Windows;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32;
 
+using PixelBox.Drawing;
+
 namespace PixelBox;
 
 /// <summary>
@@ -37,10 +39,9 @@ public class PixelMagnifier : FrameworkElement
 
     public event EventHandler<PixelChangedEventArgs>? PixelChanged;
 
-    private readonly Rect[] _centerRects = new Rect[2];
+    private readonly SamplingAreaIndicator _samplingAreaIndicator;
 
-    private static readonly Pen s_penWhite = new(Brushes.White, 1);
-    private static readonly Pen s_penBlack = new(Brushes.Black, 1);
+    private readonly VisualCollection _visuals;
 
     #endregion
     #region Dependency Properties
@@ -227,21 +228,21 @@ public class PixelMagnifier : FrameworkElement
         if (sender is PixelMagnifier mag)
         {
             mag.UpdateGridMetrics((int)e.NewValue);
-            mag.SetCenterRectangles();
+            mag.UpdateSamplingAreaIndicator();
         }
     }
 
     private static void OnPixelSizeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
         if (sender is PixelMagnifier mag)
-            mag.SetCenterRectangles();
+            mag.UpdateSamplingAreaIndicator();
     }
 
     private static void OnSamplingModeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
         if (sender is PixelMagnifier mag)
         {
-            mag.SetCenterRectangles();
+            mag.UpdateSamplingAreaIndicator();
             mag.CaptureAt(mag._lastMousePos);
         }
     }
@@ -249,7 +250,7 @@ public class PixelMagnifier : FrameworkElement
     private static void OnShowGridChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
         if (sender is PixelMagnifier mag)
-            mag.SetCenterRectangles();
+            mag.UpdateSamplingAreaIndicator();
     }
 
     private static void OnRefreshIntervalChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
@@ -320,40 +321,27 @@ public class PixelMagnifier : FrameworkElement
     }
 
     /// <summary>
-    /// Sets the the value of <see cref="_centerRects"/> which identifies the
-    /// position of center pixel.
+    /// Updates the visual indicator surrounding the current sampling area.
     /// </summary>
-    private void SetCenterRectangles()
+    private void UpdateSamplingAreaIndicator()
     {
         var pxSizeDev = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
         var pxCenterDev = (pxSizeDev + (ShowGrid ? 1 : 0)) * _pixelColumnsHalf;
 
-        _centerRects[0] = new Rect(
+        var rect = new Rect( 
             pxCenterDev, pxCenterDev,
             pxSizeDev + 1, pxSizeDev + 1);
 
         var samplerSize = (int)SamplingMode / 2;
 
         if (SamplingMode != PixelSamplingMode.Single)
-        {
-            _centerRects[0].Inflate(
-                (_centerRects[0].Width * samplerSize),
-                (_centerRects[0].Height * samplerSize));
-        }
+            rect.Inflate(rect.Width * samplerSize, rect.Height * samplerSize);
 
         if (!ShowGrid)
-        {
-            _centerRects[0].Inflate(
-                -(samplerSize + 1), 
-                -(samplerSize + 1));
-        }
+            rect.Inflate(-(samplerSize + 1), -(samplerSize + 1));
 
-        // The second rectangle should be drawn in a different pen color
-        // The idea here is creating contrast with the background the two
-        // rectangles are on so that at least one of the rectangles is
-        // always visible on screen
-        _centerRects[1] = _centerRects[0];
-        _centerRects[1].Inflate(-1, -1);
+        _samplingAreaIndicator.SetArea(rect);
+        _samplingAreaIndicator.Render();
     }
 
     private void CaptureAt(Point screenPt)
@@ -503,24 +491,23 @@ public class PixelMagnifier : FrameworkElement
 
     #endregion
 
-    static PixelMagnifier()
-    {
-        s_penWhite.Freeze();
-        s_penBlack.Freeze();
-    }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="PixelMagnifier"/> class.
     /// </summary>
     public PixelMagnifier()
     {
-        RenderOptions.SetEdgeMode(this, EdgeMode.Aliased);
         RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
 
         SnapsToDevicePixels = true;
         Focusable = false;
 
         _dpi = VisualTreeHelper.GetDpi(this);
+        _samplingAreaIndicator = new SamplingAreaIndicator();
+
+        _visuals = new VisualCollection(this)
+        {
+            _samplingAreaIndicator
+        };
 
         UpdateGridMetrics(PixelColumns);
 
@@ -538,6 +525,10 @@ public class PixelMagnifier : FrameworkElement
             _refreshTimer.Stop();
         };
     }
+
+    protected override Visual GetVisualChild(int index) => _visuals[index];
+
+    protected override int VisualChildrenCount => _visuals.Count;
 
     protected override Size MeasureOverride(Size availableSize)
     {
@@ -657,10 +648,6 @@ public class PixelMagnifier : FrameworkElement
             1.0 / _dpi.DpiScaleY));
 
         dc.DrawImage(_expandedBitmap, new Rect(0, 0, _expandedDevSize, _expandedDevSize));
-
-        // Contrasting rectangles around center pixel
-        dc.DrawRectangle(null, s_penWhite, _centerRects[0]);
-        dc.DrawRectangle(null, s_penBlack, _centerRects[1]);
 
         dc.Pop();
     }

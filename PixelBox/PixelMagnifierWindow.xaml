@@ -20,8 +20,8 @@
         <converter:EllipseRadiusConverter x:Key="EllipseRadiusConverter"/>
         <DropShadowEffect
             x:Key="DropShadowEffect"
-            BlurRadius="1"
-            Opacity=".4"
+            BlurRadius="2"
+            Opacity=".5"
             ShadowDepth="0"
             Color="Black"/>
     </Window.Resources>
@@ -122,15 +122,18 @@
             </Grid.RowDefinitions>
 
             <!-- Magnifier -->
-            <Grid
+            <Border
                 Grid.Row="0"
                 HorizontalAlignment="Center"
-                VerticalAlignment="Center">
+                VerticalAlignment="Center"
+                BorderBrush="White"
+                BorderThickness="3"
+                Effect="{StaticResource DropShadowEffect}"
+                CornerRadius="{Binding ActualHeight, ElementName=Magnifier, Mode=OneWay}">
                 <local:PixelMagnifier
                     x:Name="Magnifier"
                     PixelColumns="15"
-                    PixelSize="7"
-                    SamplingMode="Single">
+                    PixelSize="7">
                     <local:PixelMagnifier.Clip>
                         <EllipseGeometry>
                             <EllipseGeometry.Center>
@@ -154,24 +157,7 @@
                         </EllipseGeometry>
                     </local:PixelMagnifier.Clip>
                 </local:PixelMagnifier>
-
-                <!-- Magnifier frame -->
-                <Ellipse
-                    IsHitTestVisible="False"
-                    Stroke="#FFF"
-                    StrokeThickness="2.5"
-                    Effect="{StaticResource DropShadowEffect}"
-                    RenderTransformOrigin=".5,.5">
-                    <Ellipse.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform ScaleX="1.005" ScaleY="1.005"/>
-                            <SkewTransform/>
-                            <RotateTransform/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </Ellipse.RenderTransform>
-                </Ellipse>
-            </Grid>
+            </Border>
 
             <!-- Info panel -->
             <Border
