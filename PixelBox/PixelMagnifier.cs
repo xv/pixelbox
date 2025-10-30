@@ -502,7 +502,7 @@ public class PixelMagnifier : FrameworkElement
         Focusable = false;
 
         _dpi = VisualTreeHelper.GetDpi(this);
-        _samplingAreaIndicator = new SamplingAreaIndicator();
+        _samplingAreaIndicator = new SamplingAreaIndicator(_dpi);
 
         _visuals = new VisualCollection(this)
         {

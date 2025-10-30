@@ -14,6 +14,8 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
 
     private readonly Rect[] _rects = new Rect[2];
 
+    private DpiScale _dpi;
+
     static SamplingAreaIndicator()
     {
         s_penWhite.Freeze();
@@ -24,11 +26,12 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
     /// Initializes a new instance of the <see cref="SamplingAreaIndicator"/>
     /// class.
     /// </summary>
-    public SamplingAreaIndicator()
+    public SamplingAreaIndicator(DpiScale dpi)
     {
         // Small antialiased rects look super ass and this is one of the reasons
         // why this class exists
         VisualEdgeMode = EdgeMode.Aliased;
+        _dpi = dpi;
     }
 
     public void SetArea(Rect rect)
@@ -51,7 +54,19 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
 
         using var dc = RenderOpen();
 
+        var reqScale = _dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0;
+
+        if (reqScale)
+        {
+            dc.PushTransform(new ScaleTransform(
+                1 / _dpi.DpiScaleX, 
+                1 / _dpi.DpiScaleY));
+        }
+
         dc.DrawRectangle(null, s_penWhite, _rects[0]);
         dc.DrawRectangle(null, s_penBlack, _rects[1]);
+
+        if (reqScale)
+            dc.Pop();
     }
 }
