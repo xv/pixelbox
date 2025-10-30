@@ -5,7 +5,7 @@ using System.Windows;
 namespace PixelBox.Drawing;
 
 /// <summary>
-/// 
+/// Renders two contrasting rectangle for use as sampling area visual indicators.
 /// </summary>
 internal sealed class SamplingAreaIndicator : DrawingVisual
 {
@@ -14,7 +14,8 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
 
     private readonly Rect[] _rects = new Rect[2];
 
-    private DpiScale _dpi;
+    private readonly DpiScale _dpi;
+    private ScaleTransform? _scaleTrans;
 
     static SamplingAreaIndicator()
     {
@@ -38,6 +39,13 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
         _dpi = dpi;
     }
 
+    /// <summary>
+    /// Sets the area of the sampling indicator.
+    /// </summary>
+    /// 
+    /// <param name="rect">
+    /// The rectangle representing the sampling area.
+    /// </param>
     public void SetArea(Rect rect)
     {
         _rects[0] = rect;
@@ -51,6 +59,9 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
         _rects[1].Inflate(-1, -1);
     }
 
+    /// <summary>
+    /// Renders the sampling area indicator.
+    /// </summary>
     public void Render()
     {
         if (DesignerProperties.GetIsInDesignMode(this))
@@ -59,12 +70,13 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
         using var dc = RenderOpen();
 
         var reqScale = _dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0;
-
         if (reqScale)
         {
-            dc.PushTransform(new ScaleTransform(
-                1 / _dpi.DpiScaleX, 
-                1 / _dpi.DpiScaleY));
+            _scaleTrans ??= new ScaleTransform();
+            _scaleTrans.ScaleX = 1.0 / _dpi.DpiScaleX;
+            _scaleTrans.ScaleY = 1.0 / _dpi.DpiScaleY;
+
+            dc.PushTransform(_scaleTrans);
         }
 
         dc.DrawRectangle(null, s_penWhite, _rects[0]);

@@ -20,6 +20,7 @@ public class PixelMagnifier : FrameworkElement
     #region Fields
 
     private DpiScale _dpi;
+    private ScaleTransform? _scaleTrans;
 
     private readonly DispatcherTimer _refreshTimer;
 
@@ -642,14 +643,19 @@ public class PixelMagnifier : FrameworkElement
             new Int32Rect(0, 0, _expandedDevSize, _expandedDevSize),
             _expandedBuffer, dstStride, 0);
 
-        // Map device pixels to DIPs once with a scale transform to avoid having to
-        // repeatedly apply divisions when DPI scaling is > 96
-        dc.PushTransform(new ScaleTransform(
-            1.0 / _dpi.DpiScaleX, 
-            1.0 / _dpi.DpiScaleY));
+        var reqScale = _dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0;
+        if (reqScale)
+        {
+            _scaleTrans ??= new ScaleTransform();
+            _scaleTrans.ScaleX = 1.0 / _dpi.DpiScaleX;
+            _scaleTrans.ScaleY = 1.0 / _dpi.DpiScaleY;
+
+            dc.PushTransform(_scaleTrans);
+        }
 
         dc.DrawImage(_expandedBitmap, new Rect(0, 0, _expandedDevSize, _expandedDevSize));
 
-        dc.Pop();
+        if (reqScale)
+            dc.Pop();
     }
 }
