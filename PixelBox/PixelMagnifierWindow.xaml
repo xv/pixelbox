@@ -18,13 +18,33 @@
     <Window.Resources>
         <converter:CenterPointConverter x:Key="CenterPointConverter"/>
         <converter:EllipseRadiusConverter x:Key="EllipseRadiusConverter"/>
+        
         <DropShadowEffect
             x:Key="DropShadowEffect"
             BlurRadius="2"
             Opacity=".5"
             ShadowDepth="0"
             Color="Black"/>
+        
+        <Storyboard x:Key="MagnifierFadeInStoryboard">
+            <DoubleAnimation
+                Storyboard.TargetName="MagnifierHost"
+                Storyboard.TargetProperty="Opacity"
+                From="0"
+                To="1"
+                Duration="0:0:0.2">
+                <DoubleAnimation.EasingFunction>
+                    <QuadraticEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
     </Window.Resources>
+
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Window.Loaded">
+            <BeginStoryboard Storyboard="{StaticResource MagnifierFadeInStoryboard}"/>
+        </EventTrigger>
+    </Window.Triggers>
 
     <Window.InputBindings>
         <KeyBinding
@@ -109,6 +129,8 @@
 
         <Grid
             x:Name="MagnifierHost"
+            Opacity="0"
+            d:Opacity="1"
             RenderTransformOrigin=".5,.5">
             <Grid.RenderTransform>
                 <TranslateTransform
