@@ -572,11 +572,11 @@ public class PixelMagnifier : FrameworkElement
         if (_captureBuffer == null)
             return;
 
-        var pxDev = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
+        var pxSizeDev = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
         var gridGapDev = drawGrid ? 1 : 0;
 
         // Expanded (destination) device pixel size including gaps
-        var totalDev = pxDev * _pixelColumns + gridGapDev * (_pixelColumns - 1);
+        var totalDev = pxSizeDev * _pixelColumns + gridGapDev * (_pixelColumns - 1);
 
         if (_expandedDevSize != totalDev)
         {
@@ -603,13 +603,13 @@ public class PixelMagnifier : FrameworkElement
             fixed (byte* dstBuf = _expandedBuffer)
             {
                 // Reusable single horizontal line block of one pixel's width
-                var lineBytes = pxDev * 4;
+                var lineBytes = pxSizeDev * 4;
                 byte* lineBlock = stackalloc byte[lineBytes];
 
                 for (var srcY = 0; srcY < _pixelColumns; srcY++)
                 {
                     byte* srcRow = srcBuf + srcY * srcStride;
-                    var dstBlockY = srcY * (pxDev + gridGapDev);
+                    var dstBlockY = srcY * (pxSizeDev + gridGapDev);
 
                     for (var srcX = 0; srcX < _pixelColumns; srcX++)
                     {
@@ -618,7 +618,7 @@ public class PixelMagnifier : FrameworkElement
                         var g = pSrc[1];
                         var r = pSrc[2];
 
-                        for (var bx = 0; bx < pxDev; bx++)
+                        for (var bx = 0; bx < pxSizeDev; bx++)
                         {
                             lineBlock[bx * 4 + 0] = b;
                             lineBlock[bx * 4 + 1] = g;
@@ -626,9 +626,9 @@ public class PixelMagnifier : FrameworkElement
                             lineBlock[bx * 4 + 3] = 255; // Alpha is irrelevant
                         }
 
-                        var dstBlockX = srcX * (pxDev + gridGapDev);
+                        var dstBlockX = srcX * (pxSizeDev + gridGapDev);
 
-                        for (var by = 0; by < pxDev; by++)
+                        for (var by = 0; by < pxSizeDev; by++)
                         {
                             byte* pDstRow = dstBuf + (dstBlockY + by) * dstStride + dstBlockX * 4;
                             Buffer.MemoryCopy(lineBlock, pDstRow, lineBytes, lineBytes);
