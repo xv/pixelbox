@@ -510,6 +510,7 @@ public class PixelMagnifier : FrameworkElement
         };
 
         UpdateGridMetrics(PixelColumns);
+        UpdateSamplingAreaIndicator();
 
         _refreshTimer = new DispatcherTimer(DispatcherPriority.Render)
         {
