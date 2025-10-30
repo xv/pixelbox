@@ -24,7 +24,7 @@ public partial class PixelMagnifierWindow : Window
 
     private const double WindowOffset = 1;
 
-    private readonly DpiScale _dpi;
+    private DpiScale _dpi;
     private readonly Rect _screen = SystemParameters.WorkArea;
 
     private readonly SolidColorBrush _colorPreviewBrush = new(Colors.Transparent);
@@ -473,6 +473,12 @@ public partial class PixelMagnifierWindow : Window
         {
             Magnifier.PixelChanged -= OnPixelChanged;
         };
+    }
+
+    protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
+    {
+        base.OnDpiChanged(oldDpi, newDpi);
+        _dpi = newDpi;
     }
 
     protected override void OnMouseMove(MouseEventArgs e)

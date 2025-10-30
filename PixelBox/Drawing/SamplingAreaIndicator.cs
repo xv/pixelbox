@@ -9,18 +9,33 @@ namespace PixelBox.Drawing;
 /// </summary>
 internal sealed class SamplingAreaIndicator : DrawingVisual
 {
+    #region Fields
+
     private static readonly Pen s_penWhite = new(Brushes.White, 1);
     private static readonly Pen s_penBlack = new(Brushes.Black, 1);
 
     private readonly Rect[] _rects = new Rect[2];
 
-    private readonly DpiScale _dpi;
+    private DpiScale _dpi;
     private ScaleTransform? _scaleTrans;
+
+    #endregion
 
     static SamplingAreaIndicator()
     {
         s_penWhite.Freeze();
         s_penBlack.Freeze();
+    }
+
+    /// <summary>
+    /// Configures the internal <see cref="ScaleTransform"/> so that the visual
+    /// is scaled properly regardless of the monitor's current DPI scaling.
+    /// </summary>
+    private void SetScaleTransform()
+    {
+        _scaleTrans ??= new ScaleTransform();
+        _scaleTrans.ScaleX = 1.0 / _dpi.DpiScaleX;
+        _scaleTrans.ScaleY = 1.0 / _dpi.DpiScaleY;
     }
 
     /// <summary>
@@ -33,10 +48,21 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
     /// </param>
     public SamplingAreaIndicator(DpiScale dpi)
     {
-        // Small antialiased rects look super ass and this is one of the reasons
-        // why this class exists
+        // Small antialiased rects look super ass and this is actually one of
+        // the reasons why this class exists
         VisualEdgeMode = EdgeMode.Aliased;
         _dpi = dpi;
+
+        if (_dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0)
+            SetScaleTransform();
+    }
+
+    protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
+    {
+        base.OnDpiChanged(oldDpi, newDpi);
+
+        _dpi = newDpi;
+        SetScaleTransform();
     }
 
     /// <summary>
@@ -68,21 +94,15 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
             return;
 
         using var dc = RenderOpen();
+        var useScale = _scaleTrans is not null;
 
-        var reqScale = _dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0;
-        if (reqScale)
-        {
-            _scaleTrans ??= new ScaleTransform();
-            _scaleTrans.ScaleX = 1.0 / _dpi.DpiScaleX;
-            _scaleTrans.ScaleY = 1.0 / _dpi.DpiScaleY;
-
+        if (useScale)
             dc.PushTransform(_scaleTrans);
-        }
 
         dc.DrawRectangle(null, s_penWhite, _rects[0]);
         dc.DrawRectangle(null, s_penBlack, _rects[1]);
 
-        if (reqScale)
+        if (useScale)
             dc.Pop();
     }
 }

@@ -493,6 +493,17 @@ public class PixelMagnifier : FrameworkElement
     #endregion
 
     /// <summary>
+    /// Configures the internal <see cref="ScaleTransform"/> so that the visual
+    /// is scaled properly regardless of the monitor's current DPI scaling.
+    /// </summary>
+    private void SetScaleTransform()
+    {
+        _scaleTrans ??= new ScaleTransform();
+        _scaleTrans.ScaleX = 1.0 / _dpi.DpiScaleX;
+        _scaleTrans.ScaleY = 1.0 / _dpi.DpiScaleY;
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="PixelMagnifier"/> class.
     /// </summary>
     public PixelMagnifier()
@@ -512,6 +523,9 @@ public class PixelMagnifier : FrameworkElement
 
         UpdateGridMetrics(PixelColumns);
         UpdateSamplingAreaIndicator();
+
+        if (_dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0)
+            SetScaleTransform();
 
         _refreshTimer = new DispatcherTimer(DispatcherPriority.Render)
         {
@@ -543,6 +557,16 @@ public class PixelMagnifier : FrameworkElement
         // Convert device pixels to DIPs
         var totalSizeDip = totalSizeDev / _dpi.DpiScaleX;
         return new Size(totalSizeDip, totalSizeDip);
+    }
+
+    protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
+    {
+        base.OnDpiChanged(oldDpi, newDpi);
+
+        _dpi = newDpi;
+
+        UpdateSamplingAreaIndicator();
+        SetScaleTransform();
     }
 
     protected override void OnRender(DrawingContext dc)
@@ -643,19 +667,13 @@ public class PixelMagnifier : FrameworkElement
             new Int32Rect(0, 0, _expandedDevSize, _expandedDevSize),
             _expandedBuffer, dstStride, 0);
 
-        var reqScale = _dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0;
-        if (reqScale)
-        {
-            _scaleTrans ??= new ScaleTransform();
-            _scaleTrans.ScaleX = 1.0 / _dpi.DpiScaleX;
-            _scaleTrans.ScaleY = 1.0 / _dpi.DpiScaleY;
-
+        var useScale = _scaleTrans is not null;
+        if (useScale)
             dc.PushTransform(_scaleTrans);
-        }
 
         dc.DrawImage(_expandedBitmap, new Rect(0, 0, _expandedDevSize, _expandedDevSize));
 
-        if (reqScale)
+        if (useScale)
             dc.Pop();
     }
 }
