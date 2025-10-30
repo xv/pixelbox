@@ -26,6 +26,10 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
     /// Initializes a new instance of the <see cref="SamplingAreaIndicator"/>
     /// class.
     /// </summary>
+    /// 
+    /// /// <param name="dpi">
+    /// DPI scale information.
+    /// </param>
     public SamplingAreaIndicator(DpiScale dpi)
     {
         // Small antialiased rects look super ass and this is one of the reasons
