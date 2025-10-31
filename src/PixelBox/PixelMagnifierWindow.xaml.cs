@@ -523,6 +523,12 @@ public partial class PixelMagnifierWindow : Window
                 HandlePixelNavigation();
                 e.Handled = true;
                 break;
+            case Key.System:
+                // Prevent Alt key from (probably) processing WM_ENTERMENULOOP
+                // which causes the window to stop following the mouse until
+                // the key is pressed again
+                e.Handled = true;
+                break;
         }
     }
 
