@@ -79,7 +79,7 @@ public partial class PixelMagnifierWindow : Window
             nameof(PixelColorString),
             typeof(string),
             typeof(PixelMagnifierWindow),
-            new PropertyMetadata("?"));
+            new PropertyMetadata(string.Empty));
 
     /// <summary>
     /// Gets or sets the current pixel color as a string representation.
@@ -95,7 +95,7 @@ public partial class PixelMagnifierWindow : Window
             nameof(PixelPositionString),
             typeof(string),
             typeof(PixelMagnifierWindow),
-            new PropertyMetadata("?"));
+            new PropertyMetadata(string.Empty));
 
     /// <summary>
     /// Gets or sets the current pixel position as a string representation.
@@ -169,7 +169,7 @@ public partial class PixelMagnifierWindow : Window
     /// <summary>
     /// Gets or sets whether to show the information panel below the magnifier.
     /// </summary>
-    public bool ShowInfoPanel
+    private bool ShowInfoPanel
     {
         get => InfoPanelHost.Visibility == Visibility.Visible;
         set => InfoPanelHost.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
@@ -610,6 +610,8 @@ public partial class PixelMagnifierWindow : Window
 
         Magnifier.SamplingMode = _config.SamplingMode;
         Magnifier.ShowGrid = _config.ShowGrid;
+        Magnifier.ShowGrid = _config.ShowGrid;
+        ShowInfoPanel = _config.ShowInfoPanel;
     }
 
     private void ExtractConfig()
@@ -619,5 +621,6 @@ public partial class PixelMagnifierWindow : Window
         _config.RefreshInterval = Magnifier.RefreshInterval;
         _config.SamplingMode = Magnifier.SamplingMode;
         _config.ShowGrid = Magnifier.ShowGrid;
+        _config.ShowInfoPanel = ShowInfoPanel;
     }
 }

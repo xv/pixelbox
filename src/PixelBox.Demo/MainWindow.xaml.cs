@@ -9,9 +9,16 @@ namespace PixelBox.Demo;
 /// </summary>
 public partial class MainWindow : Window
 {
+    private readonly PixelMagnifierWindowConfig _magWindowCfg;
+
     public MainWindow()
     {
         InitializeComponent();
+
+        _magWindowCfg = new PixelMagnifierWindowConfig 
+        {
+            ShowInfoPanel = false
+        };
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
@@ -20,11 +27,9 @@ public partial class MainWindow : Window
 
         if (e.Key == Key.Space)
         {
-            // var cfg = new PixelMagnifierWindowConfig { PixelSize = 10, ShowGrid = false };
 
-            var magWindow = new PixelMagnifierWindow()
+            var magWindow = new PixelMagnifierWindow(_magWindowCfg)
             {
-                ShowInfoPanel = true,
                 ConfirmationSoundEffect = PixelMagnifierWindow.SoundEffect.Pop
             };
 
