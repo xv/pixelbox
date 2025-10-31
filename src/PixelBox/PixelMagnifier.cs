@@ -56,7 +56,7 @@ public class PixelMagnifier : FrameworkElement
                 FrameworkPropertyMetadataOptions.AffectsMeasure |
                 FrameworkPropertyMetadataOptions.AffectsRender,
                 OnPixelColumnsChanged, CoercePixelColumns),
-            v => (v is int i) && (i >= 1));
+            v => (v is int i) && (i > 0) && (i < 100));
 
     public static readonly DependencyProperty PixelSizeProperty =
         DependencyProperty.Register(
@@ -67,7 +67,7 @@ public class PixelMagnifier : FrameworkElement
                 FrameworkPropertyMetadataOptions.AffectsMeasure |
                 FrameworkPropertyMetadataOptions.AffectsRender,
                 OnPixelSizeChanged),
-            v => (v is int i) && (i >= 1) && (i <= 100));
+            v => (v is int i) && (i > 0) && (i <= 100));
 
     public static readonly DependencyProperty ShowGridProperty =
         DependencyProperty.Register(
@@ -94,7 +94,7 @@ public class PixelMagnifier : FrameworkElement
             typeof(int),
             typeof(PixelMagnifier),
             new FrameworkPropertyMetadata(30, OnRefreshIntervalChanged),
-            v => (v is int i) && (i >= 1) && (i <= 1000));
+            v => (v is int i) && (i > 0) && (i <= 1000));
 
 
     [SuppressMessage(
@@ -144,7 +144,8 @@ public class PixelMagnifier : FrameworkElement
     }
 
     /// <summary>
-    /// Gets or sets the number of pixel columns.
+    /// Gets or sets the number of pixel columns. The value must be greater than
+    /// zero and less than 100.
     /// </summary>
     /// 
     /// <remarks>
@@ -152,7 +153,7 @@ public class PixelMagnifier : FrameworkElement
     /// symmetric horizontally and vertically.
     /// </remarks>
     [Category("Appearance")]
-    [Description("Sets the number of pixel columns in the grid. Uses odd values only.")]
+    [Description("Sets the number of pixel columns in the grid. Uses odd values only. Valid range is [1,99].")]
     public int PixelColumns
     {
         get => (int)GetValue(PixelColumnsProperty);
@@ -177,10 +178,11 @@ public class PixelMagnifier : FrameworkElement
     public Point PixelPosition => _lastMousePos;
 
     /// <summary>
-    /// Gets or sets the size of the pixel cells.
+    /// Gets or sets the size of the pixel cells. The value must be greater than
+    /// zero and less than or equal to 100.
     /// </summary>
     [Category("Appearance")]
-    [Description("Sets the size (in px) of individual pixel cells in the grid.")]
+    [Description("Sets the size (in px) of individual pixel cells in the grid. Valid range is [1,100].")]
     public int PixelSize
     {
         get => (int)GetValue(PixelSizeProperty);
@@ -199,10 +201,11 @@ public class PixelMagnifier : FrameworkElement
     }
 
     /// <summary>
-    /// Gets or sets the redraw rate of the control.
+    /// Gets or sets the redraw rate of the control in milliseconds. The value
+    /// must be greater than zero and less than or equal to 1000.
     /// </summary>
     [Category("Behavior")]
-    [Description("Sets refresh rate (in ms) of the control.")]
+    [Description("Sets refresh rate (in ms) of the control. Valid range is [1,1000].")]
     public int RefreshInterval
     {
         get => (int)GetValue(RefreshIntervalProperty);
