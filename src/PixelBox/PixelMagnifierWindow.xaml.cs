@@ -36,12 +36,11 @@ public partial class PixelMagnifierWindow : Window
     private readonly Cursor _cursor;
 
     private readonly PixelSamplingMode[] _samplingModes =
-    {
+    [
         PixelSamplingMode.Single,
         PixelSamplingMode.ThreeByThree,
-        PixelSamplingMode.FiveByFive,
-        PixelSamplingMode.SevenBySeven
-    };
+        PixelSamplingMode.FiveByFive
+    ];
 
     #endregion
     #region Enums

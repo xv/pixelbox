@@ -16,9 +16,5 @@ public enum PixelSamplingMode
     /// <summary>
     /// The average color of 25 pixels in a 5x5 kernel.
     /// </summary>
-    FiveByFive = 5,
-    /// <summary>
-    /// The average color of 49 pixels in a 7x7 kernel.
-    /// </summary>
-    SevenBySeven = 7
+    FiveByFive = 5
 }
