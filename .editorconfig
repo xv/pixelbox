@@ -1,4 +1,12 @@
-﻿[*.cs]
+﻿[*]
+indent_style = space
+indent_size = 4
+tab_width = 4
 
+[*.csproj]
+indent_size = 2
+tab_width = 2
+
+[*.cs]
 # IDE0079: Remove unnecessary suppression
 dotnet_diagnostic.IDE0079.severity = none

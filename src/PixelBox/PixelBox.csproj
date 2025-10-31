@@ -5,15 +5,29 @@
     <UseWPF>true</UseWPF>
     <OutputType>Library</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <!-- Executable assembly info -->
+  <PropertyGroup>
     <AssemblyName>$(MSBuildProjectName.ToLower())</AssemblyName>
     <AssemblyTitle>Pixel Magnification Control for WPF</AssemblyTitle>
-    <PackageId>$(AssemblyName)</PackageId>
-    <Company>Jad Altahan</Company>
-    <Copyright>Copyright (C) 2025, Jad Altahan</Copyright>
     <FileVersion>1.0.0.0</FileVersion>
     <Version>1.0.0</Version>
+    <Company>Jad Altahan</Company>
+    <Copyright>Copyright (C) 2025, Jad Altahan</Copyright>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <!-- NuGet metadata -->
+  <PropertyGroup>
+    <PackageId>$(AssemblyName)</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>wpf;control;pixel;magnifier;colorpicker</PackageTags>
+    <RepositoryUrl>https://github.com/xv/pixelbox</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Description>Customizable BitBlt-based pixel magnification WPF control that can also be used as a mouse-tracked color picker window, similar to those found in browser developer tools.</Description>
+    <Authors>Jad Altahan</Authors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -25,7 +39,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\README.md">
+    <None Include="..\..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
