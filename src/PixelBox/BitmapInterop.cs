@@ -120,10 +120,10 @@ internal static class BitmapInterop
     public static BitmapSource ToBitmapSource(this HBITMAP hBitmap, bool freeze)
     {
         var bsrc = Imaging.CreateBitmapSourceFromHBitmap(
-                hBitmap,
-                nint.Zero,
-                Int32Rect.Empty,
-                BitmapSizeOptions.FromEmptyOptions());
+            hBitmap,
+            nint.Zero,
+            Int32Rect.Empty,
+            BitmapSizeOptions.FromEmptyOptions());
 
         if (freeze && bsrc.CanFreeze)
             bsrc.Freeze();

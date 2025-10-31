@@ -7,8 +7,8 @@ internal class EllipseRadiusConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        if (values.Length < 2 || 
-            values[0] is not double w || 
+        if (values.Length < 2 ||
+            values[0] is not double w ||
             values[1] is not double h)
             return 0.0;
 

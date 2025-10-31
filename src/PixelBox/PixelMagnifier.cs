@@ -52,9 +52,9 @@ public class PixelMagnifier : FrameworkElement
             nameof(PixelColumns),
             typeof(int),
             typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(11, 
+            new FrameworkPropertyMetadata(11,
                 FrameworkPropertyMetadataOptions.AffectsMeasure |
-                FrameworkPropertyMetadataOptions.AffectsRender, 
+                FrameworkPropertyMetadataOptions.AffectsRender,
                 OnPixelColumnsChanged, CoercePixelColumns),
             v => (v is int i) && (i >= 1));
 
@@ -63,9 +63,9 @@ public class PixelMagnifier : FrameworkElement
             nameof(PixelSize),
             typeof(int),
             typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(9, 
-                FrameworkPropertyMetadataOptions.AffectsMeasure | 
-                FrameworkPropertyMetadataOptions.AffectsRender, 
+            new FrameworkPropertyMetadata(9,
+                FrameworkPropertyMetadataOptions.AffectsMeasure |
+                FrameworkPropertyMetadataOptions.AffectsRender,
                 OnPixelSizeChanged),
             v => (v is int i) && (i >= 1) && (i <= 100));
 
@@ -74,9 +74,9 @@ public class PixelMagnifier : FrameworkElement
             nameof(ShowGrid),
             typeof(bool),
             typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(true, 
-                FrameworkPropertyMetadataOptions.AffectsMeasure | 
-                FrameworkPropertyMetadataOptions.AffectsRender, 
+            new FrameworkPropertyMetadata(true,
+                FrameworkPropertyMetadataOptions.AffectsMeasure |
+                FrameworkPropertyMetadataOptions.AffectsRender,
                 OnShowGridChanged));
 
     public static readonly DependencyProperty SamplingModeProperty =
@@ -84,8 +84,8 @@ public class PixelMagnifier : FrameworkElement
             nameof(SamplingMode),
             typeof(PixelSamplingMode),
             typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(PixelSamplingMode.Single, 
-                FrameworkPropertyMetadataOptions.AffectsRender, 
+            new FrameworkPropertyMetadata(PixelSamplingMode.Single,
+                FrameworkPropertyMetadataOptions.AffectsRender,
                 OnSamplingModeChanged));
 
     public static readonly DependencyProperty RefreshIntervalProperty =
@@ -104,7 +104,7 @@ public class PixelMagnifier : FrameworkElement
     private static object CoercePixelColumns(DependencyObject d, object value)
     {
         var cols = (int)value;
-            
+
         if (cols % 2 != 1)
             cols++;
 
@@ -329,7 +329,7 @@ public class PixelMagnifier : FrameworkElement
         var pxSizeDev = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
         var pxCenterDev = (pxSizeDev + (ShowGrid ? 1 : 0)) * _pixelColumnsHalf;
 
-        var rect = new Rect( 
+        var rect = new Rect(
             pxCenterDev, pxCenterDev,
             pxSizeDev + 1, pxSizeDev + 1);
 
@@ -424,8 +424,8 @@ public class PixelMagnifier : FrameworkElement
         // Index of the first cell (top-left corner) of the kernel
         var first = _pixelColumnsHalf - (kSize / 2);
 
-        int rSum = 0, 
-            gSum = 0, 
+        int rSum = 0,
+            gSum = 0,
             bSum = 0;
 
         for (int y = 0; y < kSize; y++)
@@ -441,8 +441,8 @@ public class PixelMagnifier : FrameworkElement
 
         // Mean of the RGB components
         return Color.FromRgb(
-            (byte)(rSum / kTotal), 
-            (byte)(gSum / kTotal), 
+            (byte)(rSum / kTotal),
+            (byte)(gSum / kTotal),
             (byte)(bSum / kTotal));
     }
 

@@ -16,7 +16,7 @@ public class PixelMagnifierWindowConfig
         PixelSizeMax = 15;
 
     public const int
-        RefreshIntervalMin = 10, 
+        RefreshIntervalMin = 10,
         RefreshIntervalMax = 100;
 
     /// <summary>

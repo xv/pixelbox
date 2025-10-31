@@ -185,7 +185,7 @@ public partial class PixelMagnifierWindow : Window
     /// <summary>
     /// Gets the screen coordinates of the currently selected pixel.
     /// </summary>
-    public Point? SelectedPixelPosition 
+    public Point? SelectedPixelPosition
     { get; private set; }
 
     #endregion

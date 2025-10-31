@@ -16,6 +16,6 @@ internal class CenterPointConverter : IMultiValueConverter
         return new Point(x / 2.0, y / 2.0);
     }
 
-    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) => 
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture) =>
         throw new NotSupportedException();
 }
