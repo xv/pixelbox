@@ -167,7 +167,8 @@ public partial class PixelMagnifierWindow : Window
     { get; set; } = SoundEffect.Pop;
 
     /// <summary>
-    /// Gets or sets whether to show the information panel below the magnifier.
+    /// Gets or sets whether the info panel containing the current pixel's color
+    /// and screen position is displayed.
     /// </summary>
     private bool ShowInfoPanel
     {

@@ -44,8 +44,7 @@ public class PixelMagnifierWindowConfig
     { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets whether the info panel containing the current pixel's color
-    /// and screen position is displayed.
+    /// <inheritdoc cref="PixelMagnifierWindow.ShowInfoPanel"/>
     /// </summary>
     public bool ShowInfoPanel
     { get; set; } = true;
