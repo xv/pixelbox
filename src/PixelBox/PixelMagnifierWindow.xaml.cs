@@ -192,6 +192,45 @@ public partial class PixelMagnifierWindow : Window
     #region Methods
 
     /// <summary>
+    /// Applies user-set configuration.
+    /// </summary>
+    private void ApplyConfig()
+    {
+        Magnifier.PixelColumns = Math.Clamp(
+            _config.PixelColumns,
+            PixelMagnifierWindowConfig.PixelColumnsMin,
+            PixelMagnifierWindowConfig.PixelColumnsMax);
+
+        Magnifier.PixelSize = Math.Clamp(
+            _config.PixelSize,
+            PixelMagnifierWindowConfig.PixelSizeMin,
+            PixelMagnifierWindowConfig.PixelSizeMax);
+
+        Magnifier.RefreshInterval = Math.Clamp(
+            _config.RefreshInterval,
+            PixelMagnifierWindowConfig.RefreshIntervalMin,
+            PixelMagnifierWindowConfig.RefreshIntervalMax);
+
+        Magnifier.SamplingMode = _config.SamplingMode;
+        Magnifier.ShowGrid = _config.ShowGrid;
+        Magnifier.ShowGrid = _config.ShowGrid;
+        ShowInfoPanel = _config.ShowInfoPanel;
+    }
+
+    /// <summary>
+    /// Extracts user-set configuration.
+    /// </summary>
+    private void ExtractConfig()
+    {
+        _config.PixelSize = Magnifier.PixelSize;
+        _config.PixelColumns = Magnifier.PixelColumns;
+        _config.RefreshInterval = Magnifier.RefreshInterval;
+        _config.SamplingMode = Magnifier.SamplingMode;
+        _config.ShowGrid = Magnifier.ShowGrid;
+        _config.ShowInfoPanel = ShowInfoPanel;
+    }
+
+    /// <summary>
     /// Moves the mouse cursor in the direction(s) of the arrow keys currently
     /// pressed. Supports 8-directional movement.
     /// </summary>
@@ -545,8 +584,13 @@ public partial class PixelMagnifierWindow : Window
     private void OnExpandViewExecuted(object sender, ExecutedRoutedEventArgs e) =>
         Magnifier.PixelColumns = Math.Min(Magnifier.PixelColumns + 2, PixelMagnifierWindowConfig.PixelColumnsMax);
 
-    private void OnShrinkViewExecuted(object sender, ExecutedRoutedEventArgs e) =>
+    private void OnShrinkViewExecuted(object sender, ExecutedRoutedEventArgs e)
+    {
+        if (Magnifier.PixelColumns <= (int)Magnifier.SamplingMode)
+            return;
+
         Magnifier.PixelColumns = Math.Max(Magnifier.PixelColumns - 2, PixelMagnifierWindowConfig.PixelColumnsMin);
+    }
 
     private void OnZoomInExecuted(object sender, ExecutedRoutedEventArgs e) =>
         Magnifier.PixelSize = Math.Min(Magnifier.PixelSize + 1, PixelMagnifierWindowConfig.PixelSizeMax);
@@ -556,6 +600,9 @@ public partial class PixelMagnifierWindow : Window
 
     private void OnIncreaseColorSamplingAreaExecuted(object sender, ExecutedRoutedEventArgs e)
     {
+        if ((int)Magnifier.SamplingMode >= Magnifier.PixelColumns)
+            return;
+
         var idx = Array.IndexOf(_samplingModes, Magnifier.SamplingMode);
         if (idx < _samplingModes.Length - 1)
             Magnifier.SamplingMode = _samplingModes[idx + 1];
@@ -590,38 +637,5 @@ public partial class PixelMagnifierWindow : Window
             stream?.Dispose();
 
         s_preloadedSoundStreams.Clear();
-    }
-
-    private void ApplyConfig()
-    {
-        Magnifier.PixelColumns = Math.Clamp(
-            _config.PixelColumns,
-            PixelMagnifierWindowConfig.PixelColumnsMin,
-            PixelMagnifierWindowConfig.PixelColumnsMax);
-
-        Magnifier.PixelSize = Math.Clamp(
-            _config.PixelSize,
-            PixelMagnifierWindowConfig.PixelSizeMin,
-            PixelMagnifierWindowConfig.PixelSizeMax);
-
-        Magnifier.RefreshInterval = Math.Clamp(
-            _config.RefreshInterval,
-            PixelMagnifierWindowConfig.RefreshIntervalMin,
-            PixelMagnifierWindowConfig.RefreshIntervalMax);
-
-        Magnifier.SamplingMode = _config.SamplingMode;
-        Magnifier.ShowGrid = _config.ShowGrid;
-        Magnifier.ShowGrid = _config.ShowGrid;
-        ShowInfoPanel = _config.ShowInfoPanel;
-    }
-
-    private void ExtractConfig()
-    {
-        _config.PixelSize = Magnifier.PixelSize;
-        _config.PixelColumns = Magnifier.PixelColumns;
-        _config.RefreshInterval = Magnifier.RefreshInterval;
-        _config.SamplingMode = Magnifier.SamplingMode;
-        _config.ShowGrid = Magnifier.ShowGrid;
-        _config.ShowInfoPanel = ShowInfoPanel;
     }
 }

@@ -28,7 +28,7 @@ public partial class MainWindow : Window
         if (e.Key == Key.Space)
         {
 
-            var magWindow = new PixelMagnifierWindow(_magWindowCfg)
+            var magWindow = new PixelMagnifierWindow()
             {
                 ConfirmationSoundEffect = PixelMagnifierWindow.SoundEffect.Pop
             };
