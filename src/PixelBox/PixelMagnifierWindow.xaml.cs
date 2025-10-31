@@ -586,6 +586,7 @@ public partial class PixelMagnifierWindow : Window
 
     private void OnShrinkViewExecuted(object sender, ExecutedRoutedEventArgs e)
     {
+        // Sampling kernel cannot be larger than the number of pixels available
         if (Magnifier.PixelColumns <= (int)Magnifier.SamplingMode)
             return;
 

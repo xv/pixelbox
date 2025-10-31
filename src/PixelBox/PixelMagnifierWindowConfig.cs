@@ -8,11 +8,11 @@ namespace PixelBox;
 public class PixelMagnifierWindowConfig
 {
     public const int
-        PixelColumnsMin = 15,
+        PixelColumnsMin = 11,
         PixelColumnsMax = 25;
 
     public const int
-        PixelSizeMin = 7,
+        PixelSizeMin = 10,
         PixelSizeMax = 15;
 
     public const int
