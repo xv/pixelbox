@@ -349,15 +349,10 @@ public partial class PixelMagnifierWindow : Window
     /// converted from screen coordinates to the coordinate system of this
     /// window.
     /// </returns>
-    /// 
-    /// <remarks>
-    /// The window (<see cref="PixelMagnifierWindow"/>) must be loaded into the
-    /// visual tree before this method is called.
-    /// </remarks>
     private Point GetMousePosition()
     {
         PInvoke.GetCursorPos(out System.Drawing.Point p);
-        return PointFromScreen(new Point(p.X, p.Y));
+        return new Point(p.X / _dpi.DpiScaleX, p.Y / _dpi.DpiScaleY);
     }
 
     /// <summary>
