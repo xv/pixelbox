@@ -14,7 +14,8 @@
     <FileVersion>1.0.0.0</FileVersion>
     <Version>1.0.0</Version>
     <Company>Jad Altahan</Company>
-    <Copyright>Copyright (C) 2025, Jad Altahan</Copyright>
+    <Copyright>Copyright (C) 2025, $(Company)</Copyright>
+    <Product>$(MSBuildProjectName)</Product>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
@@ -27,7 +28,7 @@
     <RepositoryUrl>https://github.com/xv/pixelbox</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Description>Customizable BitBlt-based pixel magnification WPF control that can also be used as a mouse-tracked color picker window, similar to those found in browser developer tools.</Description>
-    <Authors>Jad Altahan</Authors>
+    <Authors>$(Company)</Authors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
