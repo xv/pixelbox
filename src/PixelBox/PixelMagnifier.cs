@@ -623,8 +623,6 @@ public class PixelMagnifier : FrameworkElement
         var srcStride = _captureStride;
         var dstStride = _expandedDevSize * 4;
 
-        Array.Clear(_expandedBuffer!, 0, _expandedBuffer!.Length);
-
         unsafe
         {
             fixed (byte* srcBuf = _captureBuffer)
