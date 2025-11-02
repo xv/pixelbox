@@ -1,14 +1,13 @@
-﻿using System.ComponentModel;
+﻿using PixelBox.Drawing;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Windows.Media.Imaging;
-using System.Windows.Media;
-using System.Windows.Threading;
+using System.Runtime.CompilerServices;
 using System.Windows;
-
-using Windows.Win32.Graphics.Gdi;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Windows.Win32;
-
-using PixelBox.Drawing;
+using Windows.Win32.Graphics.Gdi;
 
 namespace PixelBox;
 
@@ -35,7 +34,6 @@ public class PixelMagnifier : FrameworkElement
     private int _captureStride;
 
     private WriteableBitmap? _expandedBitmap;
-    private byte[]? _expandedBuffer;
     private int _expandedDevSize = 0;
 
     public event EventHandler<PixelChangedEventArgs>? PixelChanged;
@@ -572,7 +570,7 @@ public class PixelMagnifier : FrameworkElement
         SetScaleTransform();
     }
 
-    protected override void OnRender(DrawingContext dc)
+    protected override unsafe void OnRender(DrawingContext dc)
     {
         base.OnRender(dc);
 
@@ -602,14 +600,11 @@ public class PixelMagnifier : FrameworkElement
 
         var pxSizeDev = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
         var gridGapDev = drawGrid ? 1 : 0;
-
-        // Expanded (destination) device pixel size including gaps
         var totalDev = pxSizeDev * _pixelColumns + gridGapDev * (_pixelColumns - 1);
 
         if (_expandedDevSize != totalDev)
         {
             _expandedDevSize = totalDev;
-            _expandedBuffer = new byte[_expandedDevSize * _expandedDevSize * 4];
 
             _expandedBitmap = new WriteableBitmap(
                 _expandedDevSize, _expandedDevSize,
@@ -620,53 +615,51 @@ public class PixelMagnifier : FrameworkElement
             CaptureAt(_lastMousePos);
         }
 
-        var srcStride = _captureStride;
-        var dstStride = _expandedDevSize * 4;
+        _expandedBitmap!.Lock();
 
-        unsafe
+        byte* dstBase = (byte*)_expandedBitmap.BackBuffer;
+        var dstStride = _expandedBitmap.BackBufferStride;
+
+        fixed (byte* srcBuf = _captureBuffer)
         {
-            fixed (byte* srcBuf = _captureBuffer)
-            fixed (byte* dstBuf = _expandedBuffer)
+            var lineBytes = pxSizeDev * 4;
+            byte* lineBlock = stackalloc byte[lineBytes];
+
+            for (int srcY = 0; srcY < _pixelColumns; srcY++)
             {
-                // Reusable single horizontal line block of one pixel's width
-                var lineBytes = pxSizeDev * 4;
-                byte* lineBlock = stackalloc byte[lineBytes];
+                byte* pDrcRow = srcBuf + srcY * _captureStride;
+                var dstBlockY = srcY * (pxSizeDev + gridGapDev);
 
-                for (var srcY = 0; srcY < _pixelColumns; srcY++)
+                for (var srcX = 0; srcX < _pixelColumns; srcX++)
                 {
-                    byte* srcRow = srcBuf + srcY * srcStride;
-                    var dstBlockY = srcY * (pxSizeDev + gridGapDev);
+                    byte* pSrc = pDrcRow + srcX * 4;
+                    var b = pSrc[0];
+                    var g = pSrc[1];
+                    var r = pSrc[2];
 
-                    for (var srcX = 0; srcX < _pixelColumns; srcX++)
+                    // Pre-fill one horizontal line of a pixel block
+                    for (var bx = 0; bx < pxSizeDev; bx++)
                     {
-                        byte* pSrc = srcRow + srcX * 4;
-                        var b = pSrc[0];
-                        var g = pSrc[1];
-                        var r = pSrc[2];
+                        lineBlock[bx * 4 + 0] = b;
+                        lineBlock[bx * 4 + 1] = g;
+                        lineBlock[bx * 4 + 2] = r;
+                        lineBlock[bx * 4 + 3] = 255;
+                    }
 
-                        for (var bx = 0; bx < pxSizeDev; bx++)
-                        {
-                            lineBlock[bx * 4 + 0] = b;
-                            lineBlock[bx * 4 + 1] = g;
-                            lineBlock[bx * 4 + 2] = r;
-                            lineBlock[bx * 4 + 3] = 255; // Alpha is irrelevant
-                        }
+                    var dstBlockX = srcX * (pxSizeDev + gridGapDev);
 
-                        var dstBlockX = srcX * (pxSizeDev + gridGapDev);
-
-                        for (var by = 0; by < pxSizeDev; by++)
-                        {
-                            byte* pDstRow = dstBuf + (dstBlockY + by) * dstStride + dstBlockX * 4;
-                            Buffer.MemoryCopy(lineBlock, pDstRow, lineBytes, lineBytes);
-                        }
+                    // Copy the line block vertically into destination
+                    for (var by = 0; by < pxSizeDev; by++)
+                    {
+                        byte* pDstRow = dstBase + (dstBlockY + by) * dstStride + dstBlockX * 4;
+                        Buffer.MemoryCopy(lineBlock, pDstRow, lineBytes, lineBytes);
                     }
                 }
             }
         }
 
-        _expandedBitmap!.WritePixels(
-            new Int32Rect(0, 0, _expandedDevSize, _expandedDevSize),
-            _expandedBuffer, dstStride, 0);
+        _expandedBitmap.AddDirtyRect(new Int32Rect(0, 0, _expandedDevSize, _expandedDevSize));
+        _expandedBitmap.Unlock();
 
         var useScale = _scaleTrans is not null;
         if (useScale)
