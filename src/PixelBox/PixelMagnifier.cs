@@ -1,13 +1,14 @@
-﻿using PixelBox.Drawing;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media;
 using System.Windows.Threading;
-using Windows.Win32;
+using System.Windows;
+
 using Windows.Win32.Graphics.Gdi;
+using Windows.Win32;
+
+using PixelBox.Drawing;
 
 namespace PixelBox;
 
@@ -310,6 +311,17 @@ public class PixelMagnifier : FrameworkElement
     public void UnlockPosition() => _lockedPixelPos = new Point(-1, -1);
 
     /// <summary>
+    /// Configures the internal <see cref="ScaleTransform"/> so that the visual
+    /// is scaled properly regardless of the monitor's current DPI scaling.
+    /// </summary>
+    private void SetScaleTransform()
+    {
+        _scaleTrans ??= new ScaleTransform();
+        _scaleTrans.ScaleX = 1.0 / _dpi.DpiScaleX;
+        _scaleTrans.ScaleY = 1.0 / _dpi.DpiScaleY;
+    }
+
+    /// <summary>
     /// Updates the grid metrics based on the specified number of columns.
     /// </summary>
     /// 
@@ -492,17 +504,6 @@ public class PixelMagnifier : FrameworkElement
     }
 
     #endregion
-
-    /// <summary>
-    /// Configures the internal <see cref="ScaleTransform"/> so that the visual
-    /// is scaled properly regardless of the monitor's current DPI scaling.
-    /// </summary>
-    private void SetScaleTransform()
-    {
-        _scaleTrans ??= new ScaleTransform();
-        _scaleTrans.ScaleX = 1.0 / _dpi.DpiScaleX;
-        _scaleTrans.ScaleY = 1.0 / _dpi.DpiScaleY;
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PixelMagnifier"/> class.
