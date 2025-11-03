@@ -35,8 +35,8 @@ public class PixelMagnifier : FrameworkElement
     private byte[]? _captureBuffer;
     private int _captureStride;
 
-    private WriteableBitmap? _expandedBitmap;
-    private int _expandedDevSize = 0;
+    private WriteableBitmap? _bitmap;
+    private int _bitmapDevSize = 0;
 
     public event EventHandler<PixelChangedEventArgs>? PixelChanged;
 
@@ -562,6 +562,147 @@ public class PixelMagnifier : FrameworkElement
         return true;
     }
 
+    /// <summary>
+    /// Draws a simulated grid to visualize individual pixel cell boundaries.
+    /// </summary>
+    /// 
+    /// <param name="dc">
+    /// The drawing context to use.
+    /// </param>
+    private void DrawGrid(DrawingContext dc)
+    {
+        dc.DrawRectangle(Brushes.Black, null,
+            new Rect(0, 0, ActualWidth, ActualHeight));
+    }
+
+    /// <summary>
+    /// Ensures that a capture buffer is available. If no previous capture
+    /// exists, a new one is performed at the current mouse position.
+    /// </summary>
+    /// 
+    /// <returns>
+    /// <see langword="true"/> if a capture buffer is available;
+    /// <see langword="false"/> otherwise.
+    /// </returns>
+    private bool EnsureCaptureReady()
+    {
+        if (_captureBuffer == null)
+        {
+            _lastMousePos = MousePosition;
+            CaptureAt(_lastMousePos);
+        }
+
+        return _captureBuffer != null;
+    }
+
+    /// <summary>
+    /// Ensures that the bitmap is created and sized correctly for the current
+    /// pixel and grid configuration.
+    /// </summary>
+    /// 
+    /// <param name="drawGrid">
+    /// Indicates whether grid gaps should be accounted for in the bitmap size.
+    /// </param>
+    private void EnsureBitmapReady(bool drawGrid)
+    {
+        var gridGapDev = drawGrid ? 1 : 0;
+        var totalDev = (_pixelSize * _pixelColumns) + (gridGapDev * (_pixelColumns - 1));
+
+        if (_bitmapDevSize == totalDev)
+            return;
+
+        _bitmapDevSize = totalDev;
+
+        _bitmap = new WriteableBitmap(
+            _bitmapDevSize, _bitmapDevSize,
+            _dpi.PixelsPerInchX, _dpi.PixelsPerInchY,
+            PixelFormats.Bgra32, null);
+
+        // Recapture if the bitmap size has changed
+        CaptureAt(_lastMousePos);
+    }
+
+    /// <summary>
+    /// Writes pixel data from the last captured region to the bitmap's back
+    /// buffer.
+    /// </summary>
+    /// 
+    /// <param name="drawGrid">
+    /// Indicates whether one-pixel gaps should be created between pixel cells.
+    /// </param>
+    private unsafe void FillBitmapBuffer(bool drawGrid)
+    {
+        if (_bitmap is null)
+            return;
+
+        var gridGapDev = drawGrid ? 1 : 0;
+        var dstStride = _bitmap.BackBufferStride;
+
+        _bitmap.Lock();
+
+        byte* dstBase = (byte*)_bitmap.BackBuffer;
+
+        fixed (byte* srcBuf = _captureBuffer)
+        {
+            var lineBytes = _pixelSize * 4;
+            byte* lineBlock = stackalloc byte[lineBytes];
+
+            for (var srcY = 0; srcY < _pixelColumns; srcY++)
+            {
+                byte* pSrcRow = srcBuf + srcY * _captureStride;
+                var dstBlockY = srcY * (_pixelSize + gridGapDev);
+
+                for (var srcX = 0; srcX < _pixelColumns; srcX++)
+                {
+                    byte* pSrc = pSrcRow + srcX * 4;
+                    var b = pSrc[0];
+                    var g = pSrc[1];
+                    var r = pSrc[2];
+
+                    for (var bx = 0; bx < _pixelSize; bx++)
+                    {
+                        lineBlock[bx * 4 + 0] = b;
+                        lineBlock[bx * 4 + 1] = g;
+                        lineBlock[bx * 4 + 2] = r;
+                        lineBlock[bx * 4 + 3] = 255;
+                    }
+
+                    var dstBlockX = srcX * (_pixelSize + gridGapDev);
+
+                    for (var by = 0; by < _pixelSize; by++)
+                    {
+                        byte* pDstRow = dstBase + (dstBlockY + by) * dstStride + dstBlockX * 4;
+                        Buffer.MemoryCopy(lineBlock, pDstRow, lineBytes, lineBytes);
+                    }
+                }
+            }
+        }
+
+        _bitmap.AddDirtyRect(new Int32Rect(0, 0, _bitmapDevSize, _bitmapDevSize));
+        _bitmap.Unlock();
+    }
+
+    /// <summary>
+    /// Draws the bitmap onto the specified <see cref="DrawingContext"/>,
+    /// applying DPI scaling if required.
+    /// </summary>
+    /// 
+    /// <param name="dc">
+    /// The drawing context to use.
+    /// </param>
+    private void DrawBitmap(DrawingContext dc)
+    {
+        var useScale = _scaleTrans is not null;
+
+        if (useScale)
+            dc.PushTransform(_scaleTrans);
+
+        dc.DrawImage(_bitmap!, new Rect(0, 0, _bitmapDevSize, _bitmapDevSize));
+
+        if (useScale)
+            dc.Pop();
+    }
+
     #endregion
 
     /// <summary>
@@ -644,92 +785,15 @@ public class PixelMagnifier : FrameworkElement
         // We simply draw a background behind to simulate grid lines
         var drawGrid = ShowGrid;
         if (drawGrid)
-        {
-            dc.DrawRectangle(Brushes.Black, null,
-                new Rect(0, 0, ActualWidth, ActualHeight));
-        }
+            DrawGrid(dc);
 
         // If we don't have a capture yet (e.g., StartCapture() isn't called,
         // then capture once at cursor
-        if (_captureBuffer == null)
-        {
-            _lastMousePos = MousePosition;
-            CaptureAt(_lastMousePos);
-        }
-
-        // Do nothing if the capture attempt somehow failed
-        if (_captureBuffer == null)
+        if (!EnsureCaptureReady())
             return;
 
-        var gridGapDev = drawGrid ? 1 : 0;
-        var totalDev = (_pixelColumns * _pixelSize) + (gridGapDev * (_pixelColumns - 1));
-
-        if (_expandedDevSize != totalDev)
-        {
-            _expandedDevSize = totalDev;
-
-            _expandedBitmap = new WriteableBitmap(
-                _expandedDevSize, _expandedDevSize,
-                _dpi.PixelsPerInchX, _dpi.PixelsPerInchY,
-                PixelFormats.Bgra32, null);
-
-            // Recapture if grid columns are dynamically increased
-            CaptureAt(_lastMousePos);
-        }
-
-        _expandedBitmap!.Lock();
-
-        byte* dstBase = (byte*)_expandedBitmap.BackBuffer;
-        var dstStride = _expandedBitmap.BackBufferStride;
-
-        fixed (byte* srcBuf = _captureBuffer)
-        {
-            var lineBytes = _pixelSize * 4;
-            byte* lineBlock = stackalloc byte[lineBytes];
-
-            for (int srcY = 0; srcY < _pixelColumns; srcY++)
-            {
-                byte* pDrcRow = srcBuf + srcY * _captureStride;
-                var dstBlockY = srcY * (_pixelSize + gridGapDev);
-
-                for (var srcX = 0; srcX < _pixelColumns; srcX++)
-                {
-                    byte* pSrc = pDrcRow + srcX * 4;
-                    var b = pSrc[0];
-                    var g = pSrc[1];
-                    var r = pSrc[2];
-
-                    // Pre-fill one horizontal line of a pixel block
-                    for (var bx = 0; bx < _pixelSize; bx++)
-                    {
-                        lineBlock[bx * 4 + 0] = b;
-                        lineBlock[bx * 4 + 1] = g;
-                        lineBlock[bx * 4 + 2] = r;
-                        lineBlock[bx * 4 + 3] = 255;
-                    }
-
-                    var dstBlockX = srcX * (_pixelSize + gridGapDev);
-
-                    // Copy the line block vertically into destination
-                    for (var by = 0; by < _pixelSize; by++)
-                    {
-                        byte* pDstRow = dstBase + (dstBlockY + by) * dstStride + dstBlockX * 4;
-                        Buffer.MemoryCopy(lineBlock, pDstRow, lineBytes, lineBytes);
-                    }
-                }
-            }
-        }
-
-        _expandedBitmap.AddDirtyRect(new Int32Rect(0, 0, _expandedDevSize, _expandedDevSize));
-        _expandedBitmap.Unlock();
-
-        var useScale = _scaleTrans is not null;
-        if (useScale)
-            dc.PushTransform(_scaleTrans);
-
-        dc.DrawImage(_expandedBitmap, new Rect(0, 0, _expandedDevSize, _expandedDevSize));
-
-        if (useScale)
-            dc.Pop();
+        EnsureBitmapReady(drawGrid);
+        FillBitmapBuffer(drawGrid);
+        DrawBitmap(dc);
     }
 }
