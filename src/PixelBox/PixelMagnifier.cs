@@ -259,7 +259,7 @@ public class PixelMagnifier : FrameworkElement
         if (sender is PixelMagnifier mag)
         {
             mag.RecalculateGridMetrics(GridMetricUpdateFlags.Columns);
-            mag.UpdateSamplingAreaIndicator();
+            mag.RenderSamplingAreaIndicator();
         }
     }
 
@@ -268,7 +268,7 @@ public class PixelMagnifier : FrameworkElement
         if (sender is PixelMagnifier mag)
         {
             mag.RecalculateGridMetrics(GridMetricUpdateFlags.CellSize);
-            mag.UpdateSamplingAreaIndicator();
+            mag.RenderSamplingAreaIndicator();
         }
     }
 
@@ -276,7 +276,7 @@ public class PixelMagnifier : FrameworkElement
     {
         if (sender is PixelMagnifier mag)
         {
-            mag.UpdateSamplingAreaIndicator();
+            mag.RenderSamplingAreaIndicator();
             mag.CaptureAt(mag._lastMousePos);
         }
     }
@@ -284,7 +284,7 @@ public class PixelMagnifier : FrameworkElement
     private static void OnShowGridChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
         if (sender is PixelMagnifier mag)
-            mag.UpdateSamplingAreaIndicator();
+            mag.RenderSamplingAreaIndicator();
     }
 
     private static void OnRefreshIntervalChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
@@ -372,9 +372,9 @@ public class PixelMagnifier : FrameworkElement
     }
 
     /// <summary>
-    /// Updates the visual indicator surrounding the current sampling area.
+    /// Renders the visual indicator surrounding the current sampling area.
     /// </summary>
-    private void UpdateSamplingAreaIndicator()
+    private void RenderSamplingAreaIndicator()
     {
         var pxCenter = (_pixelSize + (ShowGrid ? 1 : 0)) * _pixelColumnsHalf;
 
@@ -552,15 +552,15 @@ public class PixelMagnifier : FrameworkElement
         Focusable = false;
 
         _dpi = VisualTreeHelper.GetDpi(this);
-        _samplingAreaIndicator = new SamplingAreaIndicator(_dpi);
 
+        _samplingAreaIndicator = new SamplingAreaIndicator(_dpi);
         _visuals = new VisualCollection(this)
         {
             _samplingAreaIndicator
         };
 
         RecalculateGridMetrics(GridMetricUpdateFlags.All);
-        UpdateSamplingAreaIndicator();
+        RenderSamplingAreaIndicator();
 
         if (_dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0)
             SetScaleTransform();
@@ -607,7 +607,7 @@ public class PixelMagnifier : FrameworkElement
         SetScaleTransform();
 
         RecalculateGridMetrics(GridMetricUpdateFlags.All);
-        UpdateSamplingAreaIndicator();
+        RenderSamplingAreaIndicator();
     }
 
     protected override unsafe void OnRender(DrawingContext dc)
