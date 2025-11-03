@@ -277,7 +277,7 @@ public class PixelMagnifier : FrameworkElement
         if (sender is PixelMagnifier mag)
         {
             mag.RenderSamplingAreaIndicator();
-            mag.CaptureAt(mag._lastMousePos);
+            mag.SampleColorFromLastCapture();
         }
     }
 
@@ -394,6 +394,13 @@ public class PixelMagnifier : FrameworkElement
         _samplingAreaIndicator.Render();
     }
 
+    /// <summary>
+    /// Captures a new bitmap at the specified screen position.
+    /// </summary>
+    /// 
+    /// <param name="screenPt">
+    /// The screen position to capture at.
+    /// </param>
     private void CaptureAt(Point screenPt)
     {
         var cx = (int)screenPt.X;
@@ -425,12 +432,28 @@ public class PixelMagnifier : FrameworkElement
             bsrc.CopyPixels(_captureBuffer, _captureStride, 0);
 
             _centerPixelColor = SampleColor(SamplingMode, _captureBuffer, _captureStride);
+            PixelChanged?.Invoke(this, new PixelChangedEventArgs(_centerPixelColor, _lastMousePos));
         }
         finally
         {
             PInvoke.DeleteObject(hBitmap);
-            PixelChanged?.Invoke(this, new PixelChangedEventArgs(_centerPixelColor, _lastMousePos));
         }
+    }
+
+    /// <summary>
+    /// Samples color using the last capture buffer. However, if the said buffer
+    /// is <see langword="null"/>, a new capture will be created.
+    /// </summary>
+    private void SampleColorFromLastCapture()
+    {
+        if (_captureBuffer is null)
+        {
+            CaptureAt(_lastMousePos);
+            return;
+        }
+
+        _centerPixelColor = SampleColor(SamplingMode, _captureBuffer, _captureStride);
+        PixelChanged?.Invoke(this, new PixelChangedEventArgs(_centerPixelColor, _lastMousePos));
     }
 
     /// <summary>
