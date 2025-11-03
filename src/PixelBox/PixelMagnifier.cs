@@ -407,7 +407,7 @@ public class PixelMagnifier : FrameworkElement
         var cy = (int)screenPt.Y;
 
         // Possible negative coordinates here when the cursor is at the boundary
-        // of the screen are valid!
+        // of the screen are valid! No need to clamp anything
         var left = cx - _pixelColumnsHalf;
         var top = cy - _pixelColumnsHalf;
 
@@ -630,7 +630,7 @@ public class PixelMagnifier : FrameworkElement
     /// <param name="drawGrid">
     /// Indicates whether one-pixel gaps should be created between pixel cells.
     /// </param>
-    private unsafe void FillBitmapBuffer(bool drawGrid)
+    private unsafe void CopyCaptureToBitmap(bool drawGrid)
     {
         if (_bitmap is null)
             return;
@@ -649,7 +649,7 @@ public class PixelMagnifier : FrameworkElement
 
             for (var srcY = 0; srcY < _pixelColumns; srcY++)
             {
-                byte* pSrcRow = srcBuf + srcY * _captureStride;
+                byte* pSrcRow = srcBuf + (srcY * _captureStride);
                 var dstBlockY = srcY * (_pixelSize + gridGapDev);
 
                 for (var srcX = 0; srcX < _pixelColumns; srcX++)
@@ -671,7 +671,7 @@ public class PixelMagnifier : FrameworkElement
 
                     for (var by = 0; by < _pixelSize; by++)
                     {
-                        byte* pDstRow = dstBase + (dstBlockY + by) * dstStride + dstBlockX * 4;
+                        byte* pDstRow = dstBase + ((dstBlockY + by) * dstStride) + (dstBlockX * 4);
                         Buffer.MemoryCopy(lineBlock, pDstRow, lineBytes, lineBytes);
                     }
                 }
@@ -793,7 +793,7 @@ public class PixelMagnifier : FrameworkElement
             return;
 
         EnsureBitmapReady(drawGrid);
-        FillBitmapBuffer(drawGrid);
+        CopyCaptureToBitmap(drawGrid);
         DrawBitmap(dc);
     }
 }
