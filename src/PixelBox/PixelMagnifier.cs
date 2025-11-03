@@ -24,6 +24,7 @@ public class PixelMagnifier : FrameworkElement
 
     private readonly DispatcherTimer _refreshTimer;
 
+    private int _pixelSize;
     private int _pixelColumns;
     private int _pixelColumnsHalf;
 
@@ -42,6 +43,33 @@ public class PixelMagnifier : FrameworkElement
     private readonly SamplingAreaIndicator _samplingAreaIndicator;
 
     private readonly VisualCollection _visuals;
+
+    #endregion
+    #region Enums
+
+    /// <summary>
+    /// Specifies which grid metric values should be recalculated.
+    /// </summary>
+    [Flags]
+    private enum GridMetricUpdateFlags
+    {
+        /// <summary>
+        /// No grid metrics are updated.
+        /// </summary>
+        None = 0,
+        /// <summary>
+        /// Indicates that the grid's column metrics should be recalculated.
+        /// </summary>
+        Columns = 1 << 0,
+        /// <summary>
+        /// Indicates that the grid's cell size metric should be recalculated.
+        /// </summary>
+        CellSize = 1 << 1,
+        /// <summary>
+        /// Indicates that all grid metrics should be recalculated.
+        /// </summary>
+        All = Columns | CellSize
+    }
 
     #endregion
     #region Dependency Properties
@@ -230,7 +258,7 @@ public class PixelMagnifier : FrameworkElement
     {
         if (sender is PixelMagnifier mag)
         {
-            mag.UpdateGridMetrics((int)e.NewValue);
+            mag.RecalculateGridMetrics(GridMetricUpdateFlags.Columns);
             mag.UpdateSamplingAreaIndicator();
         }
     }
@@ -238,7 +266,10 @@ public class PixelMagnifier : FrameworkElement
     private static void OnPixelSizeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
         if (sender is PixelMagnifier mag)
+        {
+            mag.RecalculateGridMetrics(GridMetricUpdateFlags.CellSize);
             mag.UpdateSamplingAreaIndicator();
+        }
     }
 
     private static void OnSamplingModeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
@@ -322,16 +353,22 @@ public class PixelMagnifier : FrameworkElement
     }
 
     /// <summary>
-    /// Updates the grid metrics based on the specified number of columns.
+    /// Recalculates grid metric values based on the specified update flags.
     /// </summary>
     /// 
-    /// <param name="cols">
-    /// Total number of columns in the grid.
+    /// <param name="flags">
+    /// Specifies which grid metrics to recalculate.
     /// </param>
-    private void UpdateGridMetrics(int cols)
+    private void RecalculateGridMetrics(GridMetricUpdateFlags flags)
     {
-        _pixelColumns = cols;
-        _pixelColumnsHalf = cols / 2;
+        if ((flags & GridMetricUpdateFlags.CellSize) != 0)
+            _pixelSize = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
+
+        if ((flags & GridMetricUpdateFlags.Columns) != 0)
+        {
+            _pixelColumns = PixelColumns;
+            _pixelColumnsHalf = _pixelColumns / 2;
+        }
     }
 
     /// <summary>
@@ -339,12 +376,11 @@ public class PixelMagnifier : FrameworkElement
     /// </summary>
     private void UpdateSamplingAreaIndicator()
     {
-        var pxSizeDev = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
-        var pxCenterDev = (pxSizeDev + (ShowGrid ? 1 : 0)) * _pixelColumnsHalf;
+        var pxCenter = (_pixelSize + (ShowGrid ? 1 : 0)) * _pixelColumnsHalf;
 
         var rect = new Rect(
-            pxCenterDev, pxCenterDev,
-            pxSizeDev + 1, pxSizeDev + 1);
+            pxCenter, pxCenter,
+            _pixelSize + 1, _pixelSize + 1);
 
         var samplerSize = (int)SamplingMode / 2;
 
@@ -523,7 +559,7 @@ public class PixelMagnifier : FrameworkElement
             _samplingAreaIndicator
         };
 
-        UpdateGridMetrics(PixelColumns);
+        RecalculateGridMetrics(GridMetricUpdateFlags.All);
         UpdateSamplingAreaIndicator();
 
         if (_dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0)
@@ -550,15 +586,15 @@ public class PixelMagnifier : FrameworkElement
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        var pxSizeDev = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
-        var totalSizeDev = pxSizeDev * PixelColumns;
+        var sizeDev = _pixelColumns * _pixelSize;
 
         if (ShowGrid)
-            totalSizeDev += PixelColumns - 1;
+            sizeDev += _pixelColumns - 1;
 
         // Convert device pixels to DIPs
-        var totalSizeDip = totalSizeDev / _dpi.DpiScaleX;
-        return new Size(totalSizeDip, totalSizeDip);
+        return new Size(
+            sizeDev / _dpi.DpiScaleX,
+            sizeDev / _dpi.DpiScaleY);
     }
 
     protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
@@ -566,9 +602,12 @@ public class PixelMagnifier : FrameworkElement
         base.OnDpiChanged(oldDpi, newDpi);
 
         _dpi = newDpi;
+        _samplingAreaIndicator.SetDpi(_dpi);
 
-        UpdateSamplingAreaIndicator();
         SetScaleTransform();
+
+        RecalculateGridMetrics(GridMetricUpdateFlags.All);
+        UpdateSamplingAreaIndicator();
     }
 
     protected override unsafe void OnRender(DrawingContext dc)
@@ -599,9 +638,8 @@ public class PixelMagnifier : FrameworkElement
         if (_captureBuffer == null)
             return;
 
-        var pxSizeDev = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
         var gridGapDev = drawGrid ? 1 : 0;
-        var totalDev = pxSizeDev * _pixelColumns + gridGapDev * (_pixelColumns - 1);
+        var totalDev = (_pixelColumns * _pixelSize) + (gridGapDev * (_pixelColumns - 1));
 
         if (_expandedDevSize != totalDev)
         {
@@ -623,13 +661,13 @@ public class PixelMagnifier : FrameworkElement
 
         fixed (byte* srcBuf = _captureBuffer)
         {
-            var lineBytes = pxSizeDev * 4;
+            var lineBytes = _pixelSize * 4;
             byte* lineBlock = stackalloc byte[lineBytes];
 
             for (int srcY = 0; srcY < _pixelColumns; srcY++)
             {
                 byte* pDrcRow = srcBuf + srcY * _captureStride;
-                var dstBlockY = srcY * (pxSizeDev + gridGapDev);
+                var dstBlockY = srcY * (_pixelSize + gridGapDev);
 
                 for (var srcX = 0; srcX < _pixelColumns; srcX++)
                 {
@@ -639,7 +677,7 @@ public class PixelMagnifier : FrameworkElement
                     var r = pSrc[2];
 
                     // Pre-fill one horizontal line of a pixel block
-                    for (var bx = 0; bx < pxSizeDev; bx++)
+                    for (var bx = 0; bx < _pixelSize; bx++)
                     {
                         lineBlock[bx * 4 + 0] = b;
                         lineBlock[bx * 4 + 1] = g;
@@ -647,10 +685,10 @@ public class PixelMagnifier : FrameworkElement
                         lineBlock[bx * 4 + 3] = 255;
                     }
 
-                    var dstBlockX = srcX * (pxSizeDev + gridGapDev);
+                    var dstBlockX = srcX * (_pixelSize + gridGapDev);
 
                     // Copy the line block vertically into destination
-                    for (var by = 0; by < pxSizeDev; by++)
+                    for (var by = 0; by < _pixelSize; by++)
                     {
                         byte* pDstRow = dstBase + (dstBlockY + by) * dstStride + dstBlockX * 4;
                         Buffer.MemoryCopy(lineBlock, pDstRow, lineBytes, lineBytes);

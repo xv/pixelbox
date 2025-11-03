@@ -66,6 +66,15 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
     }
 
     /// <summary>
+    /// Manually sets the DPI scale.
+    /// </summary>
+    /// 
+    /// <param name="newDpi">
+    /// The value to set.
+    /// </param>
+    public void SetDpi(DpiScale newDpi) => OnDpiChanged(_dpi, newDpi);
+
+    /// <summary>
     /// Sets the area of the sampling indicator.
     /// </summary>
     /// 
