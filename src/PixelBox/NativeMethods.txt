@@ -4,7 +4,10 @@ CreateCompatibleDC
 DeleteDC
 GetCursorPos
 GetDC
+GetDIBits
 GetSystemMetrics
 ReleaseDC
 SelectObject
 SetCursorPos
+
+BI_COMPRESSION

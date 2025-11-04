@@ -370,7 +370,7 @@ public partial class PixelMagnifierWindow : Window
         if (hBitmap == HBITMAP.Null)
             return null;
 
-        try { return hBitmap.ToBitmapSource(true); }
+        try { return BitmapInterop.BitmapSourceFromHBitmap(hBitmap, true); }
         finally { PInvoke.DeleteObject(hBitmap); }
     }
 

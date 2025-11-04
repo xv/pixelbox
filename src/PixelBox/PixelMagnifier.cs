@@ -421,17 +421,26 @@ public class PixelMagnifier : FrameworkElement
 
         try
         {
-            var bsrc = hBitmap.ToBitmapSource(true);
+            if (BitmapInterop.HBitmapToBuffer(hBitmap, _pixelColumns, _pixelColumns, ref _captureBuffer, out var stride))
+                _captureStride = stride;
+            else
+            {
+                // If for whatever reason the function failed, fallback to
+                // creating a BitmapSource from the HBITMAP we already have
+                // then use it to copy HBITMAP's data to the capture buffer
+                var bsrc = BitmapInterop.BitmapSourceFromHBitmap(hBitmap, true);
 
-            _captureStride = bsrc.PixelWidth * 4;
+                _captureBuffer = null;
+                _captureStride = bsrc.PixelWidth * 4;
 
-            var required = _captureStride * bsrc.PixelHeight;
-            if (_captureBuffer == null || _captureBuffer.Length < required)
-                _captureBuffer = new byte[required];
+                var requiredBytes = _captureStride * bsrc.PixelHeight;
+                if (_captureBuffer is null || _captureBuffer.Length < requiredBytes)
+                    _captureBuffer = new byte[requiredBytes];
 
-            bsrc.CopyPixels(_captureBuffer, _captureStride, 0);
+                bsrc.CopyPixels(_captureBuffer, _captureStride, 0);
+            }
 
-            _centerPixelColor = SampleColor(SamplingMode, _captureBuffer, _captureStride);
+            _centerPixelColor = SampleColor(SamplingMode, _captureBuffer!, _captureStride);
             PixelChanged?.Invoke(this, new PixelChangedEventArgs(_centerPixelColor, _lastMousePos));
         }
         finally
@@ -586,13 +595,13 @@ public class PixelMagnifier : FrameworkElement
     /// </returns>
     private bool EnsureCaptureReady()
     {
-        if (_captureBuffer == null)
+        if (_captureBuffer is null)
         {
             _lastMousePos = MousePosition;
             CaptureAt(_lastMousePos);
         }
 
-        return _captureBuffer != null;
+        return _captureBuffer is not null;
     }
 
     /// <summary>
