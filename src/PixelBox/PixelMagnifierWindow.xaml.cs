@@ -607,10 +607,6 @@ public partial class PixelMagnifierWindow : Window
         if (e.Command == PixelMagnifierUICommands.Close)
         {
             DialogResult = true;
-
-            if (_config.CopyColorToClipboard)
-                Clipboard.SetText(PixelColorString);
-
             PlaySoundEffect(ConfirmationSoundEffect);
         }
 
