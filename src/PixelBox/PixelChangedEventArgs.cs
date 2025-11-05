@@ -1,4 +1,7 @@
-﻿using System.Windows.Media;
+﻿// Copyright 2025 Jad Altahan <xv.git@aol.com>
+// SPDX-License-Identifier: MIT
+
+using System.Windows.Media;
 using System.Windows;
 
 namespace PixelBox;

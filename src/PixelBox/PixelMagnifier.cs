@@ -1,4 +1,7 @@
-﻿using System.ComponentModel;
+﻿// Copyright 2025 Jad Altahan <xv.git@aol.com>
+// SPDX-License-Identifier: MIT
+
+using System.ComponentModel;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows.Threading;

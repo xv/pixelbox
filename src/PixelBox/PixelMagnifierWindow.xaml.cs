@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿// Copyright 2025 Jad Altahan <xv.git@aol.com>
+// SPDX-License-Identifier: MIT
+
+using System.IO;
 using System.Media;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;

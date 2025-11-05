@@ -1,4 +1,6 @@
-﻿
+﻿// Copyright 2025 Jad Altahan <xv.git@aol.com>
+// SPDX-License-Identifier: MIT
+
 namespace PixelBox;
 
 /// <summary>

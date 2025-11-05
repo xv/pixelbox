@@ -1,4 +1,7 @@
-﻿using Windows.Win32.UI.WindowsAndMessaging;
+﻿// Copyright 2025 Jad Altahan <xv.git@aol.com>
+// SPDX-License-Identifier: MIT
+
+using Windows.Win32.UI.WindowsAndMessaging;
 using Windows.Win32;
 using System.Windows;
 

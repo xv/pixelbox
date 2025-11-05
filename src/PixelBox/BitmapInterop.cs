@@ -1,4 +1,7 @@
-﻿using System.Windows.Interop;
+﻿// Copyright 2025 Jad Altahan <xv.git@aol.com>
+// SPDX-License-Identifier: MIT
+
+using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Windows;
 

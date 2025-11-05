@@ -1,4 +1,7 @@
-﻿using System.Globalization;
+﻿// Copyright 2025 Jad Altahan <xv.git@aol.com>
+// SPDX-License-Identifier: MIT
+
+using System.Globalization;
 using System.Windows.Data;
 
 namespace PixelBox.BindingConverters;

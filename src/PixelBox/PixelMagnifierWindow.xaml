@@ -1,4 +1,7 @@
-﻿<Window
+﻿<!-- Copyright 2025 Jad Altahan<xv.git@aol.com>
+     SPDX-License-Identifier: MIT -->
+
+<Window
     x:Class="PixelBox.PixelMagnifierWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

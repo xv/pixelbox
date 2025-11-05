@@ -1,4 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿// Copyright 2025 Jad Altahan <xv.git@aol.com>
+// SPDX-License-Identifier: MIT
+
+using System.Runtime.InteropServices;
 
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
