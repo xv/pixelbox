@@ -427,6 +427,9 @@ public partial class PixelMagnifierWindow : Window
 
     #endregion
 
+    /// <summary>
+    /// Initializes static members of <see cref="PixelMagnifierWindow"/>.
+    /// </summary>
     static PixelMagnifierWindow()
     {
         LoadSoundStreams();
@@ -490,6 +493,7 @@ public partial class PixelMagnifierWindow : Window
         Unloaded += (_, _) =>
         {
             Magnifier.PixelChanged -= OnPixelChanged;
+            Magnifier.Dispose();
         };
     }
 

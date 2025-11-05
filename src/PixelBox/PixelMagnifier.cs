@@ -1,13 +1,10 @@
 ﻿using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Windows;
 
-using Windows.Win32.Graphics.Gdi;
 using Windows.Win32;
-
 using PixelBox.Drawing;
 
 namespace PixelBox;
@@ -15,7 +12,7 @@ namespace PixelBox;
 /// <summary>
 /// Represents a pixel magnification control.
 /// </summary>
-public class PixelMagnifier : FrameworkElement
+public class PixelMagnifier : FrameworkElement, IDisposable
 {
     #region Fields
 
@@ -32,9 +29,7 @@ public class PixelMagnifier : FrameworkElement
     private Point _lastMousePos = new(-1, -1);
     private Point _lockedPixelPos = new(-1, -1);
 
-    private byte[]? _captureBuffer;
-    private int _captureStride;
-
+    private PersistentDibSection? _dib;
     private WriteableBitmap? _bitmap;
     private int _bitmapDevSize = 0;
 
@@ -43,6 +38,8 @@ public class PixelMagnifier : FrameworkElement
     private readonly SamplingAreaIndicator _samplingAreaIndicator;
 
     private readonly VisualCollection _visuals;
+
+    private bool _disposed;
 
     #endregion
     #region Enums
@@ -124,10 +121,6 @@ public class PixelMagnifier : FrameworkElement
             v => (v is int i) && (i > 0) && (i <= 1000));
 
 
-    [SuppressMessage(
-        "Performance",
-        "CA1859:Use concrete types when possible for improved performance",
-        Justification = "Returning type <object> is required.")]
     private static object CoercePixelColumns(DependencyObject d, object value)
     {
         var cols = (int)value;
@@ -394,6 +387,20 @@ public class PixelMagnifier : FrameworkElement
         _samplingAreaIndicator.Render();
     }
 
+    private void EnsureDibAvailable(int width, int height)
+    {
+        if (_dib is null)
+        {
+            _dib = new PersistentDibSection(width, height);
+            return;
+        }
+
+        if (width == _dib.Width && height == _dib.Height)
+            return;
+
+        _dib.Resize(width, height);
+    }
+
     /// <summary>
     /// Captures a new bitmap at the specified screen position.
     /// </summary>
@@ -401,7 +408,7 @@ public class PixelMagnifier : FrameworkElement
     /// <param name="screenPt">
     /// The screen position to capture at.
     /// </param>
-    private void CaptureAt(Point screenPt)
+    private unsafe void CaptureAt(Point screenPt)
     {
         var cx = (int)screenPt.X;
         var cy = (int)screenPt.Y;
@@ -411,57 +418,15 @@ public class PixelMagnifier : FrameworkElement
         var left = cx - _pixelColumnsHalf;
         var top = cy - _pixelColumnsHalf;
 
-        var hBitmap = BitmapInterop.CaptureRectToHBitmap(left, top, _pixelColumns, _pixelColumns);
-        if (hBitmap == HBITMAP.Null)
-        {
-            _captureBuffer = null;
-            _centerPixelColor = Colors.Transparent;
+        EnsureDibAvailable(_pixelColumns, _pixelColumns);
+
+        if (_dib is null)
             return;
-        }
 
-        try
-        {
-            if (BitmapInterop.HBitmapToBuffer(hBitmap, _pixelColumns, _pixelColumns, ref _captureBuffer, out var stride))
-                _captureStride = stride;
-            else
-            {
-                // If for whatever reason the function failed, fallback to
-                // creating a BitmapSource from the HBITMAP we already have
-                // then use it to copy HBITMAP's data to the capture buffer
-                var bsrc = BitmapInterop.BitmapSourceFromHBitmap(hBitmap, true);
-
-                _captureBuffer = null;
-                _captureStride = bsrc.PixelWidth * 4;
-
-                var requiredBytes = _captureStride * bsrc.PixelHeight;
-                if (_captureBuffer is null || _captureBuffer.Length < requiredBytes)
-                    _captureBuffer = new byte[requiredBytes];
-
-                bsrc.CopyPixels(_captureBuffer, _captureStride, 0);
-            }
-
-            _centerPixelColor = SampleColor(SamplingMode, _captureBuffer!, _captureStride);
-            PixelChanged?.Invoke(this, new PixelChangedEventArgs(_centerPixelColor, _lastMousePos));
-        }
-        finally
-        {
-            PInvoke.DeleteObject(hBitmap);
-        }
-    }
-
-    /// <summary>
-    /// Samples color using the last capture buffer. However, if the said buffer
-    /// is <see langword="null"/>, a new capture will be created.
-    /// </summary>
-    private void SampleColorFromLastCapture()
-    {
-        if (_captureBuffer is null)
-        {
-            CaptureAt(_lastMousePos);
+        if (!_dib.Capture(left, top))
             return;
-        }
 
-        _centerPixelColor = SampleColor(SamplingMode, _captureBuffer, _captureStride);
+        _centerPixelColor = SampleColor(SamplingMode, (byte*)_dib.Bits, _dib.Stride);
         PixelChanged?.Invoke(this, new PixelChangedEventArgs(_centerPixelColor, _lastMousePos));
     }
 
@@ -474,8 +439,8 @@ public class PixelMagnifier : FrameworkElement
     /// sampling kernel.
     /// </param>
     /// 
-    /// <param name="buffer">
-    /// Byte array containing the pixel data.
+    /// <param name="pBits">
+    /// Pointer to the pixel data.
     /// </param>
     /// 
     /// <param name="stride">
@@ -488,15 +453,15 @@ public class PixelMagnifier : FrameworkElement
     /// pixel is returned; otherwise, the average color of nearby pixels is
     /// calculated and returned.
     /// </returns>
-    private Color SampleColor(PixelSamplingMode mode, byte[] buffer, int stride)
+    private unsafe Color SampleColor(PixelSamplingMode mode, byte* pBits, int stride)
     {
         if (mode == PixelSamplingMode.Single)
         {
             var idx = (_pixelColumnsHalf * stride) + (_pixelColumnsHalf * 4);
             return Color.FromRgb(
-                /* R */ buffer[idx + 2],
-                /* G */ buffer[idx + 1],
-                /* B */ buffer[idx]);
+                *(pBits + idx + 2 /* R */),
+                *(pBits + idx + 1 /* G */),
+                *(pBits + idx + 0 /* B */));
         }
 
         var kSize = (int)mode;
@@ -514,9 +479,9 @@ public class PixelMagnifier : FrameworkElement
             for (int x = 0; x < kSize; x++)
             {
                 var idx = (first + y) * stride + (first + x) * 4;
-                bSum += buffer[idx];
-                gSum += buffer[idx + 1];
-                rSum += buffer[idx + 2];
+                bSum += *(pBits + idx + 0);
+                gSum += *(pBits + idx + 1);
+                rSum += *(pBits + idx + 2);
             }
         }
 
@@ -525,6 +490,25 @@ public class PixelMagnifier : FrameworkElement
             (byte)(rSum / kTotal),
             (byte)(gSum / kTotal),
             (byte)(bSum / kTotal));
+    }
+
+    /// <summary>
+    /// Samples color using the last capture buffer. However, if the said buffer
+    /// is <see langword="null"/>, a new capture will be created.
+    /// </summary>
+    private unsafe void SampleColorFromLastCapture()
+    {
+        if (_dib is null)
+        {
+            CaptureAt(_lastMousePos);
+            return;
+        }
+
+        _centerPixelColor = SampleColor(SamplingMode,
+            (byte*)_dib.Bits, _dib.Stride);
+
+        PixelChanged?.Invoke(this, new PixelChangedEventArgs(
+            _centerPixelColor, _lastMousePos));
     }
 
     /// <summary>
@@ -595,13 +579,13 @@ public class PixelMagnifier : FrameworkElement
     /// </returns>
     private bool EnsureCaptureReady()
     {
-        if (_captureBuffer is null)
+        if (_dib is null)
         {
             _lastMousePos = MousePosition;
             CaptureAt(_lastMousePos);
         }
 
-        return _captureBuffer is not null;
+        return _dib is not null;
     }
 
     /// <summary>
@@ -641,7 +625,7 @@ public class PixelMagnifier : FrameworkElement
     /// </param>
     private unsafe void CopyCaptureToBitmap(bool drawGrid)
     {
-        if (_bitmap is null)
+        if (_bitmap is null || _dib is null)
             return;
 
         var gridGapDev = drawGrid ? 1 : 0;
@@ -650,39 +634,37 @@ public class PixelMagnifier : FrameworkElement
         _bitmap.Lock();
 
         byte* dstBase = (byte*)_bitmap.BackBuffer;
+        byte* srcBase = (byte*)_dib.Bits;
 
-        fixed (byte* srcBuf = _captureBuffer)
+        var lineBytes = _pixelSize * 4;
+        byte* lineBlock = stackalloc byte[lineBytes];
+
+        for (var srcY = 0; srcY < _pixelColumns; srcY++)
         {
-            var lineBytes = _pixelSize * 4;
-            byte* lineBlock = stackalloc byte[lineBytes];
+            byte* pSrcRow = srcBase + (srcY * _dib.Stride);
+            var dstBlockY = srcY * (_pixelSize + gridGapDev);
 
-            for (var srcY = 0; srcY < _pixelColumns; srcY++)
+            for (var srcX = 0; srcX < _pixelColumns; srcX++)
             {
-                byte* pSrcRow = srcBuf + (srcY * _captureStride);
-                var dstBlockY = srcY * (_pixelSize + gridGapDev);
+                byte* pSrc = pSrcRow + srcX * 4;
+                var b = pSrc[0];
+                var g = pSrc[1];
+                var r = pSrc[2];
 
-                for (var srcX = 0; srcX < _pixelColumns; srcX++)
+                for (var bx = 0; bx < _pixelSize; bx++)
                 {
-                    byte* pSrc = pSrcRow + srcX * 4;
-                    var b = pSrc[0];
-                    var g = pSrc[1];
-                    var r = pSrc[2];
+                    lineBlock[bx * 4 + 0] = b;
+                    lineBlock[bx * 4 + 1] = g;
+                    lineBlock[bx * 4 + 2] = r;
+                    lineBlock[bx * 4 + 3] = 255;
+                }
 
-                    for (var bx = 0; bx < _pixelSize; bx++)
-                    {
-                        lineBlock[bx * 4 + 0] = b;
-                        lineBlock[bx * 4 + 1] = g;
-                        lineBlock[bx * 4 + 2] = r;
-                        lineBlock[bx * 4 + 3] = 255;
-                    }
+                var dstBlockX = srcX * (_pixelSize + gridGapDev);
 
-                    var dstBlockX = srcX * (_pixelSize + gridGapDev);
-
-                    for (var by = 0; by < _pixelSize; by++)
-                    {
-                        byte* pDstRow = dstBase + ((dstBlockY + by) * dstStride) + (dstBlockX * 4);
-                        Buffer.MemoryCopy(lineBlock, pDstRow, lineBytes, lineBytes);
-                    }
+                for (var by = 0; by < _pixelSize; by++)
+                {
+                    byte* pDstRow = dstBase + ((dstBlockY + by) * dstStride) + (dstBlockX * 4);
+                    Buffer.MemoryCopy(lineBlock, pDstRow, lineBytes, lineBytes);
                 }
             }
         }
@@ -804,5 +786,27 @@ public class PixelMagnifier : FrameworkElement
         EnsureBitmapReady(drawGrid);
         CopyCaptureToBitmap(drawGrid);
         DrawBitmap(dc);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
+
+        _dib?.Dispose();
+        _dib = null;
+
+        _disposed = true;
+    }
+
+    ~PixelMagnifier()
+    {
+        Dispose(false);
     }
 }

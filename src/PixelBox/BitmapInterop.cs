@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Windows.Interop;
+﻿using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Windows;
 
@@ -46,10 +45,6 @@ internal static class BitmapInterop
     /// <see cref="HBITMAP"/> via a call to <c>DeleteObject()</c> when it is
     /// no longer needed.
     /// </remarks>
-    [SuppressMessage(
-        "Performance",
-        "CA1806:Do not ignore method results",
-        Justification = "Unnecessary ReleaseDC() return results.")]
     public static HBITMAP CaptureRectToHBitmap(int left, int top, int width, int height)
     {
         var hdcScreen = PInvoke.GetDC(HWND.Null);
@@ -78,7 +73,7 @@ internal static class BitmapInterop
             0, 0, width, height,
             hdcScreen,
             left, top,
-            ROP_CODE.SRCCOPY | ROP_CODE.CAPTUREBLT);
+            ROP_CODE.SRCCOPY);
 
         PInvoke.SelectObject(hdcMem, hOld);
         PInvoke.DeleteDC(hdcMem);
@@ -100,95 +95,6 @@ internal static class BitmapInterop
     /// </param>
     public static HBITMAP CaptureRectToHBitmap(Int32Rect rect) =>
         CaptureRectToHBitmap(rect.X, rect.Y, rect.Width, rect.Height);
-
-    /// <summary>
-    /// Copies pixel data from a specified <see cref="HBITMAP"/> handle into a
-    /// managed byte buffer.
-    /// </summary>
-    /// 
-    /// <param name="hBitmap">
-    /// Handle to the source bitmap.
-    /// </param>
-    /// 
-    /// <param name="width">
-    /// Width of the bitmap, in pixels.
-    /// </param>
-    /// 
-    /// <param name="height">
-    /// Height of the bitmap, in pixels.
-    /// </param>
-    /// 
-    /// <param name="buffer">
-    /// Reference to a byte array that will receive the bitmap's pixel data. if
-    /// <paramref name="buffer"/> is <see langword="null"/> or too small, a new
-    /// buffer is allocated.
-    /// </param>
-    ///
-    /// <param name="stride">
-    /// When this method returns, contains the stride.
-    /// </param>
-    /// 
-    /// <returns>
-    /// <see langword="true"/> if the bitmap data was successfully copied to
-    /// <paramref name="buffer"/>; <see langword="false"/> otherwise.
-    /// </returns>
-    [SuppressMessage(
-        "Performance",
-        "CA1806:Do not ignore method results",
-        Justification = "Unnecessary ReleaseDC() return results.")]
-    public static unsafe bool HBitmapToBuffer(HBITMAP hBitmap, int width, int height, ref byte[]? buffer, out int stride)
-    {
-        stride = width * 4;
-
-        var hdc = PInvoke.GetDC(HWND.Null);
-        if (hdc == HDC.Null)
-            return false;
-
-        var bmi = new BITMAPINFO
-        {
-            bmiHeader = new BITMAPINFOHEADER()
-            {
-                biSize = (uint)sizeof(BITMAPINFOHEADER),
-                biWidth = width,
-                biHeight = -height,
-                biPlanes = 1,
-                biBitCount = 32,
-                biCompression = (uint)BI_COMPRESSION.BI_RGB
-            }
-        };
-
-        var requiredBytes = checked(stride * height);
-        if (buffer is null || buffer.Length < requiredBytes)
-            buffer = new byte[requiredBytes];
-
-        try
-        {
-            fixed (byte* pBuf= buffer)
-            {
-                var ret = PInvoke.GetDIBits(
-                    hdc,
-                    hBitmap,
-                    0,
-                    (uint)height,
-                    pBuf,
-                    &bmi,
-                    DIB_USAGE.DIB_RGB_COLORS);
-
-                if (ret == 0)
-                {
-                    buffer = null;
-                    stride = 0;
-                    return false;
-                }
-
-                return true;
-            }
-        }
-        finally
-        {
-            PInvoke.ReleaseDC(HWND.Null, hdc);
-        }
-    }
 
     /// <summary>
     /// Creates a <see cref="BitmapSource"/> from a Win32 <see cref="HBITMAP"/>.

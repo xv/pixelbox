@@ -1,6 +1,7 @@
 BitBlt
 CreateCompatibleBitmap
 CreateCompatibleDC
+CreateDIBSection
 DeleteDC
 GetCursorPos
 GetDC

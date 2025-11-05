@@ -185,7 +185,7 @@
             <Border
                 x:Name="InfoPanelHost"
                 Grid.Row="1"
-                Margin="0,15,0,0"
+                Margin="0,15,0,5"
                 Padding="6,6"
                 MinWidth="150"
                 HorizontalAlignment="Center"
