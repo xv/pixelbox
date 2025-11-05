@@ -21,28 +21,30 @@ public partial class MainWindow : Window
         };
     }
 
+    private void ShowMagnifierWindow()
+    {
+        var magWindow = new PixelMagnifierWindow(_magWindowCfg)
+        {
+            ConfirmationSoundEffect = PixelMagnifierWindow.SoundEffect.Pop
+        };
+
+        if (magWindow.ShowDialog() != true)
+            return;
+
+        var color = magWindow.SelectedPixelColor;
+        var coords = magWindow.SelectedPixelPosition;
+
+        ColorText.Text = $"#{color!.Value.R:X2}{color!.Value.G:X2}{color!.Value.B:X2}";
+        CoordsText.Text = $"X: {coords!.Value.X} Y: {coords!.Value.Y}";
+
+        ColorPreviewBox.Fill = new SolidColorBrush(color!.Value);
+    }
+
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
 
         if (e.Key == Key.Space)
-        {
-
-            var magWindow = new PixelMagnifierWindow()
-            {
-                ConfirmationSoundEffect = PixelMagnifierWindow.SoundEffect.Pop
-            };
-
-            if (magWindow.ShowDialog() == true)
-            {
-                var color = magWindow.SelectedPixelColor;
-                var coord = magWindow.SelectedPixelPosition;
-
-                Color.Text = $"#{color!.Value.R:X2}{color!.Value.G:X2}{color!.Value.B:X2}";
-                Coord.Text = $"X: {coord!.Value.X} Y: {coord!.Value.Y}";
-
-                ColorBox.Fill = new SolidColorBrush(color!.Value);
-            }
-        }
+            ShowMagnifierWindow();
     }
 }

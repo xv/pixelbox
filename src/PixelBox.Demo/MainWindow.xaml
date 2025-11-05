@@ -6,12 +6,11 @@
         xmlns:local="clr-namespace:PixelBox.Demo"
         xmlns:PixelBox="clr-namespace:PixelBox;assembly=PixelBox"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="PixelBox Demo"
         WindowStartupLocation="CenterScreen"
-        Width="300" SizeToContent="Height">
+        Width="280" SizeToContent="Height">
 
     <Grid Background="#111">
-
         <Grid Margin="20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -24,8 +23,8 @@
             </Grid.RowDefinitions>
 
             <Rectangle
-                x:Name="ColorBox"
-                Width="{Binding Height, ElementName=ColorBox}"
+                x:Name="ColorPreviewBox"
+                Width="{Binding Height, ElementName=ColorPreviewBox}"
                 Height="20"
                 Margin="0,0,10,0"
                 Fill="Transparent"
@@ -35,14 +34,14 @@
                 RadiusY="2"/>
 
             <TextBlock
-                x:Name="Color"
+                x:Name="ColorText"
                 Grid.Column="1"
                 Text="#" 
                 FontSize="14"
                 Foreground="White" />
 
             <TextBlock 
-                x:Name="Coord" 
+                x:Name="CoordsText" 
                 Grid.Row="1"
                 Grid.Column="2" 
                 Text="X: ? Y: ?"
