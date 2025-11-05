@@ -17,7 +17,7 @@ public partial class MainWindow : Window
 
         _magWindowCfg = new PixelMagnifierWindowConfig 
         {
-            ShowInfoPanel = false
+            CopyColorToClipboard = false
         };
     }
 

@@ -56,4 +56,11 @@ public class PixelMagnifierWindowConfig
     /// </summary>
     public int RefreshInterval
     { get; set; } = 30;
+
+    /// <summary>
+    /// Gets or sets whether the color string should be copied to the clipboard
+    /// when the window is closed.
+    /// </summary>
+    public bool CopyColorToClipboard
+    { get; set; } = true;
 }

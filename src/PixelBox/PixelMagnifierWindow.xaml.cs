@@ -608,7 +608,9 @@ public partial class PixelMagnifierWindow : Window
         {
             DialogResult = true;
 
-            Clipboard.SetText(PixelColorString);
+            if (_config.CopyColorToClipboard)
+                Clipboard.SetText(PixelColorString);
+
             PlaySoundEffect(ConfirmationSoundEffect);
         }
 
