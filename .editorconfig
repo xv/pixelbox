@@ -9,6 +9,7 @@ indent_size = 2
 tab_width = 2
 
 [*.cs]
-csharp_style_namespace_declarations=file_scoped
 # IDE0079: Remove unnecessary suppression
 dotnet_diagnostic.IDE0079.severity = none
+
+csharp_style_namespace_declarations=file_scoped
