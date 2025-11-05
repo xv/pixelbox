@@ -6,7 +6,6 @@ using System.Windows.Media;
 using System.Windows;
 
 using Windows.Win32.Graphics.Gdi;
-using Windows.Win32.UI.WindowsAndMessaging;
 using Windows.Win32;
 
 using PixelBox.Resources;
@@ -20,12 +19,11 @@ public partial class PixelMagnifierWindow : Window
 {
     #region Fields
 
-    private readonly PixelMagnifierWindowConfig _config;
-
-    private const double WindowOffset = 1;
-
     private DpiScale _dpi;
-    private readonly Rect _screen = SystemParameters.WorkArea;
+
+    private const double WindowOffset = 2;
+
+    private readonly PixelMagnifierWindowConfig _config;
 
     private readonly SolidColorBrush _colorPreviewBrush = new(Colors.Transparent);
 
@@ -391,16 +389,16 @@ public partial class PixelMagnifierWindow : Window
         var width = MagnifierHost.ActualWidth;
         var height = MagnifierHost.ActualHeight;
 
+        var sx = _dpi.DpiScaleX;
+        var sy = _dpi.DpiScaleY;
+
         // If at the right border of the screen, move the magnifier leftward
-        if ((left + width) > _screen.Right)
+        if ((left + width) > VirtualScreenInfo.Right / sx)
             left = pos.X - width - WindowOffset;
 
         // If the bottom border of the screen, move the magnifier upward
-        if ((top + height) > _screen.Bottom)
+        if ((top + height) > VirtualScreenInfo.Bottom / sy)
             top = pos.Y - height - WindowOffset;
-
-        var sx = _dpi.DpiScaleX;
-        var sy = _dpi.DpiScaleY;
 
         // Applying sx/sy prevents the magnifier grid lines from pixel-shifting
         // on high-DPI screens
