@@ -16,7 +16,9 @@
     Topmost="True"
     WindowState="Maximized"
     ResizeMode="NoResize"
-    Cursor="Cross">
+    Cursor="Cross"
+    AllowsTransparency="True"
+    Background="Transparent">
 
     <Window.Resources>
         <converter:CenterPointConverter x:Key="CenterPointConverter"/>
