@@ -95,7 +95,7 @@ internal sealed unsafe class PersistentDibSection : IDisposable
         if (_hdcMem == HDC.Null)
         {   
             PInvoke.ReleaseDC(HWND.Null, _hdcScreen);
-            throw new InvalidOperationException($"CreateCompatibleDC failed.");
+            throw new InvalidOperationException("CreateCompatibleDC failed.");
         }
 
         Resize(width, height);

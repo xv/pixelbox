@@ -20,7 +20,6 @@
 
     <Window.Resources>
         <converter:CenterPointConverter x:Key="CenterPointConverter"/>
-        <converter:EllipseRadiusConverter x:Key="EllipseRadiusConverter"/>
         
         <DropShadowEffect
             x:Key="DropShadowEffect"
@@ -160,25 +159,15 @@
                     PixelColumns="15"
                     PixelSize="7">
                     <local:PixelMagnifier.Clip>
-                        <EllipseGeometry>
+                        <EllipseGeometry 
+                            RadiusX="{Binding Center.X, RelativeSource={RelativeSource Self}}" 
+                            RadiusY="{Binding Center.Y, RelativeSource={RelativeSource Self}}">
                             <EllipseGeometry.Center>
                                 <MultiBinding Converter="{StaticResource CenterPointConverter}">
                                     <Binding Path="ActualWidth" ElementName="Magnifier"/>
                                     <Binding Path="ActualHeight" ElementName="Magnifier"/>
                                 </MultiBinding>
                             </EllipseGeometry.Center>
-                            <EllipseGeometry.RadiusX>
-                                <MultiBinding Converter="{StaticResource EllipseRadiusConverter}">
-                                    <Binding Path="ActualWidth" ElementName="Magnifier"/>
-                                    <Binding Path="ActualHeight" ElementName="Magnifier"/>
-                                </MultiBinding>
-                            </EllipseGeometry.RadiusX>
-                            <EllipseGeometry.RadiusY>
-                                <MultiBinding Converter="{StaticResource EllipseRadiusConverter}">
-                                    <Binding Path="ActualWidth" ElementName="Magnifier"/>
-                                    <Binding Path="ActualHeight" ElementName="Magnifier"/>
-                                </MultiBinding>
-                            </EllipseGeometry.RadiusY>
                         </EllipseGeometry>
                     </local:PixelMagnifier.Clip>
                 </local:PixelMagnifier>
