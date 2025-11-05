@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFrameworks>net8.0-windows;net9.0-windows</TargetFrameworks>
     <Nullable>enable</Nullable>
+    <LangVersion>12.0</LangVersion>
     <UseWPF>true</UseWPF>
     <OutputType>Library</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
