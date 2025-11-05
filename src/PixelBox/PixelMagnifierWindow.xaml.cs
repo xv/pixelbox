@@ -325,20 +325,6 @@ public partial class PixelMagnifierWindow : Window
     }
 
     /// <summary>
-    /// Retrieves the bounds of the virtual screen.
-    /// </summary>
-    /// 
-    /// <returns>
-    /// An <see cref="Int32Rect"/> representing the virtual screen's bounds.
-    /// </returns>
-    private static Int32Rect GetScreenBounds() =>
-        new(PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_XVIRTUALSCREEN),
-            PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_YVIRTUALSCREEN),
-            PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CXVIRTUALSCREEN),
-            PInvoke.GetSystemMetrics(SYSTEM_METRICS_INDEX.SM_CYVIRTUALSCREEN));
-
-
-    /// <summary>
     /// Retrieves the current mouse cursor screen position.
     /// </summary>
     /// 
@@ -364,7 +350,7 @@ public partial class PixelMagnifierWindow : Window
     /// </returns>
     private static BitmapSource? CaptureDesktopScreen()
     {
-        var hBitmap = BitmapInterop.CaptureRectToHBitmap(GetScreenBounds());
+        var hBitmap = BitmapInterop.CaptureRectToHBitmap(VirtualScreenInfo.Bounds);
         if (hBitmap == HBITMAP.Null)
             return null;
 
