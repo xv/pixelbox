@@ -4,49 +4,171 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PixelBox.Demo"
+        xmlns:converter="clr-namespace:PixelBox.Demo.BindingConverters"
         xmlns:PixelBox="clr-namespace:PixelBox;assembly=PixelBox"
         mc:Ignorable="d"
         Title="PixelBox Demo"
+        Background="#242424"
         WindowStartupLocation="CenterScreen"
-        Width="280" SizeToContent="Height">
+        MinWidth="320"
+        ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight">
+    
+    <Window.Resources>
+        <converter:RectangleConverter x:Key="RectangleConverter"/>
 
-    <Grid Background="#111">
-        <Grid Margin="20">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <Style x:Key="KbdStyle" TargetType="Border">
+            <Setter Property="Padding" Value="4,2,4,2"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Background" Value="#04599f"/>
+            <Setter Property="BorderBrush" Value="#03518f"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="1,0,1,0"/>
+        </Style>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <DropShadowEffect
+            x:Key="RectDropShadowEffect"
+            BlurRadius="4"
+            Opacity=".2"
+            ShadowDepth="2"
+            Direction="270"
+            Color="Black"/>
 
-            <Rectangle
-                x:Name="ColorPreviewBox"
-                Width="{Binding Height, ElementName=ColorPreviewBox}"
-                Height="20"
-                Margin="0,0,10,0"
-                Fill="Transparent"
-                Stroke="White"
-                StrokeThickness="1"
-                RadiusX="2"
-                RadiusY="2"/>
+        <DropShadowEffect
+            x:Key="KbdDropShadowEffect"
+            BlurRadius="1"
+            Opacity=".5"
+            ShadowDepth="2"
+            Direction="270"
+            Color="#035292"/>
+    </Window.Resources>
 
-            <TextBlock
-                x:Name="ColorText"
-                Grid.Column="1"
-                Text="#" 
-                FontSize="14"
-                Foreground="White" />
+    <Grid
+        Margin="15"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <TextBlock 
-                x:Name="CoordsText" 
-                Grid.Row="1"
-                Grid.Column="2" 
-                Text="X: ? Y: ?"
-                FontSize="14" 
-                Foreground="White"/>
-        </Grid>
+        <Border
+            x:Name="HintBar"
+            Grid.Row="0"
+            Background="#0568b5">
+            <Border.Clip>
+                <RectangleGeometry RadiusX="3" RadiusY="3">
+                    <RectangleGeometry.Rect>
+                        <MultiBinding Converter="{StaticResource RectangleConverter}">
+                            <Binding Path="ActualWidth" ElementName="HintBar"/>
+                            <Binding Path="ActualHeight" ElementName="HintBar"/>
+                        </MultiBinding>
+                    </RectangleGeometry.Rect>
+                </RectangleGeometry>
+            </Border.Clip>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Icon container -->
+                <Rectangle
+                    Width="35"
+                    Height="Auto"
+                    Fill="#035292"/>
+
+                <!-- Icon -->
+                <Viewbox x:Name="HintBarIcon" Width="18" Height="18">
+                    <Canvas
+                        Width="{Binding Width, ElementName=HintBarIcon}"
+                        Height="{Binding Height, ElementName=HintBarIcon}">
+                        <Path
+                            Fill="White"
+                            Stretch="Uniform"
+                            Width="{Binding Width, ElementName=HintBarIcon}"
+                            Height="{Binding Height, ElementName=HintBarIcon}">
+                            <Path.Data>
+                                <GeometryGroup>
+                                    <PathGeometry Figures="m27.2 34.8-4.5.4s2.2-7.9 3.8-13.2a4.1 4.1 0 0 0-3.6-5.5 3.6 3.6 0 0 0-2.7 1.2l-4 3.3a.7.7 0 0 0 .6 1.2l4.5-.4L17.5 35a4.1 4.1 0 0 0 3.6 5.5 3.6 3.6 0 0 0 2.7-1.2l4-3.3a.7.7 0 0 0-.6-1.2Z"/>
+                                    <EllipseGeometry Center="26,11" RadiusX="3" RadiusY="3"/>
+                                </GeometryGroup>
+                            </Path.Data>
+                        </Path>
+                    </Canvas>
+                </Viewbox>
+
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="8"
+                    MaxWidth="250"
+                    Foreground="white"
+                    VerticalAlignment="Center"
+                    TextWrapping="Wrap">
+                    <Run Text="Press"/>
+                    <InlineUIContainer
+                        BaselineAlignment="Center"
+                        Cursor="Hand">
+                        <Border
+                            Style="{StaticResource KbdStyle}"
+                            MouseLeftButtonUp="Kbd_MouseLeftButtonUp"
+                            Effect="{StaticResource KbdDropShadowEffect}">
+                            <TextBlock Text="Space" FontSize="11" Foreground="White"/>
+                        </Border>
+                    </InlineUIContainer>
+                    <Run Text="to show the magnifier window."/>
+                </TextBlock>
+            </Grid>
+        </Border>
+
+        <Border
+            x:Name="ColorInfoPanel"
+            Grid.Row="1"
+            Background="#2e2e2e"
+            BorderBrush="#414141"
+            BorderThickness="1"
+            Margin="0,10,0,0"
+            Padding="13,12,13,10"
+            CornerRadius="3"
+            d:Visibility="Visible"
+            Visibility="Collapsed">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Rectangle
+                    x:Name="ColorPreviewBox"
+                    Width="{Binding Height, ElementName=ColorPreviewBox}"
+                    Height="20"
+                    Margin="0,0,10,0"
+                    Fill="Transparent"
+                    Stroke="White"
+                    StrokeThickness="1"
+                    RadiusX="2"
+                    RadiusY="2"
+                    Effect="{StaticResource RectDropShadowEffect}"/>
+
+                <TextBlock
+                    x:Name="ColorText"
+                    Grid.Column="1"
+                    Text="#" 
+                    Foreground="White"/>
+
+                <TextBlock 
+                    x:Name="CoordsText" 
+                    Grid.Row="1"
+                    Grid.Column="2" 
+                    Text="X: ? Y: ?"
+                    Foreground="White"/>
+            </Grid>
+        </Border>
     </Grid>
 </Window>
