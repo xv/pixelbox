@@ -712,9 +712,12 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         _dpi = VisualTreeHelper.GetDpi(this);
 
         _samplingAreaIndicator = new SamplingAreaIndicator(_dpi);
-        _visuals = new VisualCollection(this)
+        _visuals = new VisualCollection(this) { _samplingAreaIndicator };
+
+        _refreshTimer = new DispatcherTimer(DispatcherPriority.Render)
         {
-            _samplingAreaIndicator
+            Interval = TimeSpan.FromMilliseconds(RefreshInterval),
+            IsEnabled = false
         };
 
         RecalculateGridMetrics(GridMetricUpdateFlags.All);
@@ -723,18 +726,12 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         if (_dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0)
             SetScaleTransform();
 
-        _refreshTimer = new DispatcherTimer(DispatcherPriority.Render)
-        {
-            Interval = TimeSpan.FromMilliseconds(RefreshInterval),
-            IsEnabled = false
-        };
-
-        _refreshTimer.Tick += OnRefreshTimerTick;
+        Loaded += (_,_) => _refreshTimer.Tick += OnRefreshTimerTick;
 
         Unloaded += (_, _) =>
         {
-            _refreshTimer.Tick -= OnRefreshTimerTick;
             _refreshTimer.Stop();
+            _refreshTimer.Tick -= OnRefreshTimerTick;
         };
     }
 
