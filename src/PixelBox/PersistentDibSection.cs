@@ -72,6 +72,23 @@ internal sealed unsafe class PersistentDibSection : IDisposable
     /// class.
     /// </summary>
     /// 
+    /// <exception cref="InvalidOperationException"/>
+    public PersistentDibSection()
+    {
+        _hdcScreen = PInvoke.GetDC(HWND.Null);
+        if (_hdcScreen == HDC.Null)
+            throw new InvalidOperationException("GetDC failed.");
+
+        _hdcMem = PInvoke.CreateCompatibleDC(_hdcScreen);
+        if (_hdcMem == HDC.Null)
+        {
+            PInvoke.ReleaseDC(HWND.Null, _hdcScreen);
+            throw new InvalidOperationException("CreateCompatibleDC failed.");
+        }
+    }
+
+    /// <inheritdoc cref="PersistentDibSection()"/>
+    /// 
     /// <param name="width">
     /// Width of the bitmap in pixels. Must be greater than zero.
     /// </param>
@@ -80,23 +97,11 @@ internal sealed unsafe class PersistentDibSection : IDisposable
     /// Height of the bitmap in pixels. Must be greater than zero.
     /// </param>
     /// 
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    /// <exception cref="InvalidOperationException"></exception>
-    public PersistentDibSection(int width, int height)
+    /// <exception cref="ArgumentOutOfRangeException"/>
+    public PersistentDibSection(int width, int height) : this()
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
-
-        _hdcScreen = PInvoke.GetDC(HWND.Null);
-        if (_hdcScreen == HDC.Null)
-            throw new InvalidOperationException("GetDC failed.");
-            
-        _hdcMem = PInvoke.CreateCompatibleDC(_hdcScreen);
-        if (_hdcMem == HDC.Null)
-        {   
-            PInvoke.ReleaseDC(HWND.Null, _hdcScreen);
-            throw new InvalidOperationException("CreateCompatibleDC failed.");
-        }
 
         Resize(width, height);
     }
