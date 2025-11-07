@@ -42,7 +42,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     private readonly VisualCollection _visuals;
 
-    private bool _loaded;
     private bool _disposed;
 
     #endregion
@@ -724,17 +723,10 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         if (_dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0)
             SetScaleTransform();
 
-        Loaded += (_, _) =>
-        {
-            _loaded = true;
-
-            _refreshTimer.Tick += OnRefreshTimerTick;
-        };
+        Loaded += (_, _) => _refreshTimer.Tick += OnRefreshTimerTick;
 
         Unloaded += (_, _) =>
         {
-            _loaded = false;
-
             _refreshTimer.Stop();
             _refreshTimer.Tick -= OnRefreshTimerTick;
         };
@@ -774,7 +766,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     {
         base.OnRender(dc);
 
-        if (RenderDesignTimePlaceholder(dc, _dpi) || !_loaded)
+        if (RenderDesignTimePlaceholder(dc, _dpi))
             return;
 
         // Since the "grid" is really nothing more than gaps between pixels,
