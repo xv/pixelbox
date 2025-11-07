@@ -424,10 +424,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
         EnsureDibAvailable(_pixelColumns, _pixelColumns);
 
-        if (_dib is null)
-            return;
-
-        if (!_dib.Capture(left, top))
+        if (!_dib!.Capture(left, top))
             return;
 
         _centerPixelColor = SampleColor(SamplingMode, (byte*)_dib.Bits, _dib.Stride);
