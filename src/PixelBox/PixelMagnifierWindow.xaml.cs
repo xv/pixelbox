@@ -461,15 +461,13 @@ public partial class PixelMagnifierWindow : Window
         _cursor = LoadCursorFromResource(ResourceUris.Cursors.Cross, true);
         _dpi = VisualTreeHelper.GetDpi(this);
 
-        OverlayImage = CaptureDesktopScreen()!;
-
         Cursor = _cursor;
 
-        Magnifier.PixelChanged += OnPixelChanged;
+        ApplyConfig();
 
         Loaded += (_, _) =>
         {
-            ApplyConfig();
+            OverlayImage = CaptureDesktopScreen()!;
 
             // Set the initial magnifier position at the current mouse position
             UpdateMagnifierPosition(GetMousePosition());

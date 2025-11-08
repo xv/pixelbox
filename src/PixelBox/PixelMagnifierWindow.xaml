@@ -77,9 +77,6 @@
             Key="OemMinus"
             Command="{x:Static local:PixelMagnifierUICommands.DecreaseColorSamplingArea}"/>
         <KeyBinding
-            Key="Space"
-            Command="{x:Static local:PixelMagnifierUICommands.Close}"/>
-        <KeyBinding
             Key="Enter"
             Command="{x:Static local:PixelMagnifierUICommands.Close}"/>
         <MouseBinding
@@ -159,7 +156,8 @@
                 <local:PixelMagnifier
                     x:Name="Magnifier"
                     PixelColumns="15"
-                    PixelSize="7">
+                    PixelSize="7"
+                    PixelChanged="OnPixelChanged">
                     <local:PixelMagnifier.Clip>
                         <EllipseGeometry 
                             RadiusX="{Binding Center.X, RelativeSource={RelativeSource Self}}" 
