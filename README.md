@@ -53,14 +53,17 @@ Quick Start
 ### Using the Control Directly
 
 > [!CAUTION]
-> `PixelMagnifier` uses unmanaged resources and implements `IDisposable`. Be sure to clean up when you are done with the control, either by calling `Dispose()` or wrapping the instance in a `using` statement.
+> `PixelMagnifier` uses unmanaged resources and implements `IDisposable`. Call `Dispose()` when the control is no longer needed to properly release its resources.
 
 ```xml
 <Window x:Class="DemoApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:pb="clr-namespace:PixelBox;assembly=PixelBox">
     <Grid>
-        <pb:PixelMagnifier
+        <!-- The control size of PixelMagnifier is automatically determiend via its
+             PixelColumns, PixelSize, and ShowGrid properties. The size should not
+             be set manually. -->
+        <pb:PixelMagnifier HorizontalAlignment="Left" VerticalAlignment="Top"
             PixelColumns="15"
             PixelSize="10"
             ShowGrid="True"
