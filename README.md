@@ -1,6 +1,6 @@
 About
 -----
-PixelBox is a fast and customizable BitBlt-based pixel magnification control for WPF. The library contains the the standalone magnifier control itself, and an optional mouse-tracked pixel magnifier and color picker window, similar to what you would find in browser developer tools.
+PixelBox is a fast and customizable BitBlt-based pixel magnification control for WPF. The library contains the standalone magnifier control itself, and an optional mouse-tracked pixel magnifier and color picker window, similar to what you would find in browser developer tools.
 
 Features
 --------
@@ -8,6 +8,7 @@ In a nutshell, what the control can provide is:
 - Adjustable pixel columns (field of view), pixel size (zoom), and refresh rate.
 - Toggleable grid lines.
 - Color sampling ranging from single pixel up to a 5×5 region.
+- Individual screen axes locking, like in macOS' Digital Color Meter.
 - High-DPI support.
 
 Here's a quick demo of the built-in magnifier window:
@@ -18,28 +19,6 @@ Requirements
 ------------
 - **Operating System**: Windows 7 SP1 or later.
 - **.NET**: [8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) or later (uses C# 12 features).
-
-API & Shortcuts Overview
-------------
-### PixelMagnifier (core control)
-
-| **Property**      | **Type**            | **Description**                            |
-|:------------------|:--------------------|:-------------------------------------------|
-| `PixelColumns`    | `int`               | Number of pixel columns (odd values only). |
-| `PixelSize`       | `int`               | Size of each pixel cell (in px).           |
-| `ShowGrid`        | `bool`              | Toggles grid visibility.                   |
-| `SamplingMode`    | `PixelSamplingMode` | `Single`,`ThreeByThree`, or `FiveByFive`   |
-| `RefreshInterval` | `int`               | Image update interval in milliseconds.     |
-| `PixelColor`      | `Color`             | Color of the sampled pixel(s).             |
-| `PixelPosition`   | `Point`             | Screen coordinates of the center pixel.    |
-
-| **Method**            | **Description**                                                           |
-|:----------------------|:--------------------------------------------------------------------------|
-| `StartCapture()`      | Begins capturing pixels by starting the internal timer.                   |
-| `StopCapture()`       | Stops capturing pixels by stopping the internal  timer.                   |
-| `ToggleCapture()`     | Toggles pixel capture. Same as calling  `StartCapture()`/`StopCapture()`. |
-| `LockPosition(Point)` | Locks capturing at X and Y of `Point`.                                    |
-| `UnlockPosition()`    | Unlocks previously locked coordinates via `LockPosition(Point)`.          |
 
 Installation
 ------------
@@ -53,7 +32,7 @@ Quick Start
 ### Using the Control Directly
 
 > [!CAUTION]
-> `PixelMagnifier` uses unmanaged resources and implements `IDisposable`. Call `Dispose()` when the control is no longer needed to properly release its resources.
+> `PixelMagnifier` uses unmanaged resources and implements `IDisposable`. Call `Dispose()` when the control is no longer needed to properly release resources it holds.
 
 ```xml
 <Window x:Class="DemoApp.MainWindow"
@@ -81,6 +60,9 @@ Quick Start
 using PixelBox;
 
 var picker = new PixelMagnifierWindow();
+
+// ShowDialog() will return true if the window was closed via either Enter key
+// or mouse left click 
 picker.ShowDialog();
 
 var color = picker.SelectedPixelColor;

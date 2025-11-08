@@ -28,9 +28,11 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     private int _pixelColumns;
     private int _pixelColumnsHalf;
 
-    private Color _centerPixelColor;
+    private Color _sampledColor;
     private Point _lastMousePos = new(-1, -1);
-    private Point _lockedPixelPos = new(-1, -1);
+
+    private Point? _lockedPos;
+    private bool _lockX, _lockY;
 
     private PersistentDibSection? _dib;
     private WriteableBitmap? _bitmap;
@@ -216,26 +218,21 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// Gets whether the control is currently capturing pixels.
     /// </summary>
     [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [EditorBrowsable(EditorBrowsableState.Always)]
     public bool IsCapturing => _refreshTimer.IsEnabled;
 
     /// <summary>
-    /// Gets or sets whether the current screen coordinate is locked, preventing
-    /// further mouse movement from tracking new pixels.
-    /// </summary>
-    [Browsable(false)]
-    public bool IsPixelPositionLocked
-    {
-        get => _lockedPixelPos.X >= 0 && _lockedPixelPos.Y >= 0;
-        set => _lockedPixelPos = value ? _lastMousePos : new Point(-1, -1);
-    }
-
-    /// <summary>
-    /// Gets the color of the pixel located at the center of the grid.
+    /// Gets the color corresponding to the pixel located at
+    /// the center of the grid.
+    ///
+    /// If <see cref="SamplingMode"/> is not <see cref="PixelSamplingMode.Single"/>,
+    /// then the average color of pixels in the sampling region is retrieved.
     /// </summary>
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     [EditorBrowsable(EditorBrowsableState.Always)]
-    public Color PixelColor => _centerPixelColor;
+    public Color PixelColor => _sampledColor;
 
     /// <summary>
     /// Gets the screen coordinates corresponding to the pixel located at
@@ -245,6 +242,82 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     [EditorBrowsable(EditorBrowsableState.Always)]
     public Point PixelPosition => _lastMousePos;
+
+    /// <summary>
+    /// Gets or sets whether both X and Y screen coordinates are locked.
+    /// </summary>
+    [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [EditorBrowsable(EditorBrowsableState.Always)]
+    public bool PositionLocked
+    {
+        get => _lockedPos.HasValue;
+        set
+        {
+            if (value)
+            {
+                _lockedPos = _lastMousePos;
+                _lockX = _lockY = true;
+            }
+            else
+            {
+                _lockedPos = null;
+                _lockX = _lockY = false;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets whether the X screen coordinate is locked.
+    /// </summary>
+    [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [EditorBrowsable(EditorBrowsableState.Always)]
+    public bool PositionXLocked
+    {
+        get => _lockX;
+        set
+        {
+            if (value && !_lockX)
+            {
+                var pos = _lockedPos ?? _lastMousePos;
+                pos.X = _lastMousePos.X >= 0 ? _lastMousePos.X : MousePosition.X;
+
+                _lockedPos = pos;
+            }
+
+            _lockX = value;
+
+            if (!_lockX && !_lockY)
+                _lockedPos = null;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets whether the Y screen coordinate is locked.
+    /// </summary>
+    [Browsable(false)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [EditorBrowsable(EditorBrowsableState.Always)]
+    public bool PositionYLocked
+    {
+        get => _lockY;
+        set
+        {
+            if (value && !_lockY)
+            {
+                var pos = _lockedPos ?? _lastMousePos;
+                pos.Y = _lastMousePos.Y >= 0 ? _lastMousePos.Y : MousePosition.Y;
+
+                _lockedPos = pos;
+            }
+
+            _lockY = value;
+
+            if (!_lockX && !_lockY)
+                _lockedPos = null;
+        }
+    }
 
     #endregion
     #region Event Handling
@@ -294,10 +367,21 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     private void OnRefreshTimerTick(object? sender, EventArgs e)
     {
-        var isLocked = IsPixelPositionLocked;
-        var currentPos = isLocked ? _lockedPixelPos : MousePosition;
+        var cursorPos = MousePosition;
+        Point currentPos;
 
-        if (!isLocked && currentPos == _lastMousePos)
+        if (!_lockedPos.HasValue)
+            currentPos = cursorPos;
+        else
+        {
+            var locked = _lockedPos.Value;
+
+            currentPos = new Point(
+                _lockX ? locked.X : cursorPos.X,
+                _lockY ? locked.Y : cursorPos.Y);
+        }
+
+        if (currentPos == _lastMousePos)
             return;
 
         _lastMousePos = currentPos;
@@ -320,25 +404,76 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     public void StopCapture() => _refreshTimer.Stop();
 
     /// <summary>
-    /// Toggles the pixel capture.
+    /// Toggles pixel capture.
     /// </summary>
     public void ToggleCapture() => _refreshTimer.IsEnabled = !_refreshTimer.IsEnabled;
 
     /// <summary>
-    /// Locks the specified coordinate, preventing mouse movements from
-    /// tracking new pixels.
+    /// Locks the specified screen coordinates on both X and Y axes.
     /// </summary>
     /// 
     /// <param name="pos">
-    /// The screen coordinate to lock.
+    /// The screen coordinates.
     /// </param>
-    public void LockPosition(Point pos) => _lockedPixelPos = pos;
+    public void LockPosition(Point pos)
+    {
+        _lockedPos = pos;
+        _lockX = _lockY = true;
+    }
 
     /// <summary>
-    /// Unlocks a previously locked coordinate via <see cref="LockPosition"/>
-    /// or <see cref="IsPixelPositionLocked"/>.
+    /// Locks the specified screen coordinates, optionally locking the X and Y
+    /// axes individually.
     /// </summary>
-    public void UnlockPosition() => _lockedPixelPos = new Point(-1, -1);
+    ///
+    /// <param name="pos">
+    /// The screen coordinates.
+    /// </param>
+    ///
+    /// <param name="lockX">
+    /// Specifies whether to lock the X coordinate.
+    /// </param>
+    /// 
+    /// <param name="lockY">
+    /// Specifies whether to lock the Y coordinate.
+    /// </param>
+    public void LockPosition(Point pos, bool lockX, bool lockY)
+    {
+        _lockedPos = pos;
+        _lockX = lockX;
+        _lockY = lockY;
+
+        if (!lockX && !lockY)
+            _lockedPos = null;
+    }
+
+    /// <summary>
+    /// Locks only the X coordinate of the current screen position.
+    /// </summary>
+    public void LockPositionX() => PositionXLocked = true;
+
+    /// <summary>
+    /// Locks only the Y coordinate of the current screen position.
+    /// </summary>
+    public void LockPositionY() => PositionYLocked = true;
+
+    /// <summary>
+    /// Unlocks the X coordinate, allowing horizontal mouse tracking to update
+    /// the position.
+    /// </summary>
+    public void UnlockPositionX() => PositionXLocked = false;
+
+    /// <summary>
+    /// Unlocks the Y coordinate, allowing vertical mouse tracking to update the
+    /// position.
+    /// </summary>
+    public void UnlockPositionY() => PositionYLocked = false;
+
+    /// <summary>
+    /// Unlocks both X and Y coordinates, allowing the mouse to update the
+    /// position freely.
+    /// </summary>
+    public void UnlockPosition() => PositionLocked = false;
 
     /// <summary>
     /// Configures the internal <see cref="ScaleTransform"/> so that the visual
@@ -429,8 +564,8 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         if (!_dib!.Capture(left, top))
             return;
 
-        _centerPixelColor = SampleColor(SamplingMode, (byte*)_dib.Bits, _dib.Stride);
-        PixelChanged?.Invoke(this, new PixelChangedEventArgs(_centerPixelColor, _lastMousePos));
+        _sampledColor = SampleColor(SamplingMode, (byte*)_dib.Bits, _dib.Stride);
+        PixelChanged?.Invoke(this, new PixelChangedEventArgs(_sampledColor, _lastMousePos));
     }
 
     /// <summary>
@@ -507,11 +642,11 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             return;
         }
 
-        _centerPixelColor = SampleColor(SamplingMode,
+        _sampledColor = SampleColor(SamplingMode,
             (byte*)_dib.Bits, _dib.Stride);
 
         PixelChanged?.Invoke(this, new PixelChangedEventArgs(
-            _centerPixelColor, _lastMousePos));
+            _sampledColor, _lastMousePos));
     }
 
     /// <summary>
