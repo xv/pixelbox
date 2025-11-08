@@ -85,45 +85,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
                 OnPixelColumnsChanged, CoercePixelColumns),
             v => (v is int i) && (i > 0) && (i < 100));
 
-    public static readonly DependencyProperty PixelSizeProperty =
-        DependencyProperty.Register(
-            nameof(PixelSize),
-            typeof(int),
-            typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(9,
-                FrameworkPropertyMetadataOptions.AffectsMeasure |
-                FrameworkPropertyMetadataOptions.AffectsRender,
-                OnPixelSizeChanged),
-            v => (v is int i) && (i > 0) && (i <= 100));
-
-    public static readonly DependencyProperty ShowGridProperty =
-        DependencyProperty.Register(
-            nameof(ShowGrid),
-            typeof(bool),
-            typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(true,
-                FrameworkPropertyMetadataOptions.AffectsMeasure |
-                FrameworkPropertyMetadataOptions.AffectsRender,
-                OnShowGridChanged));
-
-    public static readonly DependencyProperty SamplingModeProperty =
-        DependencyProperty.Register(
-            nameof(SamplingMode),
-            typeof(PixelSamplingMode),
-            typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(PixelSamplingMode.Single,
-                FrameworkPropertyMetadataOptions.AffectsRender,
-                OnSamplingModeChanged));
-
-    public static readonly DependencyProperty RefreshIntervalProperty =
-        DependencyProperty.Register(
-            nameof(RefreshInterval),
-            typeof(int),
-            typeof(PixelMagnifier),
-            new FrameworkPropertyMetadata(30, OnRefreshIntervalChanged),
-            v => (v is int i) && (i > 0) && (i <= 1000));
-
-
     private static object CoercePixelColumns(DependencyObject d, object value)
     {
         var cols = (int)value;
@@ -132,38 +93,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             cols++;
 
         return cols;
-    }
-
-    #endregion
-    #region Properties
-
-    /// <summary>
-    /// Gets whether the control is currently capturing pixels.
-    /// </summary>
-    [Browsable(false)]
-    public bool IsCapturing => _refreshTimer.IsEnabled;
-
-    /// <summary>
-    /// Gets or sets whether the current screen coordinate is locked, preventing
-    /// further mouse movement from tracking new pixels.
-    /// </summary>
-    [Browsable(false)]
-    public bool IsPixelPositionLocked
-    {
-        get => _lockedPixelPos.X >= 0 && _lockedPixelPos.Y >= 0;
-        set => _lockedPixelPos = value ? _lastMousePos : new Point(-1, -1);
-    }
-
-    /// <summary>
-    /// Gets the current mouse position in screen coordinates.
-    /// </summary>
-    private static Point MousePosition
-    {
-        get
-        {
-            PInvoke.GetCursorPos(out System.Drawing.Point p);
-            return new Point(p.X, p.Y);
-        }
     }
 
     /// <summary>
@@ -183,6 +112,123 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         set => SetValue(PixelColumnsProperty, value);
     }
 
+    public static readonly DependencyProperty PixelSizeProperty =
+        DependencyProperty.Register(
+            nameof(PixelSize),
+            typeof(int),
+            typeof(PixelMagnifier),
+            new FrameworkPropertyMetadata(9,
+                FrameworkPropertyMetadataOptions.AffectsMeasure |
+                FrameworkPropertyMetadataOptions.AffectsRender,
+                OnPixelSizeChanged),
+            v => (v is int i) && (i > 0) && (i <= 100));
+
+    /// <summary>
+    /// Gets or sets the size of the pixel cells. The value must be greater than
+    /// zero and less than or equal to 100.
+    /// </summary>
+    [Category("Appearance")]
+    [Description("Sets the size (in px) of individual pixel cells in the grid. Valid range is [1,100].")]
+    public int PixelSize
+    {
+        get => (int)GetValue(PixelSizeProperty);
+        set => SetValue(PixelSizeProperty, value);
+    }
+
+    public static readonly DependencyProperty SamplingModeProperty =
+        DependencyProperty.Register(
+            nameof(SamplingMode),
+            typeof(PixelSamplingMode),
+            typeof(PixelMagnifier),
+            new FrameworkPropertyMetadata(PixelSamplingMode.Single,
+                FrameworkPropertyMetadataOptions.AffectsRender,
+                OnSamplingModeChanged));
+
+    /// <summary>
+    /// Gets or sets the pixel color sampling mode.
+    /// </summary>
+    [Category("Behavior")]
+    [Description("Determines the pixel color sampling mode.")]
+    public PixelSamplingMode SamplingMode
+    {
+        get => (PixelSamplingMode)GetValue(SamplingModeProperty);
+        set => SetValue(SamplingModeProperty, value);
+    }
+
+    public static readonly DependencyProperty RefreshIntervalProperty =
+        DependencyProperty.Register(
+            nameof(RefreshInterval),
+            typeof(int),
+            typeof(PixelMagnifier),
+            new FrameworkPropertyMetadata(30, OnRefreshIntervalChanged),
+            v => (v is int i) && (i > 0) && (i <= 1000));
+
+    /// <summary>
+    /// Gets or sets the redraw rate of the control in milliseconds. The value
+    /// must be greater than zero and less than or equal to 1000.
+    /// </summary>
+    [Category("Behavior")]
+    [Description("Sets refresh rate (in ms) of the control. Valid range is [1,1000].")]
+    public int RefreshInterval
+    {
+        get => (int)GetValue(RefreshIntervalProperty);
+        set => SetValue(RefreshIntervalProperty, value);
+    }
+
+    public static readonly DependencyProperty ShowGridProperty =
+        DependencyProperty.Register(
+            nameof(ShowGrid),
+            typeof(bool),
+            typeof(PixelMagnifier),
+            new FrameworkPropertyMetadata(true,
+                FrameworkPropertyMetadataOptions.AffectsMeasure |
+                FrameworkPropertyMetadataOptions.AffectsRender,
+                OnShowGridChanged));
+
+    /// <summary>
+    /// Gets or sets whether the rows and columns of pixels should be
+    /// visible.
+    /// </summary>
+    [Category("Appearance")]
+    [Description("Specifies whether the pixel grid should be shown.")]
+    public bool ShowGrid
+    {
+        get => (bool)GetValue(ShowGridProperty);
+        set => SetValue(ShowGridProperty, value);
+    }
+
+    #endregion
+    #region Properties
+
+    /// <summary>
+    /// Gets the current mouse position in screen coordinates.
+    /// </summary>
+    private static Point MousePosition
+    {
+        get
+        {
+            PInvoke.GetCursorPos(out System.Drawing.Point p);
+            return new Point(p.X, p.Y);
+        }
+    }
+
+    /// <summary>
+    /// Gets whether the control is currently capturing pixels.
+    /// </summary>
+    [Browsable(false)]
+    public bool IsCapturing => _refreshTimer.IsEnabled;
+
+    /// <summary>
+    /// Gets or sets whether the current screen coordinate is locked, preventing
+    /// further mouse movement from tracking new pixels.
+    /// </summary>
+    [Browsable(false)]
+    public bool IsPixelPositionLocked
+    {
+        get => _lockedPixelPos.X >= 0 && _lockedPixelPos.Y >= 0;
+        set => _lockedPixelPos = value ? _lastMousePos : new Point(-1, -1);
+    }
+
     /// <summary>
     /// Gets the color of the pixel located at the center of the grid.
     /// </summary>
@@ -200,93 +246,50 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     [EditorBrowsable(EditorBrowsableState.Always)]
     public Point PixelPosition => _lastMousePos;
 
-    /// <summary>
-    /// Gets or sets the size of the pixel cells. The value must be greater than
-    /// zero and less than or equal to 100.
-    /// </summary>
-    [Category("Appearance")]
-    [Description("Sets the size (in px) of individual pixel cells in the grid. Valid range is [1,100].")]
-    public int PixelSize
-    {
-        get => (int)GetValue(PixelSizeProperty);
-        set => SetValue(PixelSizeProperty, value);
-    }
-
-    /// <summary>
-    /// Gets or sets the pixel color sampling mode.
-    /// </summary>
-    [Category("Behavior")]
-    [Description("Determines the pixel color sampling mode.")]
-    public PixelSamplingMode SamplingMode
-    {
-        get => (PixelSamplingMode)GetValue(SamplingModeProperty);
-        set => SetValue(SamplingModeProperty, value);
-    }
-
-    /// <summary>
-    /// Gets or sets the redraw rate of the control in milliseconds. The value
-    /// must be greater than zero and less than or equal to 1000.
-    /// </summary>
-    [Category("Behavior")]
-    [Description("Sets refresh rate (in ms) of the control. Valid range is [1,1000].")]
-    public int RefreshInterval
-    {
-        get => (int)GetValue(RefreshIntervalProperty);
-        set => SetValue(RefreshIntervalProperty, value);
-    }
-
-    /// <summary>
-    /// Gets or sets whether the rows and columns of pixels should be
-    /// visible.
-    /// </summary>
-    [Category("Appearance")]
-    [Description("Specifies whether the pixel grid should be shown.")]
-    public bool ShowGrid
-    {
-        get => (bool)GetValue(ShowGridProperty);
-        set => SetValue(ShowGridProperty, value);
-    }
-
     #endregion
     #region Event Handling
 
     private static void OnPixelColumnsChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-        if (sender is PixelMagnifier mag)
-        {
-            mag.RecalculateGridMetrics(GridMetricUpdateFlags.Columns);
-            mag.RenderSamplingAreaIndicator();
-        }
+        if (sender is not PixelMagnifier mag)
+            return;
+
+        mag.RecalculateGridMetrics(GridMetricUpdateFlags.Columns);
+        mag.RenderSamplingAreaIndicator();
     }
 
     private static void OnPixelSizeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-        if (sender is PixelMagnifier mag)
-        {
-            mag.RecalculateGridMetrics(GridMetricUpdateFlags.CellSize);
-            mag.RenderSamplingAreaIndicator();
-        }
+        if (sender is not PixelMagnifier mag)
+            return;
+
+        mag.RecalculateGridMetrics(GridMetricUpdateFlags.CellSize);
+        mag.RenderSamplingAreaIndicator();
     }
 
     private static void OnSamplingModeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-        if (sender is PixelMagnifier mag)
-        {
-            mag.RenderSamplingAreaIndicator();
-            mag.SampleColorFromLastCapture();
-        }
+        if (sender is not PixelMagnifier mag)
+            return;
+
+        mag.RenderSamplingAreaIndicator();
+        mag.SampleColorFromLastCapture();
     }
 
     private static void OnShowGridChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-        if (sender is PixelMagnifier mag)
-            mag.RenderSamplingAreaIndicator();
+        if (sender is not PixelMagnifier mag)
+            return;
+
+        mag.RenderSamplingAreaIndicator();
     }
 
     private static void OnRefreshIntervalChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-        if (sender is PixelMagnifier mag)
-            mag._refreshTimer.Interval = TimeSpan.FromMilliseconds((int)e.NewValue);
+        if (sender is not PixelMagnifier mag)
+            return;
+
+        mag._refreshTimer.Interval = TimeSpan.FromMilliseconds((int)e.NewValue);
     }
 
     private void OnRefreshTimerTick(object? sender, EventArgs e)
