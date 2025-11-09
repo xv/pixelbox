@@ -215,7 +215,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     }
 
     /// <summary>
-    /// Gets whether the control is currently capturing pixels.
+    /// Gets whether the control currently captures pixels on mouse movement.
     /// </summary>
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -702,7 +702,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// <see langword="true"/> if a capture buffer is available;
     /// <see langword="false"/> otherwise.
     /// </returns>
-    private unsafe bool EnsureCaptureReady()
+    private unsafe bool EnsureCapture()
     {
         if (_dib.Bits is null)
         {
@@ -904,7 +904,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
         // If we don't have a capture yet (e.g., StartCapture() isn't called,
         // then capture once at cursor
-        if (!EnsureCaptureReady())
+        if (!EnsureCapture())
             return;
 
         EnsureBitmapReady(drawGrid);
