@@ -35,7 +35,7 @@ public partial class MainWindow : Window
         };
 
         // ShowDialog() returns true if the magnifier was closed via
-        // mouse left click, Space or Enter keys
+        // mouse left click or Enter key
         if (magWindow.ShowDialog() != true)
             return;
 
