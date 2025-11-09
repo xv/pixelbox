@@ -123,12 +123,11 @@ internal sealed unsafe class PersistentDibSection : IDisposable
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(newHeight);
 
         if (_hBitmap != HBITMAP.Null &&
-            newWidth == _width &&
-            newHeight == _height)
-            return; // Do nothing if the size hasn't changed
+            newWidth == _width && newHeight == _height)
+            return;
 
-        // Delete old bitmap since there isn't a way to reuse it if the size
-        // has changed
+        // Delete the old bitmap since there is no way to change its size
+        // once it's created
         if (_hBitmap != HBITMAP.Null)
         {
             PInvoke.DeleteObject(_hBitmap);
@@ -137,7 +136,7 @@ internal sealed unsafe class PersistentDibSection : IDisposable
             _pBits = null;
         }
 
-        CreateDib(newWidth, newHeight);
+        CreateDIBSection(newWidth, newHeight);
     }
 
     /// <summary>
@@ -154,7 +153,7 @@ internal sealed unsafe class PersistentDibSection : IDisposable
     /// </param>
     /// 
     /// <exception cref="InvalidOperationException"></exception>
-    private void CreateDib(int width, int height)
+    private void CreateDIBSection(int width, int height)
     {
         _width = width;
         _height = height;
