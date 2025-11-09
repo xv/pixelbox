@@ -177,16 +177,12 @@ public partial class PixelMagnifierWindow : Window
         set => InfoPanelHost.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    /// <summary>
-    /// Gets the color of the currently selected pixel.
-    /// </summary>
-    public Color? SelectedPixelColor
+    /// <inheritdoc cref="PixelMagnifier.PixelColor"/>
+    public Color PixelColor
     { get; private set; }
 
-    /// <summary>
-    /// Gets the screen coordinates of the currently selected pixel.
-    /// </summary>
-    public Point? SelectedPixelPosition
+    /// <inheritdoc cref="PixelMagnifier.PixelPosition"/>
+    public Point PixelPosition
     { get; private set; }
 
     #endregion
@@ -479,8 +475,8 @@ public partial class PixelMagnifierWindow : Window
         {
             Magnifier.StopCapture();
 
-            SelectedPixelColor = Magnifier.PixelColor;
-            SelectedPixelPosition = Magnifier.PixelPosition;
+            PixelColor = Magnifier.PixelColor;
+            PixelPosition = Magnifier.PixelPosition;
 
             if (Cursor == _cursor)
             {

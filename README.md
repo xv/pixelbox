@@ -57,16 +57,14 @@ Quick Start
 > A project demonstrating the use of the built-in window is provided under `PixelBox.Demo`.
 
 ```c#
-using PixelBox;
-
-var picker = new PixelMagnifierWindow();
+var picker = new PixelBox.PixelMagnifierWindow();
 
 // ShowDialog() will return true if the window was closed via either Enter key or
 // mouse left click. You can use the return result to update your UI conditionally
 picker.ShowDialog();
 
-var color = picker.SelectedPixelColor;
-var position = picker.SelectedPixelPosition;
+var color = picker.PixelColor;
+var position = picker.PixelPosition;
 ```
 
 License

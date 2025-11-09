@@ -123,7 +123,7 @@
         </Border>
 
         <Border
-            x:Name="ColorInfoPanel"
+            x:Name="PixelInfoPanel"
             Grid.Row="1"
             Background="#2e2e2e"
             BorderBrush="#414141"
@@ -157,13 +157,13 @@
                     Effect="{StaticResource RectDropShadowEffect}"/>
 
                 <TextBlock
-                    x:Name="ColorText"
+                    x:Name="ColorTextBlock"
                     Grid.Column="1"
                     Text="#" 
                     Foreground="White"/>
 
                 <TextBlock 
-                    x:Name="CoordsText" 
+                    x:Name="PositionTextBlock" 
                     Grid.Row="1"
                     Grid.Column="2" 
                     Text="X: ? Y: ?"

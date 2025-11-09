@@ -34,19 +34,19 @@ public partial class MainWindow : Window
             ConfirmationSoundEffect = PixelMagnifierWindow.SoundEffect.Pop
         };
 
-        // ShowDialog() returns true if the magnifier was closed via
-        // mouse left click or Enter key
+        // ShowDialog() will return true if the window was closed via either Enter key or
+        // mouse left click. You can use the return result to update your UI conditionally
         if (magWindow.ShowDialog() != true)
             return;
 
-        var color = magWindow.SelectedPixelColor!;
-        var coords = magWindow.SelectedPixelPosition!;
+        var color = magWindow.PixelColor;
+        var position = magWindow.PixelPosition;
 
-        ColorText.Text = $"{HexStringFromColor(color.Value)} ({RgbStringFromColor(color.Value)})";
-        CoordsText.Text = $"X: {coords.Value.X} Y: {coords.Value.Y}";
+        ColorTextBlock.Text = $"{HexStringFromColor(color)} ({RgbStringFromColor(color)})";
+        PositionTextBlock.Text = $"X: {position.X} Y: {position.Y}";
 
-        ColorPreviewBox.Fill = new SolidColorBrush(color.Value);
-        ColorInfoPanel.Visibility = Visibility.Visible;
+        ColorPreviewBox.Fill = new SolidColorBrush(color);
+        PixelInfoPanel.Visibility = Visibility.Visible;
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
