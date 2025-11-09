@@ -1,6 +1,6 @@
 About
 -----
-PixelBox is a fast and customizable BitBlt-based pixel magnification control for WPF. The library contains the standalone magnifier control itself, and an optional mouse-tracked pixel magnifier and color picker window, similar to what you would find in browser developer tools.
+PixelBox is a fast and customizable BitBlt-based pixel magnification control for WPF. The library contains the standalone magnifier control itself, and a ready-to-use mouse-tracked pixel magnifier and color picker window, similar to what you would find in browser developer tools.
 
 Features
 --------
