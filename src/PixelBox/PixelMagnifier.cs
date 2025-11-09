@@ -29,7 +29,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     private int _pixelColumnsHalf;
 
     private Color _sampledColor;
-    private Point _lastMousePos = new(-1, -1);
+    private Point _mousePos;
 
     private Point? _lockedPos;
     private bool _lockX, _lockY;
@@ -241,7 +241,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     [EditorBrowsable(EditorBrowsableState.Always)]
-    public Point PixelPosition => _lastMousePos;
+    public Point PixelPosition => _mousePos;
 
     /// <summary>
     /// Gets or sets whether both X and Y screen coordinates are locked.
@@ -256,7 +256,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         {
             if (value)
             {
-                _lockedPos = _lastMousePos;
+                _lockedPos = _mousePos;
                 _lockX = _lockY = true;
             }
             else
@@ -280,8 +280,8 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         {
             if (value && !_lockX)
             {
-                var pos = _lockedPos ?? _lastMousePos;
-                pos.X = _lastMousePos.X >= 0 ? _lastMousePos.X : MousePosition.X;
+                var pos = _lockedPos ?? _mousePos;
+                pos.X = _mousePos.X >= 0 ? _mousePos.X : MousePosition.X;
 
                 _lockedPos = pos;
             }
@@ -306,8 +306,8 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         {
             if (value && !_lockY)
             {
-                var pos = _lockedPos ?? _lastMousePos;
-                pos.Y = _lastMousePos.Y >= 0 ? _lastMousePos.Y : MousePosition.Y;
+                var pos = _lockedPos ?? _mousePos;
+                pos.Y = _mousePos.Y >= 0 ? _mousePos.Y : MousePosition.Y;
 
                 _lockedPos = pos;
             }
@@ -381,12 +381,12 @@ public class PixelMagnifier : FrameworkElement, IDisposable
                 _lockY ? locked.Y : cursorPos.Y);
         }
 
-        if (currentPos == _lastMousePos)
+        if (currentPos == _mousePos)
             return;
 
-        _lastMousePos = currentPos;
+        _mousePos = currentPos;
 
-        CaptureAt(_lastMousePos);
+        CaptureAt(_mousePos);
         InvalidateVisual();
     }
 
@@ -552,7 +552,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             return;
 
         _sampledColor = SampleColor(SamplingMode, (byte*)_dib.Bits, _dib.Stride);
-        PixelChanged?.Invoke(this, new PixelChangedEventArgs(_sampledColor, _lastMousePos));
+        PixelChanged?.Invoke(this, new PixelChangedEventArgs(_sampledColor, _mousePos));
     }
 
     /// <summary>
@@ -625,7 +625,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     {
         if (_dib.Bits is null)
         {
-            CaptureAt(_lastMousePos);
+            CaptureAt(_mousePos);
             return;
         }
 
@@ -633,7 +633,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             (byte*)_dib.Bits, _dib.Stride);
 
         PixelChanged?.Invoke(this, new PixelChangedEventArgs(
-            _sampledColor, _lastMousePos));
+            _sampledColor, _mousePos));
     }
 
     /// <summary>
@@ -706,8 +706,8 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     {
         if (_dib.Bits is null)
         {
-            _lastMousePos = MousePosition;
-            CaptureAt(_lastMousePos);
+            _mousePos = MousePosition;
+            CaptureAt(_mousePos);
         }
 
         return _dib.Bits is not null;
@@ -737,7 +737,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             PixelFormats.Bgra32, null);
 
         // Recapture since the size has changed
-        CaptureAt(_lastMousePos);
+        CaptureAt(_mousePos);
     }
 
     /// <summary>

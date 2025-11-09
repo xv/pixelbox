@@ -10,7 +10,7 @@ namespace PixelBox.Demo;
 public partial class MainWindow : Window
 {
     private readonly PixelMagnifierWindowConfig _magWindowCfg;
-    private SolidColorBrush _colorbrush;
+    private readonly SolidColorBrush _colorbrush;
 
     public MainWindow()
     {
