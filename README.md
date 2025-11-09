@@ -22,9 +22,9 @@ Requirements
 
 Installation
 ------------
-You can either manually download a release from this repository, or via NuGet:
+You can install PixelBox either by downloading a release from this repository and referencing it manually in your project, or by using NuGet:
 ```console
-dotnet add package pixelbox
+dotnet add package PixelBox
 ```
 
 Quick Start
@@ -35,7 +35,7 @@ Quick Start
 > `PixelMagnifier` uses unmanaged resources and implements `IDisposable`. Call `Dispose()` when the control is no longer needed to properly release resources it holds.
 
 ```xml
-<Window x:Class="DemoApp.MainWindow"
+<Window x:Class="WpfApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:pb="clr-namespace:PixelBox;assembly=PixelBox">
     <Grid>
