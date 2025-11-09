@@ -61,8 +61,8 @@ using PixelBox;
 
 var picker = new PixelMagnifierWindow();
 
-// ShowDialog() will return true if the window was closed via either Enter key
-// or mouse left click 
+// ShowDialog() will return true if the window was closed via either Enter key or
+// mouse left click. You can use the return result to update your UI conditionally
 picker.ShowDialog();
 
 var color = picker.SelectedPixelColor;
