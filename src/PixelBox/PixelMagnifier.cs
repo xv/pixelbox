@@ -34,7 +34,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     private Point? _lockedPos;
     private bool _lockX, _lockY;
 
-    private PersistentDibSection? _dib;
+    private readonly PersistentDibSection _dib;
     private WriteableBitmap? _bitmap;
     private int _bitmapDevSize = 0;
 
@@ -528,20 +528,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         _samplingAreaIndicator.Render();
     }
 
-    private void EnsureDibAvailable(int width, int height)
-    {
-        if (_dib is null)
-        {
-            _dib = new PersistentDibSection(width, height);
-            return;
-        }
-
-        if (width == _dib.Width && height == _dib.Height)
-            return;
-
-        _dib.Resize(width, height);
-    }
-
     /// <summary>
     /// Captures a new bitmap at the specified screen position.
     /// </summary>
@@ -559,9 +545,10 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         var left = cx - _pixelColumnsHalf;
         var top = cy - _pixelColumnsHalf;
 
-        EnsureDibAvailable(_pixelColumns, _pixelColumns);
+        if (_pixelColumns != _dib.Width || _pixelColumns != _dib.Height)
+            _dib.Resize(_pixelColumns, _pixelColumns);
 
-        if (!_dib!.Capture(left, top))
+        if (!_dib.Capture(left, top))
             return;
 
         _sampledColor = SampleColor(SamplingMode, (byte*)_dib.Bits, _dib.Stride);
@@ -636,7 +623,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// </summary>
     private unsafe void SampleColorFromLastCapture()
     {
-        if (_dib is null)
+        if (_dib.Bits is null)
         {
             CaptureAt(_lastMousePos);
             return;
@@ -715,15 +702,15 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// <see langword="true"/> if a capture buffer is available;
     /// <see langword="false"/> otherwise.
     /// </returns>
-    private bool EnsureCaptureReady()
+    private unsafe bool EnsureCaptureReady()
     {
-        if (_dib is null)
+        if (_dib.Bits is null)
         {
             _lastMousePos = MousePosition;
             CaptureAt(_lastMousePos);
         }
 
-        return _dib is not null;
+        return _dib.Bits is not null;
     }
 
     /// <summary>
@@ -749,7 +736,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             _dpi.PixelsPerInchX, _dpi.PixelsPerInchY,
             PixelFormats.Bgra32, null);
 
-        // Recapture if the bitmap size has changed
+        // Recapture since the size has changed
         CaptureAt(_lastMousePos);
     }
 
@@ -763,7 +750,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// </param>
     private unsafe void CopyCaptureToBitmap(bool drawGrid)
     {
-        if (_bitmap is null || _dib is null)
+        if (_bitmap is null || _dib.Bits is null)
             return;
 
         var gridGapDev = drawGrid ? 1 : 0;
@@ -845,6 +832,8 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         Focusable = false;
 
         _dpi = VisualTreeHelper.GetDpi(this);
+
+        _dib = new PersistentDibSection();
 
         _samplingAreaIndicator = new SamplingAreaIndicator(_dpi);
         _visuals = new VisualCollection(this) { _samplingAreaIndicator };
@@ -935,7 +924,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             return;
 
         _dib?.Dispose();
-        _dib = null;
 
         _disposed = true;
     }
