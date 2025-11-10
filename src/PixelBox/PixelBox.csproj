@@ -22,7 +22,7 @@
 
   <!-- NuGet metadata -->
   <PropertyGroup>
-    <PackageId>$(AssemblyName)</PackageId>
+    <PackageId>$(MSBuildProjectName)</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>wpf;control;pixel;magnifier;colorpicker</PackageTags>
