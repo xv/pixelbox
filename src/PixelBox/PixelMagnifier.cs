@@ -76,6 +76,35 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     #endregion
     #region Dependency Properties
 
+    /// <summary>
+    /// Dependency property for the <see cref="Background"/> property.
+    /// </summary>
+    public static readonly DependencyProperty BackgroundProperty =
+        DependencyProperty.Register(
+            nameof(Background),
+            typeof(Brush),
+            typeof(PixelMagnifier),
+            new FrameworkPropertyMetadata(Brushes.Black,
+                FrameworkPropertyMetadataOptions.AffectsRender));
+
+    /// <summary>
+    /// Gets or sets the brush used to fill the control background.
+    /// </summary>
+    /// 
+    /// <remarks>
+    /// When <see cref="ShowGrid"/> is <see langword="true"/>, the control
+    /// displays gaps between pixels rather than drawing actual grid lines.
+    /// Setting the background fills the area behind these gaps, which creates
+    /// the visual impression of grid lines whose color is determined by this
+    /// brush.
+    /// </remarks>
+    [Category("Appearance")]
+    public Brush Background
+    {
+        get => (Brush)GetValue(BackgroundProperty);
+        set => SetValue(BackgroundProperty, value);
+    }
+
     public static readonly DependencyProperty PixelColumnsProperty =
         DependencyProperty.Register(
             nameof(PixelColumns),
@@ -689,7 +718,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// </param>
     private void DrawGrid(DrawingContext dc)
     {
-        dc.DrawRectangle(Brushes.Black, null,
+        dc.DrawRectangle(Background, null,
             new Rect(0, 0, ActualWidth, ActualHeight));
     }
 
@@ -870,7 +899,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         if (ShowGrid)
             sizeDev += _pixelColumns - 1;
 
-        // Convert device pixels to DIPs
         return new Size(
             sizeDev / _dpi.DpiScaleX,
             sizeDev / _dpi.DpiScaleY);
