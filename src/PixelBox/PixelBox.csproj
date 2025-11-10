@@ -28,7 +28,7 @@
     <PackageTags>wpf;control;pixel;magnifier;colorpicker</PackageTags>
     <RepositoryUrl>https://github.com/xv/pixelbox</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <Description>Customizable BitBlt-based pixel magnification WPF control that can also be used as a mouse-tracked color picker window, similar to those found in browser developer tools.</Description>
+    <Description>Fast and customizable BitBlt-based pixel magnification WPF control and a ready-to-use mouse-tracked color picker window.</Description>
     <Authors>$(Company)</Authors>
   </PropertyGroup>
 
