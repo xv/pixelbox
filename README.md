@@ -56,7 +56,7 @@ Quick Start
 > [!TIP]
 > A project demonstrating the use of the built-in window is provided under `PixelBox.Demo`.
 
-```c#
+```csharp
 var picker = new PixelBox.PixelMagnifierWindow();
 
 // ShowDialog() will return true if the window was closed via either Enter key or
