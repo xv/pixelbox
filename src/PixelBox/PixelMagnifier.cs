@@ -259,7 +259,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     }
 
     /// <summary>
-    /// Gets whether the control currently captures pixels on mouse movement.
+    /// Gets whether the control captures pixels on mouse movement.
     /// </summary>
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -619,8 +619,8 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// <returns>
     /// The sampled color. If <paramref name="mode"/> is set to
     /// <see cref="PixelSamplingMode.Single"/>, then the exact color of the
-    /// pixel is returned; otherwise, the average color of nearby pixels is
-    /// calculated and returned.
+    /// pixel is returned; otherwise, the average color of neighboring pixels
+    /// is calculated and returned.
     /// </returns>
     private unsafe Color SampleColor(PixelSamplingMode mode, byte* pBits, int stride)
     {
@@ -654,7 +654,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             }
         }
 
-        // Mean of the RGB components
         return Color.FromRgb(
             (byte)(rSum / kTotal),
             (byte)(gSum / kTotal),
