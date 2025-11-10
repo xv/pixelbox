@@ -60,6 +60,9 @@ public partial class PixelMagnifierWindow : Window
     #endregion
     #region Dependency Properties
 
+    /// <summary>
+    /// Dependency property for the <see cref="ColorPreviewBrush"/> property.
+    /// </summary>
     private static readonly DependencyProperty ColorPreviewBrushProperty =
         DependencyProperty.Register(
             nameof(ColorPreviewBrush),
@@ -75,6 +78,9 @@ public partial class PixelMagnifierWindow : Window
         set => SetValue(ColorPreviewBrushProperty, value);
     }
 
+    /// <summary>
+    /// Dependency property for the <see cref="PixelColorString"/> property.
+    /// </summary>
     private static readonly DependencyProperty PixelColorStringProperty =
         DependencyProperty.Register(
             nameof(PixelColorString),
@@ -91,6 +97,9 @@ public partial class PixelMagnifierWindow : Window
         set => SetValue(PixelColorStringProperty, value);
     }
 
+    /// <summary>
+    /// Dependency property for the <see cref="PixelPositionString"/> property.
+    /// </summary>
     private static readonly DependencyProperty PixelPositionStringProperty =
         DependencyProperty.Register(
             nameof(PixelPositionString),
@@ -107,6 +116,9 @@ public partial class PixelMagnifierWindow : Window
         set => SetValue(PixelPositionStringProperty, value);
     }
 
+    /// <summary>
+    /// Dependency property for the <see cref="MagnifierX"/> property.
+    /// </summary>
     private static readonly DependencyProperty MagnifierXProperty =
         DependencyProperty.Register(
             nameof(MagnifierX),
@@ -122,6 +134,9 @@ public partial class PixelMagnifierWindow : Window
         set => SetValue(MagnifierXProperty, value);
     }
 
+    /// <summary>
+    /// Dependency property for the <see cref="MagnifierY"/> property.
+    /// </summary>
     private static readonly DependencyProperty MagnifierYProperty =
         DependencyProperty.Register(
             nameof(MagnifierY),
@@ -137,11 +152,14 @@ public partial class PixelMagnifierWindow : Window
         set => SetValue(MagnifierYProperty, value);
     }
 
+    /// <summary>
+    /// Dependency property for the <see cref="OverlayImage"/> property.
+    /// </summary>
     private static readonly DependencyProperty OverlayImageProperty =
-    DependencyProperty.Register(
-        nameof(OverlayImage),
-        typeof(ImageSource),
-        typeof(PixelMagnifierWindow));
+        DependencyProperty.Register(
+            nameof(OverlayImage),
+            typeof(ImageSource),
+            typeof(PixelMagnifierWindow));
 
     /// <summary>
     /// Gets or sets the overlay image used as the background for the magnifier.

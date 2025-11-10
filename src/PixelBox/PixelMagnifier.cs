@@ -88,23 +88,26 @@ public class PixelMagnifier : FrameworkElement, IDisposable
                 FrameworkPropertyMetadataOptions.AffectsRender));
 
     /// <summary>
-    /// Gets or sets the brush used to fill the control background.
+    /// Gets or sets the brush used to fill the control's background.
     /// </summary>
     /// 
     /// <remarks>
     /// When <see cref="ShowGrid"/> is <see langword="true"/>, the control
-    /// displays gaps between pixels rather than drawing actual grid lines.
-    /// Setting the background fills the area behind these gaps, which creates
-    /// the visual impression of grid lines whose color is determined by this
-    /// brush.
+    /// leaves gaps between pixels rather than drawing actual grid lines. The
+    /// background brush fills the area behind these gaps, creating the
+    /// appearance of grid lines in the brush's color.
     /// </remarks>
     [Category("Appearance")]
+    [Description("Sets the background of the control.")]
     public Brush Background
     {
         get => (Brush)GetValue(BackgroundProperty);
         set => SetValue(BackgroundProperty, value);
     }
 
+    /// <summary>
+    /// Dependency property for the <see cref="PixelColumns"/> property.
+    /// </summary>
     public static readonly DependencyProperty PixelColumnsProperty =
         DependencyProperty.Register(
             nameof(PixelColumns),
@@ -143,6 +146,9 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         set => SetValue(PixelColumnsProperty, value);
     }
 
+    /// <summary>
+    /// Dependency property for the <see cref="PixelSize"/> property.
+    /// </summary>
     public static readonly DependencyProperty PixelSizeProperty =
         DependencyProperty.Register(
             nameof(PixelSize),
@@ -166,6 +172,9 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         set => SetValue(PixelSizeProperty, value);
     }
 
+    /// <summary>
+    /// Dependency property for the <see cref="SamplingMode"/> property.
+    /// </summary>
     public static readonly DependencyProperty SamplingModeProperty =
         DependencyProperty.Register(
             nameof(SamplingMode),
@@ -186,6 +195,9 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         set => SetValue(SamplingModeProperty, value);
     }
 
+    /// <summary>
+    /// Dependency property for the <see cref="RefreshInterval"/> property.
+    /// </summary>
     public static readonly DependencyProperty RefreshIntervalProperty =
         DependencyProperty.Register(
             nameof(RefreshInterval),
@@ -206,6 +218,9 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         set => SetValue(RefreshIntervalProperty, value);
     }
 
+    /// <summary>
+    /// Dependency property for the <see cref="ShowGrid"/> property.
+    /// </summary>
     public static readonly DependencyProperty ShowGridProperty =
         DependencyProperty.Register(
             nameof(ShowGrid),
