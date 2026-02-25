@@ -20,7 +20,8 @@ public partial class MainWindow : Window
 
         _magWindowCfg = new PixelMagnifierWindowConfig 
         {
-            RefreshInterval = 30
+            RefreshInterval = 30,
+            ShowInfoPanel = true
         };
     }
 
