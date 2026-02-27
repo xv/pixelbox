@@ -22,6 +22,7 @@
 
     <Window.Resources>
         <converter:CenterPointConverter x:Key="CenterPointConverter"/>
+        <converter:BindableConverter x:Key="BindableConverter"/>
         
         <DropShadowEffect
             x:Key="DropShadowEffect"
@@ -212,16 +213,28 @@
                             TextAlignment="Left"
                             Foreground="White"
                             FontFamily="Consolas"
-                            FontSize="12"
-                            Text="{Binding PixelColorString}"/>
+                            FontSize="12">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource BindableConverter}">
+                                    <Binding Path="PixelColor"/>
+                                    <Binding Path="PixelColorConverter"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
                         <TextBlock
                             Grid.Row="1"
                             Padding="0,0,6,0"
                             TextAlignment="Left"
                             Foreground="White"
                             FontFamily="Consolas"
-                            FontSize="12"
-                            Text="{Binding PixelPositionString}"/>
+                            FontSize="12">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource BindableConverter}">
+                                    <Binding Path="PixelPosition"/>
+                                    <Binding Path="PixelPositionConverter"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
                     </Grid>
                 </Grid>
             </Border>

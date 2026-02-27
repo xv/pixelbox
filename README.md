@@ -40,8 +40,8 @@ Quick Start
         xmlns:pb="clr-namespace:PixelBox;assembly=PixelBox">
     <Grid>
         <!-- The control size of PixelMagnifier is automatically determiend via its
-             PixelColumns, PixelSize, and ShowGrid properties. The size should not
-             be set manually. -->
+             PixelColumns, PixelSize, and ShowGrid properties. The size of the control
+             should not be set manually. -->
         <pb:PixelMagnifier HorizontalAlignment="Left" VerticalAlignment="Top"
             PixelColumns="15"
             PixelSize="10"
@@ -65,6 +65,37 @@ picker.ShowDialog();
 
 var color = picker.PixelColor;
 var position = picker.PixelPosition;
+```
+
+#### Customizing the Info Panel
+You can customize how the color and screen position values are formatted in the info panel (visible when `ShowInfoPanel = true`) by providing your own `IValueConverter` implementations to the `PixelColorConverter` and `PixelPositionConverter` properties.
+
+The example below formats the color value using CSS RGB syntax instead of the default HTML hex format:
+```csharp
+using System.Globalization;
+using System.Windows.Data;
+using System.Windows.Media;
+
+internal class ColorToCssStringConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is not Color c)
+            return string.Empty;
+
+        return $"rgb({c.R}, {c.G}, {c.B})";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+         => throw new NotImplementedException();
+}
+```
+```csharp
+// Set the converter after instantiating the window
+var picker = new PixelMagnifierWindow
+{
+    PixelColorConverter = new ColorToCssStringConverter()
+};
 ```
 
 License

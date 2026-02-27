@@ -3,6 +3,7 @@
 
 using System.IO;
 using System.Media;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
@@ -11,6 +12,7 @@ using System.Windows;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32;
 
+using PixelBox.BindingConverters;
 using PixelBox.Resources;
 
 namespace PixelBox;
@@ -79,44 +81,6 @@ public partial class PixelMagnifierWindow : Window
     }
 
     /// <summary>
-    /// Dependency property for the <see cref="PixelColorString"/> property.
-    /// </summary>
-    private static readonly DependencyProperty PixelColorStringProperty =
-        DependencyProperty.Register(
-            nameof(PixelColorString),
-            typeof(string),
-            typeof(PixelMagnifierWindow),
-            new PropertyMetadata(string.Empty));
-
-    /// <summary>
-    /// Gets or sets the current pixel color as a string representation.
-    /// </summary>
-    internal string PixelColorString
-    {
-        get => (string)GetValue(PixelColorStringProperty);
-        set => SetValue(PixelColorStringProperty, value);
-    }
-
-    /// <summary>
-    /// Dependency property for the <see cref="PixelPositionString"/> property.
-    /// </summary>
-    private static readonly DependencyProperty PixelPositionStringProperty =
-        DependencyProperty.Register(
-            nameof(PixelPositionString),
-            typeof(string),
-            typeof(PixelMagnifierWindow),
-            new PropertyMetadata(string.Empty));
-
-    /// <summary>
-    /// Gets or sets the current pixel position as a string representation.
-    /// </summary>
-    internal string PixelPositionString
-    {
-        get => (string)GetValue(PixelPositionStringProperty);
-        set => SetValue(PixelPositionStringProperty, value);
-    }
-
-    /// <summary>
     /// Dependency property for the <see cref="MagnifierX"/> property.
     /// </summary>
     private static readonly DependencyProperty MagnifierXProperty =
@@ -176,6 +140,80 @@ public partial class PixelMagnifierWindow : Window
         set => SetValue(OverlayImageProperty, value);
     }
 
+    /// <inheritdoc cref="PixelMagnifier.PixelColor"/>
+    public Color PixelColor
+    {
+        get => (Color)GetValue(PixelColorProperty);
+        private set => SetValue(PixelColorProperty, value);
+    }
+
+    /// <summary>
+    /// Dependency property for the <see cref="PixelColor"/> property.
+    /// </summary>
+    public static readonly DependencyProperty PixelColorProperty =
+        DependencyProperty.Register(
+            nameof(PixelColor),
+            typeof(Color),
+            typeof(PixelMagnifierWindow),
+            new PropertyMetadata(default(Color)));
+
+    /// <summary>
+    /// Gets or sets the value converter used to transform pixel color values
+    /// for data binding operations and user interface representation.
+    /// </summary>
+    public IValueConverter PixelColorConverter
+    {
+        get => (IValueConverter)GetValue(PixelColorConverterProperty);
+        set => SetValue(PixelColorConverterProperty, value);
+    }
+
+    /// <summary>
+    /// Dependency property for the <see cref="PixelColorConverter"/> property.
+    /// </summary>
+    public static readonly DependencyProperty PixelColorConverterProperty =
+        DependencyProperty.Register(
+            nameof(PixelColorConverter),
+            typeof(IValueConverter),
+            typeof(PixelMagnifierWindow),
+            new PropertyMetadata(new ColorToStringConverter()));
+
+    /// <inheritdoc cref="PixelMagnifier.PixelPosition"/>
+    public Point PixelPosition
+    {
+        get => (Point)GetValue(PixelPositionProperty);
+        private set => SetValue(PixelPositionProperty, value);
+    }
+
+    /// <summary>
+    /// Dependency property for the <see cref="PixelPosition"/> property.
+    /// </summary>
+    public static readonly DependencyProperty PixelPositionProperty =
+        DependencyProperty.Register(
+            nameof(PixelPosition),
+            typeof(Point),
+            typeof(PixelMagnifierWindow),
+            new PropertyMetadata(default(Point)));
+
+    /// <summary>
+    /// Gets or sets the value converter used to transform pixel screen position
+    /// values for data binding operations and user interface representation.
+    /// </summary>
+    public IValueConverter PixelPositionConverter
+    {
+        get => (IValueConverter)GetValue(PixelPositionConverterProperty);
+        set => SetValue(PixelPositionConverterProperty, value);
+    }
+
+    /// <summary>
+    /// Dependency property for the <see cref="PixelPositionConverter"/> property.
+    /// </summary>
+    public static readonly DependencyProperty PixelPositionConverterProperty =
+        DependencyProperty.Register(
+            nameof(PixelPositionConverter),
+            typeof(IValueConverter),
+            typeof(PixelMagnifierWindow),
+            new PropertyMetadata(new PointToStringConverter()));
+
     #endregion
     #region Properties
 
@@ -194,14 +232,6 @@ public partial class PixelMagnifierWindow : Window
         get => InfoPanelHost.Visibility == Visibility.Visible;
         set => InfoPanelHost.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
     }
-
-    /// <inheritdoc cref="PixelMagnifier.PixelColor"/>
-    public Color PixelColor
-    { get; private set; }
-
-    /// <inheritdoc cref="PixelMagnifier.PixelPosition"/>
-    public Point PixelPosition
-    { get; private set; }
 
     #endregion
     #region Methods
@@ -413,35 +443,6 @@ public partial class PixelMagnifierWindow : Window
         MagnifierY = Math.Floor(top * sy) / sy;
     }
 
-    /// <summary>
-    /// Updates the color preview element's brush and string representation of
-    /// the current pixel color.
-    /// </summary>
-    /// 
-    /// <param name="newColor">
-    /// The new pixel color.
-    /// </param>
-    private void UpdatePixelColorInfo(Color newColor)
-    {
-        if (newColor == _colorPreviewBrush.Color)
-            return;
-
-        _colorPreviewBrush.Color = newColor;
-
-        ColorPreviewBrush = _colorPreviewBrush;
-        PixelColorString = $"#{newColor.R:X2}{newColor.G:X2}{newColor.B:X2}";
-    }
-
-    /// <summary>
-    /// Updates the string representation of the current pixel position on screen.
-    /// </summary>
-    /// 
-    /// <param name="newPos">
-    /// The new pixel position.
-    /// </param>
-    private void UpdatePixelPositionString(Point newPos) =>
-        PixelPositionString = $"X:{newPos.X} Y:{newPos.Y}";
-
     #endregion
 
     /// <summary>
@@ -572,8 +573,11 @@ public partial class PixelMagnifierWindow : Window
 
     private void OnPixelChanged(object? sender, PixelChangedEventArgs e)
     {
-        UpdatePixelColorInfo(e.Color);
-        UpdatePixelPositionString(e.ScreenPosition);
+        PixelColor = e.Color;
+        PixelPosition = e.ScreenPosition;
+
+        _colorPreviewBrush.Color = e.Color;
+        ColorPreviewBrush = _colorPreviewBrush;
     }
 
     private void OnToggleGridExecuted(object sender, ExecutedRoutedEventArgs e) =>
