@@ -10,13 +10,10 @@ namespace PixelBox.Demo;
 public partial class MainWindow : Window
 {
     private readonly PixelMagnifierWindowConfig _magWindowCfg;
-    private readonly SolidColorBrush _colorbrush;
 
     public MainWindow()
     {
         InitializeComponent();
-
-        _colorbrush = new SolidColorBrush();
 
         _magWindowCfg = new PixelMagnifierWindowConfig 
         {
@@ -46,12 +43,10 @@ public partial class MainWindow : Window
         var color = magWindow.PixelColor;
         var position = magWindow.PixelPosition;
 
-        _colorbrush.Color = color;
-
         ColorTextBlock.Text = $"{HexStringFromColor(color)} ({RgbStringFromColor(color)})";
         PositionTextBlock.Text = $"X: {position.X} Y: {position.Y}";
 
-        ColorPreviewBox.Fill = _colorbrush;
+        ColorPreviewBox.Fill = new SolidColorBrush(color);
         PixelInfoPanel.Visibility = Visibility.Visible;
     }
 
