@@ -40,8 +40,8 @@ Quick Start
         xmlns:pb="clr-namespace:PixelBox;assembly=PixelBox">
     <Grid>
         <!-- The control size of PixelMagnifier is automatically determiend via its
-             PixelColumns, PixelSize, and ShowGrid properties. The size of the control
-             should not be set manually. -->
+             PixelColumns, PixelSize, and ShowGrid properties. The control size should
+             not be set manually. -->
         <pb:PixelMagnifier HorizontalAlignment="Left" VerticalAlignment="Top"
             PixelColumns="15"
             PixelSize="10"
