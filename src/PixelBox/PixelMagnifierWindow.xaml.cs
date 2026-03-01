@@ -1,6 +1,7 @@
 ﻿// Copyright 2025 Jad Altahan <xv.git@aol.com>
 // SPDX-License-Identifier: MIT
 
+using System.ComponentModel;
 using System.IO;
 using System.Media;
 using System.Windows.Data;
@@ -479,38 +480,51 @@ public partial class PixelMagnifierWindow : Window
         Cursor = _cursor;
 
         ApplyConfig();
+    }
 
-        Loaded += (_, _) =>
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+
+        // It appears that setting the overlay here as opposed to the Loaded event
+        // is more reliable in that if the mouse was over an interactive element
+        // (e.g., button with hover effects), the overlay properly reflects the
+        // original UI state
+        OverlayImage = CaptureDesktopScreen()!;
+
+        UpdateMagnifierPosition(GetMousePosition());
+    }
+
+    protected override void OnContentRendered(EventArgs e)
+    {
+        base.OnContentRendered(e);
+
+        Magnifier.StartCapture();
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        base.OnClosing(e);
+
+        PixelColor = Magnifier.PixelColor;
+        PixelPosition = Magnifier.PixelPosition;
+
+        ExtractConfig();
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+
+        Magnifier.StopCapture();
+        Magnifier.PixelChanged -= OnPixelChanged;
+        Magnifier.Dispose();
+
+        if (Cursor == _cursor)
         {
-            OverlayImage = CaptureDesktopScreen()!;
-
-            // Set the initial magnifier position at the current mouse position
-            UpdateMagnifierPosition(GetMousePosition());
-
-            Magnifier.StartCapture();
-        };
-
-        Closing += (_, _) =>
-        {
-            Magnifier.StopCapture();
-
-            PixelColor = Magnifier.PixelColor;
-            PixelPosition = Magnifier.PixelPosition;
-
-            if (Cursor == _cursor)
-            {
-                Cursor = null;
-                _cursor?.Dispose();
-            }
-
-            ExtractConfig();
-        };
-
-        Unloaded += (_, _) =>
-        {
-            Magnifier.PixelChanged -= OnPixelChanged;
-            Magnifier.Dispose();
-        };
+            Cursor = null;
+            _cursor?.Dispose();
+        }
     }
 
     protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
