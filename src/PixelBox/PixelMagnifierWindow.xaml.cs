@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 using System.ComponentModel;
-using System.IO;
-using System.Media;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
@@ -33,10 +31,6 @@ public partial class PixelMagnifierWindow : Window
 
     private readonly SolidColorBrush _colorPreviewBrush = new(Colors.Transparent);
 
-    private static readonly SoundPlayer s_soundPlayer = new();
-    private static readonly Dictionary<SoundEffect, MemoryStream> s_preloadedSoundStreams = [];
-    private static readonly object s_soundLock = new();
-
     private readonly Cursor _cursor;
 
     private readonly PixelSamplingMode[] _samplingModes =
@@ -45,20 +39,6 @@ public partial class PixelMagnifierWindow : Window
         PixelSamplingMode.ThreeByThree,
         PixelSamplingMode.FiveByFive
     ];
-
-    #endregion
-    #region Enums
-
-    /// <summary>
-    /// Represents predefined sound effects.
-    /// </summary>
-    public enum SoundEffect
-    {
-        None,
-        Pop,
-        Click,
-        Notify
-    }
 
     #endregion
     #region Dependency Properties
@@ -219,12 +199,6 @@ public partial class PixelMagnifierWindow : Window
     #region Properties
 
     /// <summary>
-    /// Gets or sets the sound effect that plays upon a confirmation action.
-    /// </summary>
-    public SoundEffect ConfirmationSoundEffect
-    { get; set; } = SoundEffect.Pop;
-
-    /// <summary>
     /// Gets or sets whether the info panel containing the current pixel's color
     /// and screen position is displayed.
     /// </summary>
@@ -332,47 +306,6 @@ public partial class PixelMagnifierWindow : Window
     }
 
     /// <summary>
-    /// Preloads sound streams into memory for quick access during application
-    /// runtime.
-    /// </summary>
-    private static void LoadSoundStreams()
-    {
-        static MemoryStream Load(Uri uri)
-        {
-            using var rs = Application.GetResourceStream(uri).Stream;
-            var ms = new MemoryStream();
-            rs.CopyTo(ms);
-            ms.Position = 0;
-            return ms;
-        }
-
-        s_preloadedSoundStreams[SoundEffect.Pop] = Load(ResourceUris.Sounds.Pop);
-        s_preloadedSoundStreams[SoundEffect.Click] = Load(ResourceUris.Sounds.Click);
-        s_preloadedSoundStreams[SoundEffect.Notify] = Load(ResourceUris.Sounds.Notify);
-    }
-
-    /// <summary>
-    /// Plays the specified sound effect.
-    /// </summary>
-    /// 
-    /// <param name="soundEffect">
-    /// The sound effect to play.
-    /// </param>
-    private static void PlaySoundEffect(SoundEffect soundEffect)
-    {
-        if (soundEffect == SoundEffect.None ||
-            !s_preloadedSoundStreams.TryGetValue(soundEffect, out var ms))
-            return;
-
-        lock (s_soundLock)
-        {
-            ms.Position = 0;
-            s_soundPlayer.Stream = ms;
-            s_soundPlayer.Play();
-        }
-    }
-
-    /// <summary>
     /// Retrieves the current mouse cursor screen position.
     /// </summary>
     /// 
@@ -445,14 +378,6 @@ public partial class PixelMagnifierWindow : Window
     }
 
     #endregion
-
-    /// <summary>
-    /// Initializes static members of <see cref="PixelMagnifierWindow"/>.
-    /// </summary>
-    static PixelMagnifierWindow()
-    {
-        LoadSoundStreams();
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PixelMagnifierWindow"/>
@@ -635,22 +560,8 @@ public partial class PixelMagnifierWindow : Window
     private void OnCloseExecuted(object sender, ExecutedRoutedEventArgs e)
     {
         if (e.Command == PixelMagnifierUICommands.Close)
-        {
             DialogResult = true;
-            PlaySoundEffect(ConfirmationSoundEffect);
-        }
 
         Close();
-    }
-
-    /// <summary>
-    /// Disposes all preloaded sound streams.
-    /// </summary>
-    public static void DisposePreloadedStreams()
-    {
-        foreach (var stream in s_preloadedSoundStreams.Values)
-            stream?.Dispose();
-
-        s_preloadedSoundStreams.Clear();
     }
 }

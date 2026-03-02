@@ -30,10 +30,7 @@ public partial class MainWindow : Window
 
     private void ShowMagnifierWindow()
     {
-        var magWindow = new PixelMagnifierWindow(_magWindowCfg)
-        {
-            ConfirmationSoundEffect = PixelMagnifierWindow.SoundEffect.Pop
-        };
+        var magWindow = new PixelMagnifierWindow(_magWindowCfg);
 
         // ShowDialog() will return true if the window was closed via either Enter key or
         // mouse left click. You can use the return result to update your UI conditionally

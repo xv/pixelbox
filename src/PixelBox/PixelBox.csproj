@@ -50,9 +50,6 @@
   <ItemGroup>
     <Resource Include="Resources\Cursors\simple_inverted_cross.cur" />
     <Resource Include="Resources\Cursors\cross.cur" />
-    <Resource Include="Resources\Sounds\ui_click.wav" />
-    <Resource Include="Resources\Sounds\ui_notify.wav" />
-    <Resource Include="Resources\Sounds\ui_pop.wav" />
   </ItemGroup>
 
   <ItemGroup>
