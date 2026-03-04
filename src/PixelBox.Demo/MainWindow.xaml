@@ -11,7 +11,7 @@
         Background="#242424"
         WindowStartupLocation="CenterScreen"
         MinWidth="320"
-        ResizeMode="NoResize"
+        ResizeMode="CanMinimize"
         SizeToContent="WidthAndHeight">
     
     <Window.Resources>
