@@ -40,6 +40,9 @@ public partial class PixelMagnifierWindow : Window
         PixelSamplingMode.FiveByFive
     ];
 
+    private static readonly PixelMagnifierWindowKeyBindings _keyBindings =
+        PixelMagnifierWindowKeyBindings.CreateDefault();
+
     #endregion
     #region Dependency Properties
 
@@ -199,6 +202,11 @@ public partial class PixelMagnifierWindow : Window
     #region Properties
 
     /// <summary>
+    /// Gets the key bindings for the window.
+    /// </summary>
+    public static PixelMagnifierWindowKeyBindings KeyBindings => _keyBindings;
+
+    /// <summary>
     /// Gets or sets whether the info panel containing the current pixel's color
     /// and screen position is displayed.
     /// </summary>
@@ -210,6 +218,40 @@ public partial class PixelMagnifierWindow : Window
 
     #endregion
     #region Methods
+
+    /// <summary>
+    /// Applies input bindings for various commands to the window.
+    /// </summary>
+    private void ApplyInputBindings()
+    {
+        InputBindings.Clear();
+
+        InputBindings.Add(_keyBindings.ToggleGrid);
+        InputBindings.Add(_keyBindings.ExpandView);
+        InputBindings.Add(_keyBindings.ShrinkView);
+        InputBindings.Add(_keyBindings.ZoomIn);
+        InputBindings.Add(_keyBindings.ZoomOut);
+        InputBindings.Add(_keyBindings.IncreaseColorSamplingArea);
+        InputBindings.Add(_keyBindings.DecreaseColorSamplingArea);
+
+        InputBindings.Add(new KeyBinding
+        {
+            Command = ApplicationCommands.Close,
+            Key = Key.Escape
+        });
+
+        InputBindings.Add(new KeyBinding
+        {
+            Command = PixelMagnifierUICommands.Close,
+            Key = Key.Enter
+        });
+
+        InputBindings.Add(new MouseBinding
+        {
+            Command = PixelMagnifierUICommands.Close,
+            MouseAction = MouseAction.LeftClick
+        });
+    }
 
     /// <summary>
     /// Applies user-set configuration.
@@ -235,6 +277,24 @@ public partial class PixelMagnifierWindow : Window
         Magnifier.ShowGrid = _config.ShowGrid;
         Magnifier.ShowGrid = _config.ShowGrid;
         ShowInfoPanel = _config.ShowInfoPanel;
+    }
+
+    /// <summary>
+    /// Configures the key bindings for the window.
+    /// </summary>
+    /// 
+    /// <param name="config">
+    /// Receives a <see cref="PixelMagnifierWindowKeyBindings"/> instance to
+    /// modify the key bindings.
+    /// </param>
+    ///
+    /// <exception cref="ArgumentNullException">
+    /// Thrown if <paramref name="config"/> is <see langword="null"/>.
+    /// </exception>
+    public static void ConfigureKeyBindings(Action<PixelMagnifierWindowKeyBindings> config)
+    {
+        ArgumentNullException.ThrowIfNull(config);
+        config(_keyBindings);
     }
 
     /// <summary>
@@ -404,6 +464,7 @@ public partial class PixelMagnifierWindow : Window
 
         Cursor = _cursor;
 
+        ApplyInputBindings();
         ApplyConfig();
     }
 

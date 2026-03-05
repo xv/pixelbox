@@ -51,43 +51,6 @@
         </EventTrigger>
     </Window.Triggers>
 
-    <Window.InputBindings>
-        <KeyBinding
-            Key="G"
-            Command="{x:Static local:PixelMagnifierUICommands.ToggleGrid}"/>
-        <KeyBinding
-            Key="OemPlus"
-            Modifiers="Shift"
-            Command="{x:Static local:PixelMagnifierUICommands.ExpandView}"/>
-        <KeyBinding
-            Key="OemMinus"
-            Modifiers="Shift"
-            Command="{x:Static local:PixelMagnifierUICommands.ShrinkView}"/>
-        <KeyBinding
-            Key="OemPlus"
-            Modifiers="Ctrl"
-            Command="{x:Static local:PixelMagnifierUICommands.ZoomIn}"/>
-        <KeyBinding
-            Key="OemMinus"
-            Modifiers="Ctrl"
-            Command="{x:Static local:PixelMagnifierUICommands.ZoomOut}"/>
-        <KeyBinding
-            Key="OemPlus"
-            Command="{x:Static local:PixelMagnifierUICommands.IncreaseColorSamplingArea}"/>
-        <KeyBinding
-            Key="OemMinus"
-            Command="{x:Static local:PixelMagnifierUICommands.DecreaseColorSamplingArea}"/>
-        <KeyBinding
-            Key="Enter"
-            Command="{x:Static local:PixelMagnifierUICommands.Close}"/>
-        <MouseBinding
-            MouseAction="LeftClick"
-            Command="{x:Static local:PixelMagnifierUICommands.Close}"/>
-        <KeyBinding
-            Key="Escape"
-            Command="ApplicationCommands.Close"/>
-    </Window.InputBindings>
-
     <Window.CommandBindings>
         <CommandBinding
             Command="{x:Static local:PixelMagnifierUICommands.ToggleGrid}"

@@ -5,7 +5,11 @@ using System.Windows.Input;
 
 namespace PixelBox;
 
-internal class PixelMagnifierUICommands
+/// <summary>
+/// Provides UI commands associated with <see cref="PixelMagnifier"/> and
+/// <see cref="PixelMagnifierWindow"/>.
+/// </summary>
+public class PixelMagnifierUICommands
 {
     public static readonly RoutedUICommand ToggleGrid =
         new("Toggle Grid",

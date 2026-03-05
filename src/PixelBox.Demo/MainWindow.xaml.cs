@@ -15,7 +15,19 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        _magWindowCfg = new PixelMagnifierWindowConfig 
+        // Remap the key bindings for the ToggleGrid command. This is optional.
+        // If not called, the default key bindings will be used.
+        PixelMagnifierWindow.ConfigureKeyBindings(bindings =>
+        {
+            bindings.ToggleGrid = new KeyBinding
+            {
+                Command = PixelMagnifierUICommands.ToggleGrid,
+                Key = Key.G,
+                Modifiers = ModifierKeys.Control
+            };
+        });
+
+        _magWindowCfg = new PixelMagnifierWindowConfig
         {
             RefreshInterval = 30,
             ShowInfoPanel = true
@@ -30,6 +42,8 @@ public partial class MainWindow : Window
 
     private void ShowMagnifierWindow()
     {
+        // Passing PixelMagnifierWindowConfig instance is optional. If not
+        // provided, the window will be created with default configuration
         var magWindow = new PixelMagnifierWindow(_magWindowCfg);
 
         // ShowDialog() will return true if the window was closed via either Enter key or
