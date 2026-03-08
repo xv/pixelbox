@@ -931,7 +931,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         RenderSamplingAreaIndicator();
     }
 
-    protected override unsafe void OnRender(DrawingContext dc)
+    protected override void OnRender(DrawingContext dc)
     {
         base.OnRender(dc);
 
