@@ -91,6 +91,6 @@ public class PixelMagnifierWindowKeyBindings
         ZoomIn = Bind(PixelMagnifierUICommands.ZoomIn, Key.OemPlus, ModifierKeys.Control),
         ZoomOut = Bind(PixelMagnifierUICommands.ZoomOut, Key.OemMinus, ModifierKeys.Control),
         IncreaseColorSamplingArea = Bind(PixelMagnifierUICommands.IncreaseColorSamplingArea, Key.OemPlus),
-        DecreaseColorSamplingArea = Bind(PixelMagnifierUICommands.IncreaseColorSamplingArea, Key.OemMinus)
+        DecreaseColorSamplingArea = Bind(PixelMagnifierUICommands.DecreaseColorSamplingArea, Key.OemMinus)
     };
 }
