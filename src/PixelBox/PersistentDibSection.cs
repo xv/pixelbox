@@ -1,8 +1,6 @@
 ﻿// Copyright 2025 Jad Altahan <xv.git@aol.com>
 // SPDX-License-Identifier: MIT
 
-using System.Runtime.InteropServices;
-
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
 using Windows.Win32;
@@ -215,18 +213,26 @@ internal sealed unsafe class PersistentDibSection : IDisposable
             ((left + _width) > VirtualScreenInfo.Right) ||
             ((top + _height) > VirtualScreenInfo.Bottom);
 
-        // Because we're using one persistent bitmap in memory and BitBlt
-        // updates its contents (as opposed to retrieving a fresh DIB every
-        // capture), if BitBlt tries to copy from an off-screen region
-        // (e.g., negative left or top), it will quietly fail to capture those
-        // out-of-bounds pixels. This sometimes causes visual artifacts where
-        // "dragged" or "smeared" pixels from valid regions will appear moving
-        // along parts of the bitmap are never updated. For this reason, we
-        // just clear the memory to fill these regions with black
-        //
-        // NativeMemory.Fill(...,...,255) could also be used to fill with white
+        // Because one persistent bitmap in memory and BitBlt updates its contents
+        // (as opposed to retrieving a fresh DIB every capture), if BitBlt tries
+        // to copy from an off-screen region (e.g., negative left or top), it will
+        // quietly fail to capture those out-of-bounds pixels. This can cause visual
+        // artifacts where "dragged" or "smeared" pixels from valid regions will
+        // appear moving along parts of the bitmap are never updated. Therefore,
+        // paint the bitmap black first before calling BitBlt for a more desirable
+        // visual result
         if (outOfBounds)
-            NativeMemory.Clear(_pBits, (nuint)(_stride * _height));
+        {
+            // Clearing the bitmap back buffer is an alternative approach although
+            // it does not appear any faster than using PatBlt 
+            // NativeMemory.Clear(_pBits, (nuint)(_stride * _height));
+
+            PInvoke.PatBlt(
+                _hdcMem,
+                0, 0,
+                _width, _height,
+                ROP_CODE.BLACKNESS);
+        }
 
         return PInvoke.BitBlt(
             _hdcMem,
