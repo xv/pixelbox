@@ -939,13 +939,13 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             return;
 
         // Since the "grid" is really nothing more than gaps between pixels,
-        // We simply draw a background behind to simulate grid lines
+        // simply draw a background behind to simulate grid lines
         var drawGrid = ShowGrid;
         if (drawGrid)
             DrawGrid(dc);
 
-        // If we don't have a capture yet (e.g., StartCapture() isn't called,
-        // then capture once at cursor
+        // If there's no capture yet (e.g., StartCapture() isn't called, then
+        // capture once at cursor
         if (!EnsureCapture())
             return;
 

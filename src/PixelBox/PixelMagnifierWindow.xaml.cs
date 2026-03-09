@@ -34,11 +34,7 @@ public partial class PixelMagnifierWindow : Window
     private readonly Cursor _cursor;
 
     private readonly PixelSamplingMode[] _samplingModes =
-    [
-        PixelSamplingMode.Single,
-        PixelSamplingMode.ThreeByThree,
-        PixelSamplingMode.FiveByFive
-    ];
+        Enum.GetValues<PixelSamplingMode>();
 
     private static readonly PixelMagnifierWindowKeyBindings _keyBindings =
         PixelMagnifierWindowKeyBindings.CreateDefault();
