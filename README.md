@@ -67,6 +67,39 @@ var color = picker.PixelColor;
 var position = picker.PixelPosition;
 ```
 
+#### Configuring the Window Keybinds
+
+The magnifier window uses the following keybinds by default:
+
+| **Command**                                          | **Keybind**                          |
+|------------------------------------------------------|--------------------------------------|
+| `PixelMagnifierUICommands.ToggleGrid`                | <kbd>G</kbd>                         |
+| `PixelMagnifierUICommands.ExpandView`                | <kbd>Shift</kbd> <kbd>OemPlus</kbd>  |
+| `PixelMagnifierUICommands.ShrinkView`                | <kbd>Shift</kbd> <kbd>OemMinus</kbd> |
+| `PixelMagnifierUICommands.ZoomIn`                    | <kbd>Ctrl</kbd> <kbd>OemPlus</kbd>   |
+| `PixelMagnifierUICommands.ZoomOut`                   | <kbd>Ctrl</kbd> <kbd>OemMinus</kbd>  |
+| `PixelMagnifierUICommands.IncreaseColorSamplingArea` | <kbd>OemPlus</kbd>                   |
+| `PixelMagnifierUICommands.DecreaseColorSamplingArea` | <kbd>OemMinus</kbd>                  |
+| `PixelMagnifierUICommands.Close`                     | <kbd>Enter</kbd>                     |
+
+> [!NOTE]
+> <kbd>OemPlus</kbd> and <kbd>OemMinus</kbd> are the <kbd>+</kbd> and <kbd>-</kbd> keys to the left of <kbd>Backspace</kbd>. However, they may vary on non-US keyboards.
+
+You may remap the keybinds for any of the listed commands before instantiating the window:
+```csharp
+PixelMagnifierWindow.ConfigureKeyBindings(bindings =>
+{
+    bindings.Close = new KeyBinding
+    {
+        Command = PixelMagnifierUICommands.Close,
+        Key = Key.Space,
+        Modifiers = ModifierKeys.None
+    };
+});
+
+var picker = new PixelMagnifierWindow();
+```
+
 #### Customizing the Info Panel
 You can customize how the color and screen position values are formatted in the info panel (visible when `ShowInfoPanel = true`) by providing your own `IValueConverter` implementations to the `PixelColorConverter` and `PixelPositionConverter` properties.
 

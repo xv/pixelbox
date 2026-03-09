@@ -19,7 +19,7 @@ public partial class MainWindow : Window
         // If not called, the default key bindings will be used.
         PixelMagnifierWindow.ConfigureKeyBindings(bindings =>
         {
-            bindings.ToggleGrid = new KeyBinding
+            bindings.Close = new KeyBinding
             {
                 Command = PixelMagnifierUICommands.Close,
                 Key = Key.Space,
