@@ -57,6 +57,13 @@ public class PixelMagnifierWindowKeyBindings
     { get; set; }
 
     /// <summary>
+    /// Gets or sets the key binding used to confirm the selection of the pixel
+    /// and close the magnifier window.
+    /// </summary>
+    public required KeyBinding Close
+    { get; set; }
+
+    /// <summary>
     /// Creates a new key binding to associate with the specified command.
     /// </summary>
     /// 
@@ -91,6 +98,7 @@ public class PixelMagnifierWindowKeyBindings
         ZoomIn = Bind(PixelMagnifierUICommands.ZoomIn, Key.OemPlus, ModifierKeys.Control),
         ZoomOut = Bind(PixelMagnifierUICommands.ZoomOut, Key.OemMinus, ModifierKeys.Control),
         IncreaseColorSamplingArea = Bind(PixelMagnifierUICommands.IncreaseColorSamplingArea, Key.OemPlus),
-        DecreaseColorSamplingArea = Bind(PixelMagnifierUICommands.DecreaseColorSamplingArea, Key.OemMinus)
+        DecreaseColorSamplingArea = Bind(PixelMagnifierUICommands.DecreaseColorSamplingArea, Key.OemMinus),
+        Close = Bind(PixelMagnifierUICommands.Close, Key.Enter)
     };
 }

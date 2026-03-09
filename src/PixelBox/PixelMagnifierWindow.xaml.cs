@@ -233,17 +233,12 @@ public partial class PixelMagnifierWindow : Window
         InputBindings.Add(_keyBindings.ZoomOut);
         InputBindings.Add(_keyBindings.IncreaseColorSamplingArea);
         InputBindings.Add(_keyBindings.DecreaseColorSamplingArea);
+        InputBindings.Add(_keyBindings.Close);
 
         InputBindings.Add(new KeyBinding
         {
             Command = ApplicationCommands.Close,
             Key = Key.Escape
-        });
-
-        InputBindings.Add(new KeyBinding
-        {
-            Command = PixelMagnifierUICommands.Close,
-            Key = Key.Enter
         });
 
         InputBindings.Add(new MouseBinding

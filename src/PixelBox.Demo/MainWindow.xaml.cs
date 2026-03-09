@@ -15,15 +15,15 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        // Remap the key bindings for the ToggleGrid command. This is optional.
+        // Remap the key bindings for the Close command. This is optional.
         // If not called, the default key bindings will be used.
         PixelMagnifierWindow.ConfigureKeyBindings(bindings =>
         {
             bindings.ToggleGrid = new KeyBinding
             {
-                Command = PixelMagnifierUICommands.ToggleGrid,
-                Key = Key.G,
-                Modifiers = ModifierKeys.Control
+                Command = PixelMagnifierUICommands.Close,
+                Key = Key.Space,
+                Modifiers = ModifierKeys.None
             };
         });
 
