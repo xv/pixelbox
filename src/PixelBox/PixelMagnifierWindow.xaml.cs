@@ -29,7 +29,8 @@ public partial class PixelMagnifierWindow : Window
 
     private readonly PixelMagnifierWindowConfig _config;
 
-    private readonly SolidColorBrush _colorPreviewBrush = new(Colors.Transparent);
+    private readonly SolidColorBrush _colorPreviewBrush =
+        new(Colors.Transparent);
 
     private readonly Cursor _cursor;
 

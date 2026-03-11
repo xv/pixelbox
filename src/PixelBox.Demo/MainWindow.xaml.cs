@@ -15,18 +15,6 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        // Remap the key bindings for the Close command. This is optional.
-        // If not called, the default key bindings will be used.
-        PixelMagnifierWindow.ConfigureKeyBindings(bindings =>
-        {
-            bindings.Close = new KeyBinding
-            {
-                Command = PixelMagnifierUICommands.Close,
-                Key = Key.Space,
-                Modifiers = ModifierKeys.None
-            };
-        });
-
         _magWindowCfg = new PixelMagnifierWindowConfig
         {
             RefreshInterval = 30,

@@ -85,7 +85,7 @@ The magnifier window uses the following keybinds by default:
 > [!NOTE]
 > <kbd>OemPlus</kbd> and <kbd>OemMinus</kbd> are the <kbd>+</kbd> and <kbd>-</kbd> keys to the left of <kbd>Backspace</kbd>. However, they may vary on non-US keyboards.
 
-You may remap the keybinds for any of the listed commands before instantiating the window:
+You can remap the keybinds for any of the listed commands before instantiating the window:
 ```csharp
 PixelMagnifierWindow.ConfigureKeyBindings(bindings =>
 {
