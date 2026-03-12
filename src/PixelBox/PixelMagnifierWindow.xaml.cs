@@ -62,6 +62,26 @@ public partial class PixelMagnifierWindow : Window
     }
 
     /// <summary>
+    /// Dependency property for the <see cref="InfoPanelMinWidth"/> property.
+    /// </summary>
+    public static readonly DependencyProperty InfoPanelMinWidthProperty =
+        DependencyProperty.Register(
+            nameof(InfoPanelMinWidth),
+            typeof(double),
+            typeof(PixelMagnifierWindow),
+            new PropertyMetadata(150d));
+
+    /// <summary>
+    /// Gets or sets the the minimum width of the info panel containing the
+    /// current pixel's color and screen position.
+    /// </summary>
+    public double InfoPanelMinWidth
+    {
+        get => (double)GetValue(InfoPanelMinWidthProperty);
+        set => SetValue(InfoPanelMinWidthProperty, value);
+    }
+
+    /// <summary>
     /// Dependency property for the <see cref="MagnifierX"/> property.
     /// </summary>
     private static readonly DependencyProperty MagnifierXProperty =

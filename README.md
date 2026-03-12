@@ -131,6 +131,9 @@ var picker = new PixelMagnifierWindow
 };
 ```
 
+> [!TIP]
+> The `InfoPanelMinWidth` property can be used to set the minimum width of the info panel. This is useful when the panel's content might exceed the default minimum width, which would otherwise cause the magnifier position to shift horizontally due to its centering.
+
 License
 -------
 All code in this repository is available under the terms of the [MIT](LICENSE) license.
