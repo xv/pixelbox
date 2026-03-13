@@ -965,13 +965,9 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         if (_disposed)
             return;
 
-        _dib?.Dispose();
+        if (disposing)
+            _dib?.Dispose();
 
         _disposed = true;
-    }
-
-    ~PixelMagnifier()
-    {
-        Dispose(false);
     }
 }

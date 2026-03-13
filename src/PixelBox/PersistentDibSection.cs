@@ -224,7 +224,8 @@ internal sealed unsafe class PersistentDibSection : IDisposable
         if (outOfBounds)
         {
             // Clearing the bitmap back buffer is an alternative approach although
-            // it does not appear any faster than using PatBlt 
+            // it does not appear any faster than using PatBlt, but could perhaps
+            // use further testing
             // NativeMemory.Clear(_pBits, (nuint)(_stride * _height));
 
             PInvoke.PatBlt(
