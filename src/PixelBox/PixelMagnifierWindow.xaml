@@ -56,23 +56,23 @@
             Command="{x:Static local:PixelMagnifierUICommands.ToggleGrid}"
             Executed="OnToggleGridExecuted"/>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.ExpandView}"
-            Executed="OnExpandViewExecuted"/>
+            Command="{x:Static local:PixelMagnifierUICommands.IncreaseGridSize}"
+            Executed="OnIncreaseGridSizeExecuted"/>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.ShrinkView}"
-            Executed="OnShrinkViewExecuted"/>
+            Command="{x:Static local:PixelMagnifierUICommands.DecreaseGridSize}"
+            Executed="OnDecreaseGridSizeExecuted"/>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.ZoomIn}"
-            Executed="OnZoomInExecuted"/>
+            Command="{x:Static local:PixelMagnifierUICommands.IncreasePixelSize}"
+            Executed="OnIncreasePixelSizeExecuted"/>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.ZoomOut}"
-            Executed="OnZoomOutExecuted"/>
+            Command="{x:Static local:PixelMagnifierUICommands.DecreasePixelSize}"
+            Executed="OnDecreasePixelSizeExecuted"/>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.IncreaseColorSamplingArea}"
-            Executed="OnIncreaseColorSamplingAreaExecuted"/>
+            Command="{x:Static local:PixelMagnifierUICommands.IncreaseColorSamplerSize}"
+            Executed="OnIncreaseColorSamplerSizeExecuted"/>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.DecreaseColorSamplingArea}"
-            Executed="OnDecreaseColorSamplingAreaExecuted"/>
+            Command="{x:Static local:PixelMagnifierUICommands.DecreaseColorSamplerSize}"
+            Executed="OnDecreaseColorSamplerSizeExecuted"/>
         <CommandBinding
             Command="ApplicationCommands.Close"
             Executed="OnCloseExecuted"/>
@@ -119,7 +119,7 @@
                 CornerRadius="{Binding ActualHeight, ElementName=Magnifier, Mode=OneWay}">
                 <local:PixelMagnifier
                     x:Name="Magnifier"
-                    PixelColumns="15"
+                    GridSize="15"
                     PixelSize="7"
                     PixelChanged="OnPixelChanged">
                     <local:PixelMagnifier.Clip>

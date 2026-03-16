@@ -17,43 +17,41 @@ public class PixelMagnifierWindowKeyBindings
     { get; set; }
 
     /// <summary>
-    /// Gets or sets the key binding used to expand the area of the screen being
-    /// magnified.
+    /// Gets or sets the key binding used increase the size of the pixel grid.
     /// </summary>
-    public required KeyBinding ExpandView
+    public required KeyBinding IncreaseGridSize
     { get; set; }
 
     /// <summary>
-    /// Gets or sets the key binding used to shrink the area of the screen being
-    /// magnified.
+    /// Gets or sets the key binding used decrease the size of the pixel grid.
     /// </summary>
-    public required KeyBinding ShrinkView
+    public required KeyBinding DecreaseGridSize
     { get; set; }
 
     /// <summary>
-    /// Gets or sets the key binding used to zoom in the magnified view.
+    /// Gets or sets the key binding used to increase the size of pixel cells in
+    /// the magnified view.
     /// </summary>
-    public required KeyBinding ZoomIn
+    public required KeyBinding IncreasePixelSize
     { get; set; }
 
     /// <summary>
-    /// Gets or sets the key binding used to zoom out the magnified view.
+    /// Gets or sets the key binding used to decrease the size of pixel cells in
+    /// the magnified view.
     /// </summary>
-    public required KeyBinding ZoomOut
+    public required KeyBinding DecreasePixelSize
     { get; set; }
 
     /// <summary>
-    /// Gets or sets the key binding used to increase the size of color sampling
-    /// area.
+    /// Gets or sets the key binding used to increase the size of color sampler.
     /// </summary>
-    public required KeyBinding IncreaseColorSamplingArea
+    public required KeyBinding IncreaseColorSamplerSize
     { get; set; }
 
     /// <summary>
-    /// Gets or sets the key binding used to decrease the size of color sampling
-    /// area.
+    /// Gets or sets the key binding used to decrease the size of color sampler.
     /// </summary>
-    public required KeyBinding DecreaseColorSamplingArea
+    public required KeyBinding DecreaseColorSamplerSize
     { get; set; }
 
     /// <summary>
@@ -93,12 +91,12 @@ public class PixelMagnifierWindowKeyBindings
     public static PixelMagnifierWindowKeyBindings CreateDefault() => new()
     {
         ToggleGrid = Bind(PixelMagnifierUICommands.ToggleGrid, Key.G),
-        ExpandView = Bind(PixelMagnifierUICommands.ExpandView, Key.OemPlus, ModifierKeys.Shift),
-        ShrinkView = Bind(PixelMagnifierUICommands.ShrinkView, Key.OemMinus, ModifierKeys.Shift),
-        ZoomIn = Bind(PixelMagnifierUICommands.ZoomIn, Key.OemPlus, ModifierKeys.Control),
-        ZoomOut = Bind(PixelMagnifierUICommands.ZoomOut, Key.OemMinus, ModifierKeys.Control),
-        IncreaseColorSamplingArea = Bind(PixelMagnifierUICommands.IncreaseColorSamplingArea, Key.OemPlus),
-        DecreaseColorSamplingArea = Bind(PixelMagnifierUICommands.DecreaseColorSamplingArea, Key.OemMinus),
+        IncreaseGridSize = Bind(PixelMagnifierUICommands.IncreaseGridSize, Key.OemPlus, ModifierKeys.Shift),
+        DecreaseGridSize = Bind(PixelMagnifierUICommands.DecreaseGridSize, Key.OemMinus, ModifierKeys.Shift),
+        IncreasePixelSize = Bind(PixelMagnifierUICommands.IncreasePixelSize, Key.OemPlus, ModifierKeys.Control),
+        DecreasePixelSize = Bind(PixelMagnifierUICommands.DecreasePixelSize, Key.OemMinus, ModifierKeys.Control),
+        IncreaseColorSamplerSize = Bind(PixelMagnifierUICommands.IncreaseColorSamplerSize, Key.OemPlus),
+        DecreaseColorSamplerSize = Bind(PixelMagnifierUICommands.DecreaseColorSamplerSize, Key.OemMinus),
         Close = Bind(PixelMagnifierUICommands.Close, Key.Enter)
     };
 }

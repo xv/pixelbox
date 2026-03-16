@@ -25,8 +25,8 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     private readonly DispatcherTimer _refreshTimer;
 
     private int _pixelSize;
-    private int _pixelColumns;
-    private int _pixelColumnsHalf;
+    private int _gridSize;
+    private int _gridSizeHalf;
 
     private Color _sampledColor;
     private Point _mousePos;
@@ -60,9 +60,10 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         /// </summary>
         None = 0,
         /// <summary>
-        /// Indicates that the grid's column metrics should be recalculated.
+        /// Indicates that the grid's dimension should be recalculated. This
+        /// represents the number of cells along one side of the square grid.
         /// </summary>
-        Columns = 1 << 0,
+        Dimension = 1 << 0,
         /// <summary>
         /// Indicates that the grid's cell size metric should be recalculated.
         /// </summary>
@@ -70,7 +71,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         /// <summary>
         /// Indicates that all grid metrics should be recalculated.
         /// </summary>
-        All = Columns | CellSize
+        All = Dimension | CellSize
     }
 
     #endregion
@@ -106,20 +107,20 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     }
 
     /// <summary>
-    /// Dependency property for the <see cref="PixelColumns"/> property.
+    /// Dependency property for the <see cref="GridSize"/> property.
     /// </summary>
-    public static readonly DependencyProperty PixelColumnsProperty =
+    public static readonly DependencyProperty GridSizeProperty =
         DependencyProperty.Register(
-            nameof(PixelColumns),
+            nameof(GridSize),
             typeof(int),
             typeof(PixelMagnifier),
             new FrameworkPropertyMetadata(11,
                 FrameworkPropertyMetadataOptions.AffectsMeasure |
                 FrameworkPropertyMetadataOptions.AffectsRender,
-                OnPixelColumnsChanged, CoercePixelColumns),
+                OnGridSizeChanged, CoerceGridSize),
             v => (v is int i) && (i > 0) && (i < 100));
 
-    private static object CoercePixelColumns(DependencyObject d, object value)
+    private static object CoerceGridSize(DependencyObject d, object value)
     {
         var cols = (int)value;
 
@@ -130,7 +131,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     }
 
     /// <summary>
-    /// Gets or sets the number of pixel columns. The value must be greater than
+    /// Gets or sets the size of the pixel grid. The value must be greater than
     /// zero and less than 100.
     /// </summary>
     /// 
@@ -139,11 +140,11 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// symmetric horizontally and vertically.
     /// </remarks>
     [Category("Appearance")]
-    [Description("Sets the number of pixel columns in the grid. Uses odd values only. Valid range is [1,99].")]
-    public int PixelColumns
+    [Description("Sets the size of the pixel grid. Uses odd values only. Valid range is [1,99].")]
+    public int GridSize
     {
-        get => (int)GetValue(PixelColumnsProperty);
-        set => SetValue(PixelColumnsProperty, value);
+        get => (int)GetValue(GridSizeProperty);
+        set => SetValue(GridSizeProperty, value);
     }
 
     /// <summary>
@@ -232,7 +233,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
                 OnShowGridChanged));
 
     /// <summary>
-    /// Gets or sets whether the rows and columns of pixels should be
+    /// Gets or sets whether the lines of rows and columns of pixels should be
     /// visible.
     /// </summary>
     [Category("Appearance")]
@@ -366,12 +367,12 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     #endregion
     #region Event Handling
 
-    private static void OnPixelColumnsChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+    private static void OnGridSizeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
         if (sender is not PixelMagnifier mag)
             return;
 
-        mag.RecalculateGridMetrics(GridMetricUpdateFlags.Columns);
+        mag.RecalculateGridMetrics(GridMetricUpdateFlags.Dimension);
         mag.RenderSamplingAreaIndicator();
     }
 
@@ -542,10 +543,10 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         if ((flags & GridMetricUpdateFlags.CellSize) != 0)
             _pixelSize = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
 
-        if ((flags & GridMetricUpdateFlags.Columns) != 0)
+        if ((flags & GridMetricUpdateFlags.Dimension) != 0)
         {
-            _pixelColumns = PixelColumns;
-            _pixelColumnsHalf = _pixelColumns / 2;
+            _gridSize = GridSize;
+            _gridSizeHalf = _gridSize / 2;
         }
     }
 
@@ -554,7 +555,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     /// </summary>
     private void RenderSamplingAreaIndicator()
     {
-        var pxCenter = (_pixelSize + (ShowGrid ? 1 : 0)) * _pixelColumnsHalf;
+        var pxCenter = (_pixelSize + (ShowGrid ? 1 : 0)) * _gridSizeHalf;
 
         var rect = new Rect(
             pxCenter, pxCenter,
@@ -586,11 +587,11 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
         // Possible negative coordinates here when the cursor is at the boundary
         // of the screen are valid! No need to clamp anything
-        var left = cx - _pixelColumnsHalf;
-        var top = cy - _pixelColumnsHalf;
+        var left = cx - _gridSizeHalf;
+        var top = cy - _gridSizeHalf;
 
-        if (_pixelColumns != _dib.Width || _pixelColumns != _dib.Height)
-            _dib.Resize(_pixelColumns, _pixelColumns);
+        if (_gridSize != _dib.Width || _gridSize != _dib.Height)
+            _dib.Resize(_gridSize, _gridSize);
 
         if (!_dib.Capture(left, top))
             return;
@@ -626,7 +627,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     {
         if (mode == PixelSamplingMode.Single)
         {
-            var idx = (_pixelColumnsHalf * stride) + (_pixelColumnsHalf * 4);
+            var idx = (_gridSizeHalf * stride) + (_gridSizeHalf * 4);
             return Color.FromRgb(
                 *(pBits + idx + 2 /* R */),
                 *(pBits + idx + 1 /* G */),
@@ -637,7 +638,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         var kTotal = kSize * kSize;
 
         // Index of the first cell (top-left corner) of the kernel
-        var first = _pixelColumnsHalf - (kSize / 2);
+        var first = _gridSizeHalf - (kSize / 2);
 
         int rSum = 0,
             gSum = 0,
@@ -767,7 +768,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     private void EnsureBitmapReady(bool drawGrid)
     {
         var gridGapDev = drawGrid ? 1 : 0;
-        var totalDev = (_pixelSize * _pixelColumns) + (gridGapDev * (_pixelColumns - 1));
+        var totalDev = (_pixelSize * _gridSize) + (gridGapDev * (_gridSize - 1));
 
         if (_bitmapDevSize == totalDev)
             return;
@@ -807,12 +808,12 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         var lineBytes = _pixelSize * 4;
         byte* lineBlock = stackalloc byte[lineBytes];
 
-        for (var srcY = 0; srcY < _pixelColumns; srcY++)
+        for (var srcY = 0; srcY < _gridSize; srcY++)
         {
             byte* pSrcRow = srcBase + (srcY * _dib.Stride);
             var dstBlockY = srcY * (_pixelSize + gridGapDev);
 
-            for (var srcX = 0; srcX < _pixelColumns; srcX++)
+            for (var srcX = 0; srcX < _gridSize; srcX++)
             {
                 byte* pSrc = pSrcRow + srcX * 4;
                 var b = pSrc[0];
@@ -908,10 +909,10 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        var sizeDev = _pixelColumns * _pixelSize;
+        var sizeDev = _gridSize * _pixelSize;
 
         if (ShowGrid)
-            sizeDev += _pixelColumns - 1;
+            sizeDev += _gridSize - 1;
 
         return new Size(
             sizeDev / _dpi.DpiScaleX,

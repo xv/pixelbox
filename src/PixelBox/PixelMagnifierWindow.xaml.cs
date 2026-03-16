@@ -244,12 +244,12 @@ public partial class PixelMagnifierWindow : Window
         InputBindings.Clear();
 
         InputBindings.Add(_keyBindings.ToggleGrid);
-        InputBindings.Add(_keyBindings.ExpandView);
-        InputBindings.Add(_keyBindings.ShrinkView);
-        InputBindings.Add(_keyBindings.ZoomIn);
-        InputBindings.Add(_keyBindings.ZoomOut);
-        InputBindings.Add(_keyBindings.IncreaseColorSamplingArea);
-        InputBindings.Add(_keyBindings.DecreaseColorSamplingArea);
+        InputBindings.Add(_keyBindings.IncreaseGridSize);
+        InputBindings.Add(_keyBindings.DecreaseGridSize);
+        InputBindings.Add(_keyBindings.IncreasePixelSize);
+        InputBindings.Add(_keyBindings.DecreasePixelSize);
+        InputBindings.Add(_keyBindings.IncreaseColorSamplerSize);
+        InputBindings.Add(_keyBindings.DecreaseColorSamplerSize);
         InputBindings.Add(_keyBindings.Close);
 
         InputBindings.Add(new KeyBinding
@@ -270,10 +270,10 @@ public partial class PixelMagnifierWindow : Window
     /// </summary>
     private void ApplyConfig()
     {
-        Magnifier.PixelColumns = Math.Clamp(
-            _config.PixelColumns,
-            PixelMagnifierWindowConfig.PixelColumnsMin,
-            PixelMagnifierWindowConfig.PixelColumnsMax);
+        Magnifier.GridSize = Math.Clamp(
+            _config.GridSize,
+            PixelMagnifierWindowConfig.GridSizeMin,
+            PixelMagnifierWindowConfig.GridSizeMax);
 
         Magnifier.PixelSize = Math.Clamp(
             _config.PixelSize,
@@ -315,7 +315,7 @@ public partial class PixelMagnifierWindow : Window
     private void ExtractConfig()
     {
         _config.PixelSize = Magnifier.PixelSize;
-        _config.PixelColumns = Magnifier.PixelColumns;
+        _config.GridSize = Magnifier.GridSize;
         _config.RefreshInterval = Magnifier.RefreshInterval;
         _config.SamplingMode = Magnifier.SamplingMode;
         _config.ShowGrid = Magnifier.ShowGrid;
@@ -544,18 +544,18 @@ public partial class PixelMagnifierWindow : Window
         if (Keyboard.Modifiers == ModifierKeys.Control)
         {
             if (e.Delta > 0)
-                PixelMagnifierUICommands.ZoomIn.Execute(null, this);
+                PixelMagnifierUICommands.IncreasePixelSize.Execute(null, this);
             else if (e.Delta < 0)
-                PixelMagnifierUICommands.ZoomOut.Execute(null, this);
+                PixelMagnifierUICommands.DecreasePixelSize.Execute(null, this);
 
             e.Handled = true;
         }
         else if (Keyboard.Modifiers == ModifierKeys.Shift)
         {
             if (e.Delta > 0)
-                PixelMagnifierUICommands.ExpandView.Execute(null, this);
+                PixelMagnifierUICommands.IncreaseGridSize.Execute(null, this);
             else if (e.Delta < 0)
-                PixelMagnifierUICommands.ShrinkView.Execute(null, this);
+                PixelMagnifierUICommands.DecreaseGridSize.Execute(null, this);
 
             e.Handled = true;
         }
@@ -595,27 +595,27 @@ public partial class PixelMagnifierWindow : Window
     private void OnToggleGridExecuted(object sender, ExecutedRoutedEventArgs e) =>
         Magnifier.ShowGrid = !Magnifier.ShowGrid;
 
-    private void OnExpandViewExecuted(object sender, ExecutedRoutedEventArgs e) =>
-        Magnifier.PixelColumns = Math.Min(Magnifier.PixelColumns + 2, PixelMagnifierWindowConfig.PixelColumnsMax);
+    private void OnIncreaseGridSizeExecuted(object sender, ExecutedRoutedEventArgs e) =>
+        Magnifier.GridSize = Math.Min(Magnifier.GridSize + 2, PixelMagnifierWindowConfig.GridSizeMax);
 
-    private void OnShrinkViewExecuted(object sender, ExecutedRoutedEventArgs e)
+    private void OnDecreaseGridSizeExecuted(object sender, ExecutedRoutedEventArgs e)
     {
         // Sampling kernel cannot be larger than the number of pixels available
-        if (Magnifier.PixelColumns <= (int)Magnifier.SamplingMode)
+        if (Magnifier.GridSize <= (int)Magnifier.SamplingMode)
             return;
 
-        Magnifier.PixelColumns = Math.Max(Magnifier.PixelColumns - 2, PixelMagnifierWindowConfig.PixelColumnsMin);
+        Magnifier.GridSize = Math.Max(Magnifier.GridSize - 2, PixelMagnifierWindowConfig.GridSizeMin);
     }
 
-    private void OnZoomInExecuted(object sender, ExecutedRoutedEventArgs e) =>
+    private void OnIncreasePixelSizeExecuted(object sender, ExecutedRoutedEventArgs e) =>
         Magnifier.PixelSize = Math.Min(Magnifier.PixelSize + 1, PixelMagnifierWindowConfig.PixelSizeMax);
 
-    private void OnZoomOutExecuted(object sender, ExecutedRoutedEventArgs e) =>
+    private void OnDecreasePixelSizeExecuted(object sender, ExecutedRoutedEventArgs e) =>
         Magnifier.PixelSize = Math.Max(Magnifier.PixelSize - 1, PixelMagnifierWindowConfig.PixelSizeMin);
 
-    private void OnIncreaseColorSamplingAreaExecuted(object sender, ExecutedRoutedEventArgs e)
+    private void OnIncreaseColorSamplerSizeExecuted(object sender, ExecutedRoutedEventArgs e)
     {
-        if ((int)Magnifier.SamplingMode >= Magnifier.PixelColumns)
+        if ((int)Magnifier.SamplingMode >= Magnifier.GridSize)
             return;
 
         var idx = Array.IndexOf(_samplingModes, Magnifier.SamplingMode);
@@ -623,7 +623,7 @@ public partial class PixelMagnifierWindow : Window
             Magnifier.SamplingMode = _samplingModes[idx + 1];
     }
 
-    private void OnDecreaseColorSamplingAreaExecuted(object sender, ExecutedRoutedEventArgs e)
+    private void OnDecreaseColorSamplerSizeExecuted(object sender, ExecutedRoutedEventArgs e)
     {
         var idx = Array.IndexOf(_samplingModes, Magnifier.SamplingMode);
         if (idx > 0)

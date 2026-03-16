@@ -1,4 +1,4 @@
-About
+﻿About
 -----
 PixelBox is a fast and customizable BitBlt-based pixel magnification control for WPF. The library contains the standalone magnifier control itself, and a ready-to-use mouse-tracked pixel magnifier and color picker window, similar to what you would find in browser developer tools.
 
@@ -40,10 +40,10 @@ Quick Start
         xmlns:pb="clr-namespace:PixelBox;assembly=PixelBox">
     <Grid>
         <!-- The control size of PixelMagnifier is automatically determiend via its
-             PixelColumns, PixelSize, and ShowGrid properties. The control size should
+             GridSize, PixelSize, and ShowGrid properties. The control size should
              not be set manually. -->
         <pb:PixelMagnifier HorizontalAlignment="Left" VerticalAlignment="Top"
-            PixelColumns="15"
+            GridSize="15"
             PixelSize="10"
             ShowGrid="True"
             RefreshInterval="30"/>
@@ -74,12 +74,12 @@ The magnifier window uses the following keybinds by default:
 | **Command**                                          | **Keybind**                          |
 |------------------------------------------------------|--------------------------------------|
 | `PixelMagnifierUICommands.ToggleGrid`                | <kbd>G</kbd>                         |
-| `PixelMagnifierUICommands.ExpandView`                | <kbd>Shift</kbd> <kbd>OemPlus</kbd>  |
-| `PixelMagnifierUICommands.ShrinkView`                | <kbd>Shift</kbd> <kbd>OemMinus</kbd> |
-| `PixelMagnifierUICommands.ZoomIn`                    | <kbd>Ctrl</kbd> <kbd>OemPlus</kbd>   |
-| `PixelMagnifierUICommands.ZoomOut`                   | <kbd>Ctrl</kbd> <kbd>OemMinus</kbd>  |
-| `PixelMagnifierUICommands.IncreaseColorSamplingArea` | <kbd>OemPlus</kbd>                   |
-| `PixelMagnifierUICommands.DecreaseColorSamplingArea` | <kbd>OemMinus</kbd>                  |
+| `PixelMagnifierUICommands.IncreaseGridSize`          | <kbd>Shift</kbd> <kbd>OemPlus</kbd>  |
+| `PixelMagnifierUICommands.DecreaseGridSize`          | <kbd>Shift</kbd> <kbd>OemMinus</kbd> |
+| `PixelMagnifierUICommands.IncreasePixelSize`         | <kbd>Ctrl</kbd> <kbd>OemPlus</kbd>   |
+| `PixelMagnifierUICommands.DecreasePixelSize`         | <kbd>Ctrl</kbd> <kbd>OemMinus</kbd>  |
+| `PixelMagnifierUICommands.IncreaseColorSamplerSize`  | <kbd>OemPlus</kbd>                   |
+| `PixelMagnifierUICommands.DecreaseColorSamplerSize`  | <kbd>OemMinus</kbd>                  |
 | `PixelMagnifierUICommands.Close`                     | <kbd>Enter</kbd>                     |
 
 > [!NOTE]

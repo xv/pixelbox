@@ -10,8 +10,8 @@ namespace PixelBox;
 public class PixelMagnifierWindowConfig
 {
     public const int
-        PixelColumnsMin = 15,
-        PixelColumnsMax = 25;
+        GridSizeMin = 15,
+        GridSizeMax = 25;
 
     public const int
         PixelSizeMin = 7,
@@ -22,10 +22,10 @@ public class PixelMagnifierWindowConfig
         RefreshIntervalMax = 100;
 
     /// <summary>
-    /// <inheritdoc cref="PixelMagnifier.PixelColumns"/>
+    /// <inheritdoc cref="PixelMagnifier.GridSize"/>
     /// </summary>
-    public int PixelColumns
-    { get; set; } = PixelColumnsMin;
+    public int GridSize
+    { get; set; } = GridSizeMin;
 
     /// <summary>
     /// <inheritdoc cref="PixelMagnifier.PixelSize"/>
