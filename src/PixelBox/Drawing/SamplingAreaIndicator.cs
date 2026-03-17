@@ -37,8 +37,11 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
     private void SetScaleTransform()
     {
         _scaleTrans ??= new ScaleTransform();
+
         _scaleTrans.ScaleX = 1.0 / _dpi.DpiScaleX;
         _scaleTrans.ScaleY = 1.0 / _dpi.DpiScaleY;
+
+        VisualTransform = _scaleTrans;
     }
 
     /// <summary>
@@ -106,15 +109,8 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
             return;
 
         using var dc = RenderOpen();
-        var useScale = _scaleTrans is not null;
-
-        if (useScale)
-            dc.PushTransform(_scaleTrans);
 
         dc.DrawRectangle(null, s_penWhite, _rects[0]);
         dc.DrawRectangle(null, s_penBlack, _rects[1]);
-
-        if (useScale)
-            dc.Pop();
     }
 }
