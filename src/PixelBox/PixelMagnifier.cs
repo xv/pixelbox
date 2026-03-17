@@ -805,9 +805,6 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         byte* dstBase = (byte*)_bitmap.BackBuffer;
         byte* srcBase = (byte*)_dib.Bits;
 
-        var lineBytes = _pixelSize * 4;
-        byte* lineBlock = stackalloc byte[lineBytes];
-
         for (var srcY = 0; srcY < _gridSize; srcY++)
         {
             byte* pSrcRow = srcBase + (srcY * _dib.Stride);
@@ -816,24 +813,17 @@ public class PixelMagnifier : FrameworkElement, IDisposable
             for (var srcX = 0; srcX < _gridSize; srcX++)
             {
                 byte* pSrc = pSrcRow + srcX * 4;
-                var b = pSrc[0];
-                var g = pSrc[1];
-                var r = pSrc[2];
 
-                for (var bx = 0; bx < _pixelSize; bx++)
-                {
-                    lineBlock[bx * 4 + 0] = b;
-                    lineBlock[bx * 4 + 1] = g;
-                    lineBlock[bx * 4 + 2] = r;
-                    lineBlock[bx * 4 + 3] = 255;
-                }
-
+                var color = (uint)(255 << 24 | pSrc[2] << 16 | pSrc[1] << 8 | pSrc[0]);
                 var dstBlockX = srcX * (_pixelSize + gridGapDev);
 
                 for (var by = 0; by < _pixelSize; by++)
                 {
-                    byte* pDstRow = dstBase + ((dstBlockY + by) * dstStride) + (dstBlockX * 4);
-                    Buffer.MemoryCopy(lineBlock, pDstRow, lineBytes, lineBytes);
+                    byte* pDstRow = dstBase + ((dstBlockY + by) * dstStride);
+                    uint* pDst = (uint*)(pDstRow + (dstBlockX * 4));
+
+                    for (var bx = 0; bx < _pixelSize; bx++)
+                        pDst[bx] = color;
                 }
             }
         }
