@@ -11,7 +11,7 @@ public class PixelMagnifierWindowConfig
 {
     public const int
         GridSizeMin = 15,
-        GridSizeMax = 25;
+        GridSizeMax = 35;
 
     public const int
         PixelSizeMin = 7,
