@@ -135,7 +135,7 @@ public partial class PixelMagnifierWindow : Window
     /// the overlay would prevent the mouse cursor from interacting with the
     /// desktop's UI elements underneath.
     /// </remarks>
-    internal ImageSource OverlayImage
+    internal ImageSource? OverlayImage
     {
         get => (ImageSource)GetValue(OverlayImageProperty);
         set => SetValue(OverlayImageProperty, value);
@@ -488,7 +488,7 @@ public partial class PixelMagnifierWindow : Window
         // is more reliable in that if the mouse was over an interactive element
         // (e.g., button with hover effects), the overlay properly reflects the
         // original UI state
-        OverlayImage = CaptureDesktopScreen()!;
+        OverlayImage = CaptureDesktopScreen();
 
         UpdateMagnifierPosition(GetMousePosition());
     }
