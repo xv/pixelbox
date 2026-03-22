@@ -7,7 +7,7 @@ using System.Windows;
 namespace PixelBox;
 
 /// <summary>
-/// Provides data for the <see cref="PixelMagnifier.PixelChanged"/> event.
+/// Provides data for the <see cref="Loupe.PixelChanged"/> event.
 /// </summary>
 /// 
 /// <param name="color">

@@ -15,7 +15,7 @@ namespace PixelBox;
 /// <summary>
 /// Represents a pixel magnification control.
 /// </summary>
-public class PixelMagnifier : FrameworkElement, IDisposable
+public class Loupe : FrameworkElement, IDisposable
 {
     #region Fields
 
@@ -84,7 +84,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         DependencyProperty.Register(
             nameof(Background),
             typeof(Brush),
-            typeof(PixelMagnifier),
+            typeof(Loupe),
             new FrameworkPropertyMetadata(Brushes.Black,
                 FrameworkPropertyMetadataOptions.AffectsRender));
 
@@ -113,7 +113,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         DependencyProperty.Register(
             nameof(GridSize),
             typeof(int),
-            typeof(PixelMagnifier),
+            typeof(Loupe),
             new FrameworkPropertyMetadata(11,
                 FrameworkPropertyMetadataOptions.AffectsMeasure |
                 FrameworkPropertyMetadataOptions.AffectsRender,
@@ -154,7 +154,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         DependencyProperty.Register(
             nameof(PixelSize),
             typeof(int),
-            typeof(PixelMagnifier),
+            typeof(Loupe),
             new FrameworkPropertyMetadata(9,
                 FrameworkPropertyMetadataOptions.AffectsMeasure |
                 FrameworkPropertyMetadataOptions.AffectsRender,
@@ -180,7 +180,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         DependencyProperty.Register(
             nameof(SamplingMode),
             typeof(PixelSamplingMode),
-            typeof(PixelMagnifier),
+            typeof(Loupe),
             new FrameworkPropertyMetadata(PixelSamplingMode.Single,
                 FrameworkPropertyMetadataOptions.AffectsRender,
                 OnSamplingModeChanged));
@@ -203,7 +203,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         DependencyProperty.Register(
             nameof(RefreshInterval),
             typeof(int),
-            typeof(PixelMagnifier),
+            typeof(Loupe),
             new FrameworkPropertyMetadata(30, OnRefreshIntervalChanged),
             v => (v is int i) && (i > 0) && (i <= 1000));
 
@@ -226,7 +226,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         DependencyProperty.Register(
             nameof(ShowGrid),
             typeof(bool),
-            typeof(PixelMagnifier),
+            typeof(Loupe),
             new FrameworkPropertyMetadata(true,
                 FrameworkPropertyMetadataOptions.AffectsMeasure |
                 FrameworkPropertyMetadataOptions.AffectsRender,
@@ -369,7 +369,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     private static void OnGridSizeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-        if (sender is not PixelMagnifier mag)
+        if (sender is not Loupe mag)
             return;
 
         mag.RecalculateGridMetrics(GridMetricUpdateFlags.Dimension);
@@ -378,7 +378,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     private static void OnPixelSizeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-        if (sender is not PixelMagnifier mag)
+        if (sender is not Loupe mag)
             return;
 
         mag.RecalculateGridMetrics(GridMetricUpdateFlags.CellSize);
@@ -387,7 +387,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     private static void OnSamplingModeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-        if (sender is not PixelMagnifier mag)
+        if (sender is not Loupe mag)
             return;
 
         mag.RenderSamplingAreaIndicator();
@@ -396,7 +396,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     private static void OnShowGridChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-        if (sender is not PixelMagnifier mag)
+        if (sender is not Loupe mag)
             return;
 
         mag.RenderSamplingAreaIndicator();
@@ -404,7 +404,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
 
     private static void OnRefreshIntervalChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
-        if (sender is not PixelMagnifier mag)
+        if (sender is not Loupe mag)
             return;
 
         mag._refreshTimer.Interval = TimeSpan.FromMilliseconds((int)e.NewValue);
@@ -705,7 +705,7 @@ public class PixelMagnifier : FrameworkElement, IDisposable
         var rect = new Rect(RenderSize);
 
         var text = new FormattedText(
-            $"{nameof(PixelMagnifier)}",
+            $"{nameof(Loupe)}",
             System.Globalization.CultureInfo.InvariantCulture,
             FlowDirection.LeftToRight,
             new Typeface("Segoe UI"), 12, Brushes.Gray, dpi.PixelsPerDip)
@@ -856,9 +856,9 @@ public class PixelMagnifier : FrameworkElement, IDisposable
     #endregion
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PixelMagnifier"/> class.
+    /// Initializes a new instance of the <see cref="Loupe"/> class.
     /// </summary>
-    public PixelMagnifier()
+    public Loupe()
     {
         RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
 

@@ -2,7 +2,7 @@
      SPDX-License-Identifier: MIT -->
 
 <Window
-    x:Class="PixelBox.PixelMagnifierWindow"
+    x:Class="PixelBox.LoupeWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -10,7 +10,7 @@
     xmlns:local="clr-namespace:PixelBox"
     xmlns:converter="clr-namespace:PixelBox.BindingConverters"
     mc:Ignorable="d"
-    d:DataContext="{d:DesignInstance Type=local:PixelMagnifierWindow, IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance Type=local:LoupeWindow, IsDesignTimeCreatable=False}"
     WindowStyle="None"
     ShowInTaskbar="False"
     Topmost="True"
@@ -53,31 +53,31 @@
 
     <Window.CommandBindings>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.ToggleGrid}"
+            Command="{x:Static local:LoupeWindowCommands.ToggleGrid}"
             Executed="OnToggleGridExecuted"/>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.IncreaseGridSize}"
+            Command="{x:Static local:LoupeWindowCommands.IncreaseGridSize}"
             Executed="OnIncreaseGridSizeExecuted"/>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.DecreaseGridSize}"
+            Command="{x:Static local:LoupeWindowCommands.DecreaseGridSize}"
             Executed="OnDecreaseGridSizeExecuted"/>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.IncreasePixelSize}"
+            Command="{x:Static local:LoupeWindowCommands.IncreasePixelSize}"
             Executed="OnIncreasePixelSizeExecuted"/>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.DecreasePixelSize}"
+            Command="{x:Static local:LoupeWindowCommands.DecreasePixelSize}"
             Executed="OnDecreasePixelSizeExecuted"/>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.IncreaseColorSamplerSize}"
+            Command="{x:Static local:LoupeWindowCommands.IncreaseColorSamplerSize}"
             Executed="OnIncreaseColorSamplerSizeExecuted"/>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.DecreaseColorSamplerSize}"
+            Command="{x:Static local:LoupeWindowCommands.DecreaseColorSamplerSize}"
             Executed="OnDecreaseColorSamplerSizeExecuted"/>
         <CommandBinding
             Command="ApplicationCommands.Close"
             Executed="OnCloseExecuted"/>
         <CommandBinding
-            Command="{x:Static local:PixelMagnifierUICommands.Close}"
+            Command="{x:Static local:LoupeWindowCommands.Close}"
             Executed="OnCloseExecuted"/>
     </Window.CommandBindings>
 
@@ -117,12 +117,12 @@
                 BorderThickness="3"
                 Effect="{StaticResource DropShadowEffect}"
                 CornerRadius="{Binding ActualHeight, ElementName=Magnifier, Mode=OneWay}">
-                <local:PixelMagnifier
+                <local:Loupe
                     x:Name="Magnifier"
                     GridSize="15"
                     PixelSize="7"
                     PixelChanged="OnPixelChanged">
-                    <local:PixelMagnifier.Clip>
+                    <local:Loupe.Clip>
                         <EllipseGeometry 
                             RadiusX="{Binding Center.X, RelativeSource={RelativeSource Self}}" 
                             RadiusY="{Binding Center.Y, RelativeSource={RelativeSource Self}}">
@@ -133,8 +133,8 @@
                                 </MultiBinding>
                             </EllipseGeometry.Center>
                         </EllipseGeometry>
-                    </local:PixelMagnifier.Clip>
-                </local:PixelMagnifier>
+                    </local:Loupe.Clip>
+                </local:Loupe>
             </Border>
 
             <!-- Info panel -->

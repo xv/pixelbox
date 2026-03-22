@@ -5,9 +5,9 @@ namespace PixelBox;
 
 /// <summary>
 /// Represents various configuration parameters for
-/// <see cref="PixelMagnifierWindow"/>.
+/// <see cref="LoupeWindow"/>.
 /// </summary>
-public class PixelMagnifierWindowConfig
+public class LoupeWindowConfig
 {
     public const int
         GridSizeMin = 15,
@@ -22,37 +22,37 @@ public class PixelMagnifierWindowConfig
         RefreshIntervalMax = 100;
 
     /// <summary>
-    /// <inheritdoc cref="PixelMagnifier.GridSize"/>
+    /// <inheritdoc cref="Loupe.GridSize"/>
     /// </summary>
     public int GridSize
     { get; set; } = GridSizeMin;
 
     /// <summary>
-    /// <inheritdoc cref="PixelMagnifier.PixelSize"/>
+    /// <inheritdoc cref="Loupe.PixelSize"/>
     /// </summary>
     public int PixelSize
     { get; set; } = PixelSizeMin;
 
     /// <summary>
-    /// <inheritdoc cref="PixelMagnifier.SamplingMode"/>
+    /// <inheritdoc cref="Loupe.SamplingMode"/>
     /// </summary>
     public PixelSamplingMode SamplingMode
     { get; set; } = PixelSamplingMode.Single;
 
     /// <summary>
-    /// <inheritdoc cref="PixelMagnifier.ShowGrid"/>
+    /// <inheritdoc cref="Loupe.ShowGrid"/>
     /// </summary>
     public bool ShowGrid
     { get; set; } = true;
 
     /// <summary>
-    /// <inheritdoc cref="PixelMagnifierWindow.ShowInfoPanel"/>
+    /// <inheritdoc cref="LoupeWindow.ShowInfoPanel"/>
     /// </summary>
     public bool ShowInfoPanel
     { get; set; } = true;
 
     /// <summary>
-    /// <inheritdoc cref="PixelMagnifier.RefreshInterval"/>
+    /// <inheritdoc cref="Loupe.RefreshInterval"/>
     /// </summary>
     public int RefreshInterval
     { get; set; } = 30;

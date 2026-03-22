@@ -6,48 +6,47 @@ using System.Windows.Input;
 namespace PixelBox;
 
 /// <summary>
-/// Provides UI commands associated with <see cref="PixelMagnifier"/> and
-/// <see cref="PixelMagnifierWindow"/>.
+/// Provides UI commands associated with <see cref="LoupeWindow"/>.
 /// </summary>
-public static class PixelMagnifierUICommands
+public static class LoupeWindowCommands
 {
     public static readonly RoutedUICommand ToggleGrid =
         new("Toggle Grid",
             nameof(ToggleGrid),
-            typeof(PixelMagnifierWindow));
+            typeof(LoupeWindow));
 
     public static readonly RoutedUICommand IncreaseGridSize =
         new("Increase Grid Size",
             nameof(IncreaseGridSize),
-            typeof(PixelMagnifierWindow));
+            typeof(LoupeWindow));
 
     public static readonly RoutedUICommand DecreaseGridSize =
         new("Decrease Grid Size",
             nameof(DecreaseGridSize),
-            typeof(PixelMagnifierWindow));
+            typeof(LoupeWindow));
 
     public static readonly RoutedUICommand IncreasePixelSize =
         new("Increase Pixel Size",
             nameof(IncreasePixelSize),
-            typeof(PixelMagnifierWindow));
+            typeof(LoupeWindow));
 
     public static readonly RoutedUICommand DecreasePixelSize =
         new("Decrease Pixel Size",
             nameof(DecreasePixelSize),
-            typeof(PixelMagnifierWindow));
+            typeof(LoupeWindow));
 
     public static readonly RoutedUICommand IncreaseColorSamplerSize =
         new("Increase Color Sampler Size",
             nameof(IncreaseColorSamplerSize),
-            typeof(PixelMagnifierWindow));
+            typeof(LoupeWindow));
 
     public static readonly RoutedUICommand DecreaseColorSamplerSize =
         new("Decrease Color Sampler Size",
             nameof(DecreaseColorSamplerSize),
-            typeof(PixelMagnifierWindow));
+            typeof(LoupeWindow));
 
     public static readonly RoutedUICommand Close =
         new("Close",
             nameof(Close),
-            typeof(PixelMagnifierWindow));
+            typeof(LoupeWindow));
 }

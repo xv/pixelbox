@@ -32,17 +32,17 @@ Quick Start
 ### Using the Control Directly
 
 > [!CAUTION]
-> `PixelMagnifier` uses unmanaged resources and implements `IDisposable`. Call `Dispose()` when the control is no longer needed to properly release resources it holds.
+> `Loupe` uses unmanaged resources and implements `IDisposable`. Call `Dispose()` when the control is no longer needed to properly release resources it holds.
 
 ```xml
 <Window x:Class="WpfApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:pb="clr-namespace:PixelBox;assembly=PixelBox">
     <Grid>
-        <!-- The control size of PixelMagnifier is automatically determiend via its
-             GridSize, PixelSize, and ShowGrid properties. The control size should
-             not be set manually. -->
-        <pb:PixelMagnifier HorizontalAlignment="Left" VerticalAlignment="Top"
+        <!-- The control size of Loupe is automatically determiend via its
+             GridSize, PixelSize, and ShowGrid properties. The control size
+             should not be set manually. -->
+        <pb:Loupe HorizontalAlignment="Left" VerticalAlignment="Top"
             GridSize="15"
             PixelSize="10"
             ShowGrid="True"
@@ -57,7 +57,7 @@ Quick Start
 > A project demonstrating the use of the built-in window is provided under `PixelBox.Demo`.
 
 ```csharp
-var picker = new PixelBox.PixelMagnifierWindow();
+var picker = new PixelBox.LoupeWindow();
 
 // ShowDialog() will return true if the window was closed via either Enter key or
 // mouse left click. You can use the return result to update your UI conditionally
@@ -71,33 +71,33 @@ var position = picker.PixelPosition;
 
 The magnifier window uses the following keybinds by default:
 
-| **Command**                                          | **Keybind**                          |
-|------------------------------------------------------|--------------------------------------|
-| `PixelMagnifierUICommands.ToggleGrid`                | <kbd>G</kbd>                         |
-| `PixelMagnifierUICommands.IncreaseGridSize`          | <kbd>Shift</kbd> <kbd>OemPlus</kbd>  |
-| `PixelMagnifierUICommands.DecreaseGridSize`          | <kbd>Shift</kbd> <kbd>OemMinus</kbd> |
-| `PixelMagnifierUICommands.IncreasePixelSize`         | <kbd>Ctrl</kbd> <kbd>OemPlus</kbd>   |
-| `PixelMagnifierUICommands.DecreasePixelSize`         | <kbd>Ctrl</kbd> <kbd>OemMinus</kbd>  |
-| `PixelMagnifierUICommands.IncreaseColorSamplerSize`  | <kbd>OemPlus</kbd>                   |
-| `PixelMagnifierUICommands.DecreaseColorSamplerSize`  | <kbd>OemMinus</kbd>                  |
-| `PixelMagnifierUICommands.Close`                     | <kbd>Enter</kbd>                     |
+| **Command**                                     | **Keybind**                          |
+|-------------------------------------------------|--------------------------------------|
+| `LoupeWindowCommands.ToggleGrid`                | <kbd>G</kbd>                         |
+| `LoupeWindowCommands.IncreaseGridSize`          | <kbd>Shift</kbd> <kbd>OemPlus</kbd>  |
+| `LoupeWindowCommands.DecreaseGridSize`          | <kbd>Shift</kbd> <kbd>OemMinus</kbd> |
+| `LoupeWindowCommands.IncreasePixelSize`         | <kbd>Ctrl</kbd> <kbd>OemPlus</kbd>   |
+| `LoupeWindowCommands.DecreasePixelSize`         | <kbd>Ctrl</kbd> <kbd>OemMinus</kbd>  |
+| `LoupeWindowCommands.IncreaseColorSamplerSize`  | <kbd>OemPlus</kbd>                   |
+| `LoupeWindowCommands.DecreaseColorSamplerSize`  | <kbd>OemMinus</kbd>                  |
+| `LoupeWindowCommands.Close`                     | <kbd>Enter</kbd>                     |
 
 > [!NOTE]
 > <kbd>OemPlus</kbd> and <kbd>OemMinus</kbd> are the <kbd>+</kbd> and <kbd>-</kbd> keys to the left of <kbd>Backspace</kbd>. However, they may vary on non-US keyboards.
 
 You can remap the keybinds for any of the listed commands before instantiating the window:
 ```csharp
-PixelMagnifierWindow.ConfigureKeyBindings(bindings =>
+LoupeWindow.ConfigureKeyBindings(bindings =>
 {
     bindings.Close = new KeyBinding
     {
-        Command = PixelMagnifierUICommands.Close,
+        Command = LoupeWindowCommands.Close,
         Key = Key.Space,
         Modifiers = ModifierKeys.None
     };
 });
 
-var picker = new PixelMagnifierWindow();
+var picker = new LoupeWindow();
 ```
 
 #### Customizing the Info Panel
@@ -125,7 +125,7 @@ internal class ColorToCssStringConverter : IValueConverter
 ```
 ```csharp
 // Set the converter after instantiating the window
-var picker = new PixelMagnifierWindow
+var picker = new LoupeWindow
 {
     PixelColorConverter = new ColorToCssStringConverter()
 };

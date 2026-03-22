@@ -9,13 +9,13 @@ namespace PixelBox.Demo;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private readonly PixelMagnifierWindowConfig _magWindowCfg;
+    private readonly LoupeWindowConfig _loupeWindowCfg;
 
     public MainWindow()
     {
         InitializeComponent();
 
-        _magWindowCfg = new PixelMagnifierWindowConfig
+        _loupeWindowCfg = new LoupeWindowConfig
         {
             RefreshInterval = 30,
             ShowInfoPanel = true
@@ -28,19 +28,19 @@ public partial class MainWindow : Window
     private static string HexStringFromColor(Color color) =>
         $"#{color.R:X2}{color.G:X2}{color.B:X2}";
 
-    private void ShowMagnifierWindow()
+    private void ShowLoupeWindow()
     {
-        // Passing PixelMagnifierWindowConfig instance is optional. If not
-        // provided, the window will be created with default configuration
-        var magWindow = new PixelMagnifierWindow(_magWindowCfg);
+        // Passing LoupeWindowConfig instance is optional. If not provided, the
+        // window will be created with default configuration
+        var loupe = new LoupeWindow(_loupeWindowCfg);
 
         // ShowDialog() will return true if the window was closed via either Enter key or
         // mouse left click. You can use the return result to update your UI conditionally
-        if (magWindow.ShowDialog() != true)
+        if (loupe.ShowDialog() != true)
             return;
 
-        var color = magWindow.PixelColor;
-        var position = magWindow.PixelPosition;
+        var color = loupe.PixelColor;
+        var position = loupe.PixelPosition;
 
         ColorTextBlock.Text = $"{HexStringFromColor(color)} ({RgbStringFromColor(color)})";
         PositionTextBlock.Text = $"X: {position.X} Y: {position.Y}";
@@ -54,11 +54,11 @@ public partial class MainWindow : Window
         base.OnKeyDown(e);
 
         if (e.Key == Key.Space)
-            ShowMagnifierWindow();
+            ShowLoupeWindow();
     }
 
     private void Kbd_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        ShowMagnifierWindow();
+        ShowLoupeWindow();
     }
 }

@@ -19,7 +19,7 @@ namespace PixelBox;
 /// <summary>
 /// Represents a mouse-tracked pixel magnifier window.
 /// </summary>
-public partial class PixelMagnifierWindow : Window
+public partial class LoupeWindow : Window
 {
     #region Fields
 
@@ -27,7 +27,7 @@ public partial class PixelMagnifierWindow : Window
 
     private const double WindowOffset = 2;
 
-    private readonly PixelMagnifierWindowConfig _config;
+    private readonly LoupeWindowConfig _config;
 
     private readonly SolidColorBrush _colorPreviewBrush =
         new(Colors.Transparent);
@@ -37,8 +37,8 @@ public partial class PixelMagnifierWindow : Window
     private readonly PixelSamplingMode[] _samplingModes =
         Enum.GetValues<PixelSamplingMode>();
 
-    private static readonly PixelMagnifierWindowKeyBindings _keyBindings =
-        PixelMagnifierWindowKeyBindings.CreateDefault();
+    private static readonly LoupeWindowKeyBindings _keyBindings =
+        LoupeWindowKeyBindings.CreateDefault();
 
     #endregion
     #region Dependency Properties
@@ -50,7 +50,7 @@ public partial class PixelMagnifierWindow : Window
         DependencyProperty.Register(
             nameof(ColorPreviewBrush),
             typeof(Brush),
-            typeof(PixelMagnifierWindow));
+            typeof(LoupeWindow));
 
     /// <summary>
     /// Gets or sets the brush used to render the color preview element.
@@ -68,7 +68,7 @@ public partial class PixelMagnifierWindow : Window
         DependencyProperty.Register(
             nameof(InfoPanelMinWidth),
             typeof(double),
-            typeof(PixelMagnifierWindow),
+            typeof(LoupeWindow),
             new PropertyMetadata(150d));
 
     /// <summary>
@@ -88,7 +88,7 @@ public partial class PixelMagnifierWindow : Window
         DependencyProperty.Register(
             nameof(MagnifierX),
             typeof(double),
-            typeof(PixelMagnifierWindow));
+            typeof(LoupeWindow));
 
     /// <summary>
     /// Gets or sets the X coordinate of the magnifier window.
@@ -106,7 +106,7 @@ public partial class PixelMagnifierWindow : Window
         DependencyProperty.Register(
             nameof(MagnifierY),
             typeof(double),
-            typeof(PixelMagnifierWindow));
+            typeof(LoupeWindow));
 
     /// <summary>
     /// Gets or sets the Y coordinate of the magnifier window.
@@ -124,7 +124,7 @@ public partial class PixelMagnifierWindow : Window
         DependencyProperty.Register(
             nameof(OverlayImage),
             typeof(ImageSource),
-            typeof(PixelMagnifierWindow));
+            typeof(LoupeWindow));
 
     /// <summary>
     /// Gets or sets the overlay image used as the background for the magnifier.
@@ -141,7 +141,7 @@ public partial class PixelMagnifierWindow : Window
         set => SetValue(OverlayImageProperty, value);
     }
 
-    /// <inheritdoc cref="PixelMagnifier.PixelColor"/>
+    /// <inheritdoc cref="Loupe.PixelColor"/>
     public Color PixelColor
     {
         get => (Color)GetValue(PixelColorProperty);
@@ -155,7 +155,7 @@ public partial class PixelMagnifierWindow : Window
         DependencyProperty.Register(
             nameof(PixelColor),
             typeof(Color),
-            typeof(PixelMagnifierWindow),
+            typeof(LoupeWindow),
             new PropertyMetadata(default(Color)));
 
     /// <summary>
@@ -175,10 +175,10 @@ public partial class PixelMagnifierWindow : Window
         DependencyProperty.Register(
             nameof(PixelColorConverter),
             typeof(IValueConverter),
-            typeof(PixelMagnifierWindow),
+            typeof(LoupeWindow),
             new PropertyMetadata(new ColorToStringConverter()));
 
-    /// <inheritdoc cref="PixelMagnifier.PixelPosition"/>
+    /// <inheritdoc cref="Loupe.PixelPosition"/>
     public Point PixelPosition
     {
         get => (Point)GetValue(PixelPositionProperty);
@@ -192,7 +192,7 @@ public partial class PixelMagnifierWindow : Window
         DependencyProperty.Register(
             nameof(PixelPosition),
             typeof(Point),
-            typeof(PixelMagnifierWindow),
+            typeof(LoupeWindow),
             new PropertyMetadata(default(Point)));
 
     /// <summary>
@@ -212,7 +212,7 @@ public partial class PixelMagnifierWindow : Window
         DependencyProperty.Register(
             nameof(PixelPositionConverter),
             typeof(IValueConverter),
-            typeof(PixelMagnifierWindow),
+            typeof(LoupeWindow),
             new PropertyMetadata(new PointToStringConverter()));
 
     #endregion
@@ -221,7 +221,7 @@ public partial class PixelMagnifierWindow : Window
     /// <summary>
     /// Gets the key bindings for the window.
     /// </summary>
-    public static PixelMagnifierWindowKeyBindings KeyBindings => _keyBindings;
+    public static LoupeWindowKeyBindings KeyBindings => _keyBindings;
 
     /// <summary>
     /// Gets or sets whether the info panel containing the current pixel's color
@@ -260,7 +260,7 @@ public partial class PixelMagnifierWindow : Window
 
         InputBindings.Add(new MouseBinding
         {
-            Command = PixelMagnifierUICommands.Close,
+            Command = LoupeWindowCommands.Close,
             MouseAction = MouseAction.LeftClick
         });
     }
@@ -272,18 +272,18 @@ public partial class PixelMagnifierWindow : Window
     {
         Magnifier.GridSize = Math.Clamp(
             _config.GridSize,
-            PixelMagnifierWindowConfig.GridSizeMin,
-            PixelMagnifierWindowConfig.GridSizeMax);
+            LoupeWindowConfig.GridSizeMin,
+            LoupeWindowConfig.GridSizeMax);
 
         Magnifier.PixelSize = Math.Clamp(
             _config.PixelSize,
-            PixelMagnifierWindowConfig.PixelSizeMin,
-            PixelMagnifierWindowConfig.PixelSizeMax);
+            LoupeWindowConfig.PixelSizeMin,
+            LoupeWindowConfig.PixelSizeMax);
 
         Magnifier.RefreshInterval = Math.Clamp(
             _config.RefreshInterval,
-            PixelMagnifierWindowConfig.RefreshIntervalMin,
-            PixelMagnifierWindowConfig.RefreshIntervalMax);
+            LoupeWindowConfig.RefreshIntervalMin,
+            LoupeWindowConfig.RefreshIntervalMax);
 
         Magnifier.SamplingMode = _config.SamplingMode;
         Magnifier.ShowGrid = _config.ShowGrid;
@@ -296,14 +296,14 @@ public partial class PixelMagnifierWindow : Window
     /// </summary>
     /// 
     /// <param name="config">
-    /// Receives a <see cref="PixelMagnifierWindowKeyBindings"/> instance to
+    /// Receives a <see cref="LoupeWindowKeyBindings"/> instance to
     /// modify the key bindings.
     /// </param>
     ///
     /// <exception cref="ArgumentNullException">
     /// Thrown if <paramref name="config"/> is <see langword="null"/>.
     /// </exception>
-    public static void ConfigureKeyBindings(Action<PixelMagnifierWindowKeyBindings> config)
+    public static void ConfigureKeyBindings(Action<LoupeWindowKeyBindings> config)
     {
         ArgumentNullException.ThrowIfNull(config);
         config(_keyBindings);
@@ -452,19 +452,19 @@ public partial class PixelMagnifierWindow : Window
     #endregion
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PixelMagnifierWindow"/>
+    /// Initializes a new instance of the <see cref="LoupeWindow"/>
     /// class.
     /// </summary>
-    public PixelMagnifierWindow() : this(new PixelMagnifierWindowConfig()) { }
+    public LoupeWindow() : this(new LoupeWindowConfig()) { }
 
     /// <summary>
-    /// <inheritdoc cref="PixelMagnifierWindow()"/>
+    /// <inheritdoc cref="LoupeWindow()"/>
     /// </summary>
     /// 
     /// <param name="config">
     /// Configuration parameters of this window.
     /// </param>
-    public PixelMagnifierWindow(PixelMagnifierWindowConfig config)
+    public LoupeWindow(LoupeWindowConfig config)
     {
         InitializeComponent();
 
@@ -544,18 +544,18 @@ public partial class PixelMagnifierWindow : Window
         if (Keyboard.Modifiers == ModifierKeys.Control)
         {
             if (e.Delta > 0)
-                PixelMagnifierUICommands.IncreasePixelSize.Execute(null, this);
+                LoupeWindowCommands.IncreasePixelSize.Execute(null, this);
             else if (e.Delta < 0)
-                PixelMagnifierUICommands.DecreasePixelSize.Execute(null, this);
+                LoupeWindowCommands.DecreasePixelSize.Execute(null, this);
 
             e.Handled = true;
         }
         else if (Keyboard.Modifiers == ModifierKeys.Shift)
         {
             if (e.Delta > 0)
-                PixelMagnifierUICommands.IncreaseGridSize.Execute(null, this);
+                LoupeWindowCommands.IncreaseGridSize.Execute(null, this);
             else if (e.Delta < 0)
-                PixelMagnifierUICommands.DecreaseGridSize.Execute(null, this);
+                LoupeWindowCommands.DecreaseGridSize.Execute(null, this);
 
             e.Handled = true;
         }
@@ -596,7 +596,7 @@ public partial class PixelMagnifierWindow : Window
         Magnifier.ShowGrid = !Magnifier.ShowGrid;
 
     private void OnIncreaseGridSizeExecuted(object sender, ExecutedRoutedEventArgs e) =>
-        Magnifier.GridSize = Math.Min(Magnifier.GridSize + 2, PixelMagnifierWindowConfig.GridSizeMax);
+        Magnifier.GridSize = Math.Min(Magnifier.GridSize + 2, LoupeWindowConfig.GridSizeMax);
 
     private void OnDecreaseGridSizeExecuted(object sender, ExecutedRoutedEventArgs e)
     {
@@ -604,14 +604,14 @@ public partial class PixelMagnifierWindow : Window
         if (Magnifier.GridSize <= (int)Magnifier.SamplingMode)
             return;
 
-        Magnifier.GridSize = Math.Max(Magnifier.GridSize - 2, PixelMagnifierWindowConfig.GridSizeMin);
+        Magnifier.GridSize = Math.Max(Magnifier.GridSize - 2, LoupeWindowConfig.GridSizeMin);
     }
 
     private void OnIncreasePixelSizeExecuted(object sender, ExecutedRoutedEventArgs e) =>
-        Magnifier.PixelSize = Math.Min(Magnifier.PixelSize + 1, PixelMagnifierWindowConfig.PixelSizeMax);
+        Magnifier.PixelSize = Math.Min(Magnifier.PixelSize + 1, LoupeWindowConfig.PixelSizeMax);
 
     private void OnDecreasePixelSizeExecuted(object sender, ExecutedRoutedEventArgs e) =>
-        Magnifier.PixelSize = Math.Max(Magnifier.PixelSize - 1, PixelMagnifierWindowConfig.PixelSizeMin);
+        Magnifier.PixelSize = Math.Max(Magnifier.PixelSize - 1, LoupeWindowConfig.PixelSizeMin);
 
     private void OnIncreaseColorSamplerSizeExecuted(object sender, ExecutedRoutedEventArgs e)
     {
@@ -632,7 +632,7 @@ public partial class PixelMagnifierWindow : Window
 
     private void OnCloseExecuted(object sender, ExecutedRoutedEventArgs e)
     {
-        if (e.Command == PixelMagnifierUICommands.Close)
+        if (e.Command == LoupeWindowCommands.Close)
             DialogResult = true;
 
         Close();

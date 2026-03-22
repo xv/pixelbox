@@ -6,9 +6,9 @@ using System.Windows.Input;
 namespace PixelBox;
 
 /// <summary>
-/// Represents key bindings for <see cref="PixelMagnifierWindow"/>.
+/// Represents key bindings for <see cref="LoupeWindow"/>.
 /// </summary>
-public class PixelMagnifierWindowKeyBindings
+public class LoupeWindowKeyBindings
 {
     /// <summary>
     /// Gets or sets the key binding used to toggle the visibility of the grid.
@@ -88,15 +88,15 @@ public class PixelMagnifierWindowKeyBindings
         Modifiers = mod
     };
 
-    public static PixelMagnifierWindowKeyBindings CreateDefault() => new()
+    public static LoupeWindowKeyBindings CreateDefault() => new()
     {
-        ToggleGrid = Bind(PixelMagnifierUICommands.ToggleGrid, Key.G),
-        IncreaseGridSize = Bind(PixelMagnifierUICommands.IncreaseGridSize, Key.OemPlus, ModifierKeys.Shift),
-        DecreaseGridSize = Bind(PixelMagnifierUICommands.DecreaseGridSize, Key.OemMinus, ModifierKeys.Shift),
-        IncreasePixelSize = Bind(PixelMagnifierUICommands.IncreasePixelSize, Key.OemPlus, ModifierKeys.Control),
-        DecreasePixelSize = Bind(PixelMagnifierUICommands.DecreasePixelSize, Key.OemMinus, ModifierKeys.Control),
-        IncreaseColorSamplerSize = Bind(PixelMagnifierUICommands.IncreaseColorSamplerSize, Key.OemPlus),
-        DecreaseColorSamplerSize = Bind(PixelMagnifierUICommands.DecreaseColorSamplerSize, Key.OemMinus),
-        Close = Bind(PixelMagnifierUICommands.Close, Key.Enter)
+        ToggleGrid = Bind(LoupeWindowCommands.ToggleGrid, Key.G),
+        IncreaseGridSize = Bind(LoupeWindowCommands.IncreaseGridSize, Key.OemPlus, ModifierKeys.Shift),
+        DecreaseGridSize = Bind(LoupeWindowCommands.DecreaseGridSize, Key.OemMinus, ModifierKeys.Shift),
+        IncreasePixelSize = Bind(LoupeWindowCommands.IncreasePixelSize, Key.OemPlus, ModifierKeys.Control),
+        DecreasePixelSize = Bind(LoupeWindowCommands.DecreasePixelSize, Key.OemMinus, ModifierKeys.Control),
+        IncreaseColorSamplerSize = Bind(LoupeWindowCommands.IncreaseColorSamplerSize, Key.OemPlus),
+        DecreaseColorSamplerSize = Bind(LoupeWindowCommands.DecreaseColorSamplerSize, Key.OemMinus),
+        Close = Bind(LoupeWindowCommands.Close, Key.Enter)
     };
 }
