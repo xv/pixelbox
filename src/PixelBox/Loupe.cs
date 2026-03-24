@@ -580,7 +580,7 @@ public class Loupe : FrameworkElement, IDisposable
     /// <param name="screenPt">
     /// The screen position to capture at.
     /// </param>
-    private unsafe void CaptureAt(Point screenPt)
+    private void CaptureAt(Point screenPt)
     {
         var cx = (int)screenPt.X;
         var cy = (int)screenPt.Y;
@@ -596,12 +596,13 @@ public class Loupe : FrameworkElement, IDisposable
         if (!_dib.Capture(left, top))
             return;
 
-        _sampledColor = SampleColor(SamplingMode, (byte*)_dib.Bits, _dib.Stride);
+        _sampledColor = SampleColor(SamplingMode);
         PixelChanged?.Invoke(this, new PixelChangedEventArgs(_sampledColor, _mousePos));
     }
 
     /// <summary>
-    /// Samples the color of thr pixel.
+    /// Samples the color of the center pixel, or the average color of
+    /// neighboring pixels depending on the specified sampling mode.
     /// </summary>
     /// 
     /// <param name="mode">
@@ -620,18 +621,21 @@ public class Loupe : FrameworkElement, IDisposable
     /// <returns>
     /// The sampled color. If <paramref name="mode"/> is set to
     /// <see cref="PixelSamplingMode.Single"/>, then the exact color of the
-    /// pixel is returned; otherwise, the average color of neighboring pixels
-    /// is calculated and returned.
+    /// center pixel is returned; otherwise, the average color of neighboring
+    /// pixels is calculated and returned.
     /// </returns>
-    private unsafe Color SampleColor(PixelSamplingMode mode, byte* pBits, int stride)
+    private unsafe Color SampleColor(PixelSamplingMode mode)
     {
+        var dibBits = (byte*)_dib.Bits;
+        var dibStride = _dib.Stride;
+
         if (mode == PixelSamplingMode.Single)
         {
-            var idx = (_gridSizeHalf * stride) + (_gridSizeHalf * 4);
+            var idx = (_gridSizeHalf * dibStride) + (_gridSizeHalf * 4);
             return Color.FromRgb(
-                *(pBits + idx + 2 /* R */),
-                *(pBits + idx + 1 /* G */),
-                *(pBits + idx + 0 /* B */));
+                *(dibBits + idx + 2 /* R */),
+                *(dibBits + idx + 1 /* G */),
+                *(dibBits + idx + 0 /* B */));
         }
 
         var kSize = (int)mode;
@@ -648,10 +652,10 @@ public class Loupe : FrameworkElement, IDisposable
         {
             for (int x = 0; x < kSize; x++)
             {
-                var idx = (first + y) * stride + (first + x) * 4;
-                bSum += *(pBits + idx + 0);
-                gSum += *(pBits + idx + 1);
-                rSum += *(pBits + idx + 2);
+                var idx = (first + y) * dibStride + (first + x) * 4;
+                bSum += *(dibBits + idx + 0);
+                gSum += *(dibBits + idx + 1);
+                rSum += *(dibBits + idx + 2);
             }
         }
 
@@ -673,8 +677,7 @@ public class Loupe : FrameworkElement, IDisposable
             return;
         }
 
-        _sampledColor = SampleColor(SamplingMode,
-            (byte*)_dib.Bits, _dib.Stride);
+        _sampledColor = SampleColor(SamplingMode);
 
         PixelChanged?.Invoke(this, new PixelChangedEventArgs(
             _sampledColor, _mousePos));
