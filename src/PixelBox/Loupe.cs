@@ -8,6 +8,7 @@ using System.Windows.Threading;
 using System.Windows;
 
 using Windows.Win32;
+
 using PixelBox.Drawing;
 
 namespace PixelBox;
@@ -391,7 +392,7 @@ public class Loupe : FrameworkElement, IDisposable
             return;
 
         mag.RenderSamplingAreaIndicator();
-        mag.SampleColorFromLastCapture();
+        mag.SampleColorAndNotify();
     }
 
     private static void OnShowGridChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
@@ -431,7 +432,10 @@ public class Loupe : FrameworkElement, IDisposable
 
         _mousePos = currentPos;
 
-        CaptureAt(_mousePos);
+        if (!CaptureAt(_mousePos))
+            return;
+
+        SampleColorAndNotify();
         InvalidateVisual();
     }
 
@@ -580,7 +584,12 @@ public class Loupe : FrameworkElement, IDisposable
     /// <param name="screenPt">
     /// The screen position to capture at.
     /// </param>
-    private void CaptureAt(Point screenPt)
+    ///
+    /// <returns>
+    /// <see langword="true"/> if the capture was successful;
+    /// <see langword="false"/> otherwise.
+    /// </returns>
+    private bool CaptureAt(Point screenPt)
     {
         var cx = (int)screenPt.X;
         var cy = (int)screenPt.Y;
@@ -593,11 +602,7 @@ public class Loupe : FrameworkElement, IDisposable
         if (_gridSize != _dib.Width || _gridSize != _dib.Height)
             _dib.Resize(_gridSize, _gridSize);
 
-        if (!_dib.Capture(left, top))
-            return;
-
-        _sampledColor = SampleColor(SamplingMode);
-        PixelChanged?.Invoke(this, new PixelChangedEventArgs(_sampledColor, _mousePos));
+        return _dib.Capture(left, top);
     }
 
     /// <summary>
@@ -666,21 +671,16 @@ public class Loupe : FrameworkElement, IDisposable
     }
 
     /// <summary>
-    /// Samples color using the last capture buffer. However, if the said buffer
-    /// is <see langword="null"/>, a new capture will be created.
+    /// Samples the color of the pixel in the captured bitmap and raises the
+    /// <see cref="PixelChanged"/> event.
     /// </summary>
-    private unsafe void SampleColorFromLastCapture()
+    private unsafe void SampleColorAndNotify()
     {
         if (_dib.Bits is null)
-        {
-            CaptureAt(_mousePos);
             return;
-        }
 
         _sampledColor = SampleColor(SamplingMode);
-
-        PixelChanged?.Invoke(this, new PixelChangedEventArgs(
-            _sampledColor, _mousePos));
+        PixelChanged?.Invoke(this, new PixelChangedEventArgs(_sampledColor, _mousePos));
     }
 
     /// <summary>
@@ -751,13 +751,11 @@ public class Loupe : FrameworkElement, IDisposable
     /// </returns>
     private unsafe bool EnsureCapture()
     {
-        if (_dib.Bits is null)
-        {
-            _mousePos = MousePosition;
-            CaptureAt(_mousePos);
-        }
+        if (_dib.Bits is not null)
+            return true;
 
-        return _dib.Bits is not null;
+        _mousePos = MousePosition;
+        return CaptureAt(_mousePos);
     }
 
     /// <summary>
@@ -784,7 +782,12 @@ public class Loupe : FrameworkElement, IDisposable
             PixelFormats.Bgra32, null);
 
         // Recapture since the size has changed
-        CaptureAt(_mousePos);
+        //
+        // This also means that if pixels from the previous capture have changed,
+        // then the new capture will reflect those changes. It's thus also necessary
+        // to resample the pixel color
+        if (CaptureAt(_mousePos))
+            SampleColorAndNotify();
     }
 
     /// <summary>
