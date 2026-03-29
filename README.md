@@ -5,7 +5,7 @@ PixelBox is a fast and customizable BitBlt-based pixel magnification control for
 Features
 --------
 In a nutshell, what the control can provide is:
-- Adjustable pixel columns (field of view), pixel size (zoom), and refresh rate.
+- Adjustable grid size, pixel size, and refresh rate.
 - Toggleable grid lines.
 - Color sampling ranging from single pixel up to a 5×5 region.
 - Individual screen axes locking, like in macOS' Digital Color Meter.
@@ -127,7 +127,8 @@ internal class ColorToCssStringConverter : IValueConverter
 // Set the converter after instantiating the window
 var picker = new LoupeWindow
 {
-    PixelColorConverter = new ColorToCssStringConverter()
+    PixelColorConverter = new ColorToCssStringConverter(),
+    InfoPanelMinWidth = 175
 };
 ```
 
