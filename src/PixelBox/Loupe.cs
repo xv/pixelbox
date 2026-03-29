@@ -274,8 +274,10 @@ public class Loupe : FrameworkElement, IDisposable
     /// Gets the color corresponding to the pixel located at
     /// the center of the grid.
     ///
+    /// <para>
     /// If <see cref="SamplingMode"/> is not <see cref="PixelSamplingMode.Single"/>,
     /// then the average color of pixels in the sampling region is retrieved.
+    /// </para>
     /// </summary>
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
