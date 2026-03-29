@@ -39,6 +39,8 @@ public class Loupe : FrameworkElement, IDisposable
     private WriteableBitmap? _bitmap;
     private int _bitmapDevSize = 0;
 
+    private bool _recaptureNeeded;
+
     public event EventHandler<PixelChangedEventArgs>? PixelChanged;
 
     private readonly SamplingAreaIndicator _samplingAreaIndicator;
@@ -373,6 +375,8 @@ public class Loupe : FrameworkElement, IDisposable
         if (sender is not Loupe mag)
             return;
 
+        mag._recaptureNeeded = true;
+
         mag.RecalculateGridMetrics(GridMetricUpdateFlags.Dimension);
         mag.RenderSamplingAreaIndicator();
     }
@@ -381,6 +385,8 @@ public class Loupe : FrameworkElement, IDisposable
     {
         if (sender is not Loupe mag)
             return;
+
+        mag._recaptureNeeded = true;
 
         mag.RecalculateGridMetrics(GridMetricUpdateFlags.CellSize);
         mag.RenderSamplingAreaIndicator();
@@ -399,6 +405,8 @@ public class Loupe : FrameworkElement, IDisposable
     {
         if (sender is not Loupe mag)
             return;
+
+        mag._recaptureNeeded = true;
 
         mag.RenderSamplingAreaIndicator();
     }
@@ -615,14 +623,6 @@ public class Loupe : FrameworkElement, IDisposable
     /// sampling kernel.
     /// </param>
     /// 
-    /// <param name="pBits">
-    /// Pointer to the pixel data.
-    /// </param>
-    /// 
-    /// <param name="stride">
-    /// The stride of a single row of pixels in the buffer.
-    /// </param>
-    /// 
     /// <returns>
     /// The sampled color. If <paramref name="mode"/> is set to
     /// <see cref="PixelSamplingMode.Single"/>, then the exact color of the
@@ -749,13 +749,24 @@ public class Loupe : FrameworkElement, IDisposable
     /// <see langword="true"/> if a capture buffer is available;
     /// <see langword="false"/> otherwise.
     /// </returns>
-    private unsafe bool EnsureCapture()
+    private unsafe bool EnsureValidCapture()
     {
-        if (_dib.Bits is not null)
+        if (_dib.Bits is not null && !_recaptureNeeded)
             return true;
 
         _mousePos = MousePosition;
-        return CaptureAt(_mousePos);
+
+        if (!CaptureAt(_mousePos))
+            return false;
+
+        // Even if this is a recapture at the same position, the pixel data may
+        // have changed (e.g, previous capture was from a video playing), so
+        // color resampling and notification should be done regardless
+        SampleColorAndNotify();
+
+        _recaptureNeeded = false;
+
+        return true;
     }
 
     /// <summary>
@@ -780,14 +791,6 @@ public class Loupe : FrameworkElement, IDisposable
             _bitmapDevSize, _bitmapDevSize,
             _dpi.PixelsPerInchX, _dpi.PixelsPerInchY,
             PixelFormats.Bgra32, null);
-
-        // Recapture since the size has changed
-        //
-        // This also means that if pixels from the previous capture have changed,
-        // then the new capture will reflect those changes. It's thus also necessary
-        // to resample the pixel color
-        if (CaptureAt(_mousePos))
-            SampleColorAndNotify();
     }
 
     /// <summary>
@@ -802,6 +805,9 @@ public class Loupe : FrameworkElement, IDisposable
     {
         if (_bitmap is null || _dib.Bits is null)
             return;
+
+        // if (_dib.Width != _gridSize || _dib.Height != _gridSize)
+        //     return;
 
         var gridGapDev = drawGrid ? 1 : 0;
         var dstStride = _bitmap.BackBufferStride;
@@ -943,7 +949,7 @@ public class Loupe : FrameworkElement, IDisposable
 
         // If there's no capture yet (e.g., StartCapture() isn't called, then
         // capture once at cursor
-        if (!EnsureCapture())
+        if (!EnsureValidCapture())
             return;
 
         EnsureBitmapReady(drawGrid);
