@@ -17,7 +17,7 @@ public partial class MainWindow : Window
 
         _loupeWindowCfg = new LoupeWindowConfig
         {
-            RefreshInterval = 30,
+            RefreshInterval = 15,
             ShowInfoPanel = true
         };
     }
