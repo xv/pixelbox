@@ -82,42 +82,6 @@ public partial class LoupeWindow : Window
     }
 
     /// <summary>
-    /// Dependency property for the <see cref="MagnifierX"/> property.
-    /// </summary>
-    private static readonly DependencyProperty MagnifierXProperty =
-        DependencyProperty.Register(
-            nameof(MagnifierX),
-            typeof(double),
-            typeof(LoupeWindow));
-
-    /// <summary>
-    /// Gets or sets the X coordinate of the magnifier window.
-    /// </summary>
-    internal double MagnifierX
-    {
-        get => (double)GetValue(MagnifierXProperty);
-        set => SetValue(MagnifierXProperty, value);
-    }
-
-    /// <summary>
-    /// Dependency property for the <see cref="MagnifierY"/> property.
-    /// </summary>
-    private static readonly DependencyProperty MagnifierYProperty =
-        DependencyProperty.Register(
-            nameof(MagnifierY),
-            typeof(double),
-            typeof(LoupeWindow));
-
-    /// <summary>
-    /// Gets or sets the Y coordinate of the magnifier window.
-    /// </summary>
-    internal double MagnifierY
-    {
-        get => (double)GetValue(MagnifierYProperty);
-        set => SetValue(MagnifierYProperty, value);
-    }
-
-    /// <summary>
     /// Dependency property for the <see cref="OverlayImage"/> property.
     /// </summary>
     private static readonly DependencyProperty OverlayImageProperty =
@@ -445,8 +409,8 @@ public partial class LoupeWindow : Window
         // Flooring (or even ceiling) prevents rounding artifacts noticeable when
         // the mouse move by 1px which sometimes causes the magnifier window to
         // remain still until the mouse moves again.
-        MagnifierX = Math.Floor(left * sx) / sx;
-        MagnifierY = Math.Floor(top * sy) / sy;
+        MagnifierTranslate.X = Math.Floor(left * sx) / sx;
+        MagnifierTranslate.Y = Math.Floor(top * sy) / sy;
     }
 
     #endregion

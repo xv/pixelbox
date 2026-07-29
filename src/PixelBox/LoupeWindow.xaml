@@ -97,12 +97,11 @@
             Opacity="0"
             d:Opacity="1"
             RenderTransformOrigin=".5,.5">
+
             <Grid.RenderTransform>
-                <TranslateTransform
-                    X="{Binding MagnifierX}"
-                    Y="{Binding MagnifierY}"/>
+                <TranslateTransform x:Name="MagnifierTranslate"/>
             </Grid.RenderTransform>
-                
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
