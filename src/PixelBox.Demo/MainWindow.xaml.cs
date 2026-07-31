@@ -20,6 +20,21 @@ public partial class MainWindow : Window
             RefreshInterval = 15,
             ShowInfoPanel = true
         };
+
+        // You can configure various keybindings through this static method prior to
+        // instantiating LoupeWindow
+        //
+        // Besides the configurable keybindings, you can use CTRL or SHIFT + Mouse Wheel
+        // to set the GridSize and PixelSize properties of the Loupe control
+        LoupeWindow.ConfigureKeyBindings(bindings =>
+        {
+            bindings.Close = new KeyBinding
+            {
+                Command = LoupeWindowCommands.Close,
+                Key = Key.Enter, // Just for demo; Enter is already the default
+                Modifiers = ModifierKeys.None
+            };
+        });
     }
 
     private static string RgbStringFromColor(Color color) =>
