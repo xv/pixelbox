@@ -26,6 +26,9 @@ public partial class MainWindow : Window
         //
         // Besides the configurable keybindings, you can use CTRL or SHIFT + Mouse Wheel
         // to set the GridSize and PixelSize properties of the Loupe control
+        //
+        // You can also use the arrow keys to move the cursor pixel by pixel. Holding down
+        // the SHIFT key while using arrow keys will accelerate the movement
         LoupeWindow.ConfigureKeyBindings(bindings =>
         {
             bindings.Close = new KeyBinding

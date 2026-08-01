@@ -76,7 +76,7 @@ internal static class BitmapInterop
             0, 0, width, height,
             hdcScreen,
             left, top,
-            ROP_CODE.SRCCOPY);
+            ROP_CODE.SRCCOPY | ROP_CODE.CAPTUREBLT);
 
         PInvoke.SelectObject(hdcMem, hOld);
         PInvoke.DeleteDC(hdcMem);
