@@ -18,23 +18,35 @@ public class LoupeWindowConfig
         PixelSizeMax = 15;
 
     public const int
-        RefreshIntervalMin = 10,
+        RefreshIntervalMin = 1,
         RefreshIntervalMax = 100;
 
     /// <summary>
     /// <inheritdoc cref="Loupe.GridSize"/>
+    ///
+    /// <para>
+    /// Default is <see cref="GridSizeMin"/>.
+    /// </para>
     /// </summary>
     public int GridSize
     { get; set; } = GridSizeMin;
 
     /// <summary>
     /// <inheritdoc cref="Loupe.PixelSize"/>
+    ///
+    /// <para>
+    /// Default is <see cref="PixelSizeMin"/>.
+    /// </para>
     /// </summary>
     public int PixelSize
     { get; set; } = PixelSizeMin;
 
     /// <summary>
     /// <inheritdoc cref="Loupe.SamplingMode"/>
+    ///
+    /// <para>
+    /// Default is <see cref="PixelSamplingMode.Single"/>.
+    /// </para>
     /// </summary>
     public PixelSamplingMode SamplingMode
     { get; set; } = PixelSamplingMode.Single;
@@ -47,12 +59,20 @@ public class LoupeWindowConfig
 
     /// <summary>
     /// <inheritdoc cref="LoupeWindow.ShowInfoPanel"/>
+    ///
+    /// <para>
+    /// Default is <see langword="true"/>.
+    /// </para>
     /// </summary>
     public bool ShowInfoPanel
     { get; set; } = true;
 
     /// <summary>
     /// <inheritdoc cref="Loupe.RefreshInterval"/>
+    ///
+    /// <para>
+    /// Default is 30 milliseconds.
+    /// </para>
     /// </summary>
     public int RefreshInterval
     { get; set; } = 30;
