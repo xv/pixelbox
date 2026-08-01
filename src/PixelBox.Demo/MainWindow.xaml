@@ -151,16 +151,22 @@
                     RadiusY="2"
                     Effect="{StaticResource RectDropShadowEffect}"/>
 
-                <TextBlock
+                <TextBox
                     x:Name="ColorTextBlock"
                     Grid.Column="1"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    IsReadOnly="True"
                     Text="#" 
                     Foreground="White"/>
 
-                <TextBlock 
-                    x:Name="PositionTextBlock" 
+                <TextBox 
+                    x:Name="PositionTextBlock"
                     Grid.Row="1"
-                    Grid.Column="2" 
+                    Grid.Column="2"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    IsReadOnly="True"
                     Text="X: ? Y: ?"
                     Foreground="White"/>
             </Grid>
