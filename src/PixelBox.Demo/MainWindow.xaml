@@ -17,6 +17,14 @@
     <Window.Resources>
         <converter:RectangleConverter x:Key="RectangleConverter"/>
 
+        <Geometry x:Key="CopyIconGeometry">
+            M20,4V16a2,2,0,0,1-2,2H10a2,2,0,0,1-2-2V4a2,2,0,0,1,2-2h8A2,2,0,0,1,20,4ZM16,21a1,1,0,0,0-1-1H6V6A1,1,0,0,0,4,6V20a2,2,0,0,0,2,2h9A1,1,0,0,0,16,21Z
+        </Geometry>
+
+        <Geometry x:Key="CheckIconGeometry">
+            M9,16.17L4.83,12 3.41,13.41 9,19 21,7 19.59,5.59z
+        </Geometry>
+
         <Style x:Key="KbdStyle" TargetType="Border">
             <Setter Property="Padding" Value="4,2,4,2"/>
             <Setter Property="CornerRadius" Value="3"/>
@@ -25,6 +33,34 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="1,0,1,0"/>
+        </Style>
+
+        <Style x:Key="IconButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#575757"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            Background="{TemplateBinding Background}">
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="#747474"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <DropShadowEffect
@@ -131,6 +167,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
@@ -163,12 +200,30 @@
                 <TextBox 
                     x:Name="PositionTextBlock"
                     Grid.Row="1"
-                    Grid.Column="2"
+                    Grid.Column="1"
                     Background="Transparent"
                     BorderThickness="0"
                     IsReadOnly="True"
                     Text="X: ? Y: ?"
                     Foreground="White"/>
+
+                <Button
+                    x:Name="CopyColorTextButton"
+                    Grid.Column="2"
+                    Style="{StaticResource IconButtonStyle}"
+                    Width="16"
+                    Height="16"
+                    Cursor="Hand"
+                    Focusable="False"
+                    ToolTip="Copy Hex"
+                    Click="CopyColorTextButton_Click">
+                    <Viewbox>
+                        <Path
+                            x:Name="CopyIcon"
+                            Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                            Data="{StaticResource CopyIconGeometry}"/>
+                    </Viewbox>
+                </Button>
             </Grid>
         </Border>
     </Grid>

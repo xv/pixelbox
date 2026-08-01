@@ -89,4 +89,17 @@ public partial class MainWindow : Window
     {
         ShowLoupeWindow();
     }
+
+    private async void CopyColorTextButton_Click(object sender, RoutedEventArgs e)
+    {
+        Clipboard.SetText(ColorTextBlock.Text.Split(' ')[0]);
+
+        CopyIcon.Data = (Geometry)FindResource("CheckIconGeometry");
+        CopyColorTextButton.IsEnabled = false;
+
+        await Task.Delay(1000);
+
+        CopyIcon.Data = (Geometry)FindResource("CopyIconGeometry");
+        CopyColorTextButton.IsEnabled = true;
+    }
 }
