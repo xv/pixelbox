@@ -5,12 +5,12 @@ using System.ComponentModel;
 using System.Windows.Media;
 using System.Windows;
 
-namespace PixelBox.Drawing;
+namespace PixelBox.DrawingVisuals;
 
 /// <summary>
 /// Renders two contrasting rectangle for use as sampling area visual indicators.
 /// </summary>
-internal sealed class SamplingAreaIndicator : DrawingVisual
+internal sealed class SamplingAreaIndicator : InverseScaledDrawingVisual
 {
     #region Fields
 
@@ -18,9 +18,6 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
     private static readonly Pen s_penBlack = new(Brushes.Black, 1);
 
     private readonly Rect[] _rects = new Rect[2];
-
-    private DpiScale _dpi;
-    private ScaleTransform? _scaleTrans;
 
     #endregion
 
@@ -31,54 +28,19 @@ internal sealed class SamplingAreaIndicator : DrawingVisual
     }
 
     /// <summary>
-    /// Configures the internal <see cref="ScaleTransform"/> so that the visual
-    /// is scaled properly regardless of the monitor's current DPI scaling.
-    /// </summary>
-    private void SetScaleTransform()
-    {
-        _scaleTrans ??= new ScaleTransform();
-
-        _scaleTrans.ScaleX = 1.0 / _dpi.DpiScaleX;
-        _scaleTrans.ScaleY = 1.0 / _dpi.DpiScaleY;
-
-        VisualTransform = _scaleTrans;
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="SamplingAreaIndicator"/>
     /// class.
     /// </summary>
     /// 
-    /// /// <param name="dpi">
+    /// <param name="dpi">
     /// DPI scale information.
     /// </param>
-    public SamplingAreaIndicator(DpiScale dpi)
+    public SamplingAreaIndicator(DpiScale dpi) : base(dpi)
     {
         // Small antialiased rects look super ass and this is actually one of
         // the reasons why this class exists
         VisualEdgeMode = EdgeMode.Aliased;
-        _dpi = dpi;
-
-        if (_dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0)
-            SetScaleTransform();
     }
-
-    protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
-    {
-        base.OnDpiChanged(oldDpi, newDpi);
-
-        _dpi = newDpi;
-        SetScaleTransform();
-    }
-
-    /// <summary>
-    /// Manually sets the DPI scale.
-    /// </summary>
-    /// 
-    /// <param name="newDpi">
-    /// The value to set.
-    /// </param>
-    public void SetDpi(DpiScale newDpi) => OnDpiChanged(_dpi, newDpi);
 
     /// <summary>
     /// Sets the area of the sampling indicator.

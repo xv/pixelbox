@@ -232,7 +232,7 @@ internal sealed unsafe class PersistentDibSection : IDisposable
                 _hdcMem,
                 0, 0,
                 _width, _height,
-                ROP_CODE.BLACKNESS);
+                ROP_CODE.WHITENESS);
         }
 
         return PInvoke.BitBlt(

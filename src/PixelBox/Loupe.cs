@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.ComponentModel;
+using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -9,7 +10,7 @@ using System.Windows;
 
 using Windows.Win32;
 
-using PixelBox.Drawing;
+using PixelBox.DrawingVisuals;
 
 namespace PixelBox;
 
@@ -44,6 +45,7 @@ public class Loupe : FrameworkElement, IDisposable
     public event EventHandler<PixelChangedEventArgs>? PixelChanged;
 
     private readonly SamplingAreaIndicator _samplingAreaIndicator;
+    private readonly PixelGridlines _pixelGridlines;
 
     private readonly VisualCollection _visuals;
 
@@ -79,35 +81,6 @@ public class Loupe : FrameworkElement, IDisposable
 
     #endregion
     #region Dependency Properties
-
-    /// <summary>
-    /// Dependency property for the <see cref="Background"/> property.
-    /// </summary>
-    public static readonly DependencyProperty BackgroundProperty =
-        DependencyProperty.Register(
-            nameof(Background),
-            typeof(Brush),
-            typeof(Loupe),
-            new FrameworkPropertyMetadata(Brushes.Black,
-                FrameworkPropertyMetadataOptions.AffectsRender));
-
-    /// <summary>
-    /// Gets or sets the brush used to fill the control's background.
-    /// </summary>
-    /// 
-    /// <remarks>
-    /// When <see cref="ShowGrid"/> is <see langword="true"/>, the control
-    /// leaves gaps between pixels rather than drawing actual grid lines. The
-    /// background brush fills the area behind these gaps, creating the
-    /// appearance of grid lines in the brush's color.
-    /// </remarks>
-    [Category("Appearance")]
-    [Description("Sets the background of the control.")]
-    public Brush Background
-    {
-        get => (Brush)GetValue(BackgroundProperty);
-        set => SetValue(BackgroundProperty, value);
-    }
 
     /// <summary>
     /// Dependency property for the <see cref="GridSize"/> property.
@@ -231,7 +204,6 @@ public class Loupe : FrameworkElement, IDisposable
             typeof(bool),
             typeof(Loupe),
             new FrameworkPropertyMetadata(true,
-                FrameworkPropertyMetadataOptions.AffectsMeasure |
                 FrameworkPropertyMetadataOptions.AffectsRender,
                 OnShowGridChanged));
 
@@ -381,6 +353,7 @@ public class Loupe : FrameworkElement, IDisposable
 
         mag.RecalculateGridMetrics(GridMetricUpdateFlags.Dimension);
         mag.RenderSamplingAreaIndicator();
+        mag.RenderPixelGridlines();
     }
 
     private static void OnPixelSizeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
@@ -392,6 +365,7 @@ public class Loupe : FrameworkElement, IDisposable
 
         mag.RecalculateGridMetrics(GridMetricUpdateFlags.CellSize);
         mag.RenderSamplingAreaIndicator();
+        mag.RenderPixelGridlines();
     }
 
     private static void OnSamplingModeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
@@ -408,8 +382,7 @@ public class Loupe : FrameworkElement, IDisposable
         if (sender is not Loupe mag)
             return;
 
-        mag._recaptureNeeded = true;
-
+        mag._pixelGridlines.Opacity = (bool)e.NewValue ? 1.0 : 0.0;
         mag.RenderSamplingAreaIndicator();
     }
 
@@ -569,22 +542,29 @@ public class Loupe : FrameworkElement, IDisposable
     /// </summary>
     private void RenderSamplingAreaIndicator()
     {
-        var pxCenter = (_pixelSize + (ShowGrid ? 1 : 0)) * _gridSizeHalf;
+        var gridSpacing = ShowGrid ? 0 : 1;
+        var pxCenter = _pixelSize * _gridSizeHalf;
 
         var rect = new Rect(
-            pxCenter, pxCenter,
-            _pixelSize + 1, _pixelSize + 1);
+            pxCenter + gridSpacing, pxCenter + gridSpacing,
+            _pixelSize - gridSpacing, _pixelSize - gridSpacing);
 
-        var samplerSize = (int)SamplingMode / 2;
+        var samplerRadius = (int)SamplingMode / 2;
 
         if (SamplingMode != PixelSamplingMode.Single)
-            rect.Inflate(rect.Width * samplerSize, rect.Height * samplerSize);
-
-        if (!ShowGrid)
-            rect.Inflate(-(samplerSize + 1), -(samplerSize + 1));
+            rect.Inflate(_pixelSize * samplerRadius, _pixelSize * samplerRadius);
 
         _samplingAreaIndicator.SetArea(rect);
         _samplingAreaIndicator.Render();
+    }
+
+    /// <summary>
+    /// Renders pixel gridlines.
+    /// </summary>
+    private void RenderPixelGridlines()
+    {
+        _pixelGridlines.SetGrid(_gridSize, _pixelSize);
+        _pixelGridlines.Render();
     }
 
     /// <summary>
@@ -730,19 +710,6 @@ public class Loupe : FrameworkElement, IDisposable
     }
 
     /// <summary>
-    /// Draws a simulated grid to visualize individual pixel cell boundaries.
-    /// </summary>
-    /// 
-    /// <param name="dc">
-    /// The drawing context to use.
-    /// </param>
-    private void DrawGrid(DrawingContext dc)
-    {
-        dc.DrawRectangle(Background, null,
-            new Rect(0, 0, ActualWidth, ActualHeight));
-    }
-
-    /// <summary>
     /// Ensures that a capture buffer is available. If no previous capture
     /// exists, a new one is performed at the current mouse position.
     /// </summary>
@@ -779,10 +746,9 @@ public class Loupe : FrameworkElement, IDisposable
     /// <param name="drawGrid">
     /// Indicates whether grid gaps should be accounted for in the bitmap size.
     /// </param>
-    private void EnsureBitmapReady(bool drawGrid)
+    private void EnsureBitmapReady()
     {
-        var gridGapDev = drawGrid ? 1 : 0;
-        var totalDev = (_pixelSize * _gridSize) + (gridGapDev * (_gridSize - 1));
+        var totalDev = (_pixelSize * _gridSize);
 
         if (_bitmapDevSize == totalDev)
             return;
@@ -790,9 +756,12 @@ public class Loupe : FrameworkElement, IDisposable
         _bitmapDevSize = totalDev;
 
         _bitmap = new WriteableBitmap(
-            _bitmapDevSize, _bitmapDevSize,
-            _dpi.PixelsPerInchX, _dpi.PixelsPerInchY,
-            PixelFormats.Bgra32, null);
+            _gridSize,
+            _gridSize,
+            _dpi.DpiScaleX,
+            _dpi.DpiScaleY,
+            PixelFormats.Bgra32,
+            null);
     }
 
     /// <summary>
@@ -803,7 +772,7 @@ public class Loupe : FrameworkElement, IDisposable
     /// <param name="drawGrid">
     /// Indicates whether one-pixel gaps should be created between pixel cells.
     /// </param>
-    private unsafe void CopyCaptureToBitmap(bool drawGrid)
+    private unsafe void CopyCaptureToBitmap()
     {
         if (_bitmap is null || _dib.Bits is null)
             return;
@@ -811,38 +780,15 @@ public class Loupe : FrameworkElement, IDisposable
         // if (_dib.Width != _gridSize || _dib.Height != _gridSize)
         //     return;
 
-        var gridGapDev = drawGrid ? 1 : 0;
-        var dstStride = _bitmap.BackBufferStride;
-
         _bitmap.Lock();
 
-        byte* dstBase = (byte*)_bitmap.BackBuffer;
-        byte* srcBase = (byte*)_dib.Bits;
+        NativeMemory.Copy(
+            _dib.Bits,
+            (void*)_bitmap.BackBuffer,
+            (nuint)(_dib.Stride * _dib.Width));
 
-        for (var srcY = 0; srcY < _gridSize; srcY++)
-        {
-            byte* pSrcRow = srcBase + (srcY * _dib.Stride);
-            var dstBlockY = srcY * (_pixelSize + gridGapDev);
+        _bitmap.AddDirtyRect(new Int32Rect(0, 0, _dib.Width, _dib.Height));
 
-            for (var srcX = 0; srcX < _gridSize; srcX++)
-            {
-                byte* pSrc = pSrcRow + srcX * 4;
-
-                var color = (uint)(255 << 24 | pSrc[2] << 16 | pSrc[1] << 8 | pSrc[0]);
-                var dstBlockX = srcX * (_pixelSize + gridGapDev);
-
-                for (var by = 0; by < _pixelSize; by++)
-                {
-                    byte* pDstRow = dstBase + ((dstBlockY + by) * dstStride);
-                    uint* pDst = (uint*)(pDstRow + (dstBlockX * 4));
-
-                    for (var bx = 0; bx < _pixelSize; bx++)
-                        pDst[bx] = color;
-                }
-            }
-        }
-
-        _bitmap.AddDirtyRect(new Int32Rect(0, 0, _bitmapDevSize, _bitmapDevSize));
         _bitmap.Unlock();
     }
 
@@ -884,7 +830,9 @@ public class Loupe : FrameworkElement, IDisposable
         _dib = new PersistentDibSection();
 
         _samplingAreaIndicator = new SamplingAreaIndicator(_dpi);
-        _visuals = new VisualCollection(this) { _samplingAreaIndicator };
+        _pixelGridlines = new PixelGridlines(_dpi);
+
+        _visuals = new VisualCollection(this) { _pixelGridlines, _samplingAreaIndicator  };
 
         _refreshTimer = new DispatcherTimer(DispatcherPriority.Render)
         {
@@ -894,6 +842,7 @@ public class Loupe : FrameworkElement, IDisposable
 
         RecalculateGridMetrics(GridMetricUpdateFlags.All);
         RenderSamplingAreaIndicator();
+        RenderPixelGridlines();
 
         if (_dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0)
             SetScaleTransform();
@@ -915,9 +864,6 @@ public class Loupe : FrameworkElement, IDisposable
     {
         var sizeDev = _gridSize * _pixelSize;
 
-        if (ShowGrid)
-            sizeDev += _gridSize - 1;
-
         return new Size(
             sizeDev / _dpi.DpiScaleX,
             sizeDev / _dpi.DpiScaleY);
@@ -929,6 +875,7 @@ public class Loupe : FrameworkElement, IDisposable
 
         _dpi = newDpi;
         _samplingAreaIndicator.SetDpi(_dpi);
+        _pixelGridlines.SetDpi(_dpi);
 
         SetScaleTransform();
 
@@ -943,19 +890,13 @@ public class Loupe : FrameworkElement, IDisposable
         if (RenderDesignTimePlaceholder(dc, _dpi))
             return;
 
-        // Since the "grid" is really nothing more than gaps between pixels,
-        // simply draw a background behind to simulate grid lines
-        var drawGrid = ShowGrid;
-        if (drawGrid)
-            DrawGrid(dc);
-
         // If there's no capture yet (e.g., StartCapture() isn't called, then
         // capture once at cursor
         if (!EnsureValidCapture())
             return;
 
-        EnsureBitmapReady(drawGrid);
-        CopyCaptureToBitmap(drawGrid);
+        EnsureBitmapReady();
+        CopyCaptureToBitmap();
         DrawBitmap(dc);
     }
 
