@@ -453,6 +453,7 @@ public partial class LoupeWindow : Window
         // (e.g., button with hover effects), the overlay properly reflects the
         // original UI state
         OverlayImage = CaptureDesktopScreen();
+        OverlayImage?.Freeze();
 
         UpdateMagnifierPosition(GetMousePosition());
     }
