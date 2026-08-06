@@ -83,7 +83,9 @@
 
     <Canvas
         UseLayoutRounding="True"
-        SnapsToDevicePixels="True">
+        SnapsToDevicePixels="True"
+        Focusable="False"
+        IsHitTestVisible="False">
         <Canvas.Background>
             <ImageBrush
                 ImageSource="{Binding OverlayImage}"
