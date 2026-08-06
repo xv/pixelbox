@@ -71,16 +71,16 @@ var position = picker.PixelPosition;
 
 The magnifier window uses the following keybinds by default:
 
-| **Command**                                     | **Keybind**                          |
-|-------------------------------------------------|--------------------------------------|
-| `LoupeWindowCommands.ToggleGrid`                | <kbd>G</kbd>                         |
-| `LoupeWindowCommands.IncreaseGridSize`          | <kbd>Shift</kbd> <kbd>OemPlus</kbd>  |
-| `LoupeWindowCommands.DecreaseGridSize`          | <kbd>Shift</kbd> <kbd>OemMinus</kbd> |
-| `LoupeWindowCommands.IncreasePixelSize`         | <kbd>Ctrl</kbd> <kbd>OemPlus</kbd>   |
-| `LoupeWindowCommands.DecreasePixelSize`         | <kbd>Ctrl</kbd> <kbd>OemMinus</kbd>  |
-| `LoupeWindowCommands.IncreaseColorSamplerSize`  | <kbd>OemPlus</kbd>                   |
-| `LoupeWindowCommands.DecreaseColorSamplerSize`  | <kbd>OemMinus</kbd>                  |
-| `LoupeWindowCommands.Close`                     | <kbd>Enter</kbd>                     |
+| **Command**                                     | **Keybind**                          | **Alternative Input**               |
+|-------------------------------------------------|--------------------------------------|-------------------------------------|
+| `LoupeWindowCommands.ToggleGrid`                | <kbd>G</kbd>                         |                                     |
+| `LoupeWindowCommands.IncreaseGridSize`          | <kbd>Shift</kbd> <kbd>OemPlus</kbd>  | <kbd>Shift</kbd> `Mouse Wheel Up`   |
+| `LoupeWindowCommands.DecreaseGridSize`          | <kbd>Shift</kbd> <kbd>OemMinus</kbd> | <kbd>Shift</kbd> `Mouse Wheel Down` |
+| `LoupeWindowCommands.IncreasePixelSize`         | <kbd>Ctrl</kbd> <kbd>OemPlus</kbd>   | <kbd>Ctrl</kbd> `Mouse Wheel Up`    |
+| `LoupeWindowCommands.DecreasePixelSize`         | <kbd>Ctrl</kbd> <kbd>OemMinus</kbd>  | <kbd>Ctrl</kbd> `Mouse Wheel Down`  |
+| `LoupeWindowCommands.IncreaseColorSamplerSize`  | <kbd>OemPlus</kbd>                   |                                     |
+| `LoupeWindowCommands.DecreaseColorSamplerSize`  | <kbd>OemMinus</kbd>                  |                                     |
+| `LoupeWindowCommands.Close`                     | <kbd>Enter</kbd>                     |                                     |
 
 > [!NOTE]
 > <kbd>OemPlus</kbd> and <kbd>OemMinus</kbd> are the <kbd>+</kbd> and <kbd>-</kbd> keys to the left of <kbd>Backspace</kbd>. However, they may vary on non-US keyboards.
