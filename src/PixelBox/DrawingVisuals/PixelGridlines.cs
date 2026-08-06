@@ -1,6 +1,7 @@
 ﻿// Copyright 2026 Jad Altahan <xv.git@aol.com>
 // SPDX-License-Identifier: MIT
 
+using System.ComponentModel;
 using System.Windows.Media;
 using System.Windows;
 
@@ -65,6 +66,9 @@ internal sealed class PixelGridlines : InverseScaledDrawingVisual
     /// </summary>
     public void Render()
     {
+        if (DesignerProperties.GetIsInDesignMode(this))
+            return;
+
         using var dc = RenderOpen();
 
         double size = _gridSize * _pixelSize;
