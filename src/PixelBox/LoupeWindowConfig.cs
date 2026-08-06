@@ -29,7 +29,7 @@ public class LoupeWindowConfig
     /// </para>
     /// </summary>
     public int GridSize
-    { get; set; } = GridSizeMin;
+    { get; set; } = 17;
 
     /// <summary>
     /// <inheritdoc cref="Loupe.PixelSize"/>
@@ -39,7 +39,7 @@ public class LoupeWindowConfig
     /// </para>
     /// </summary>
     public int PixelSize
-    { get; set; } = PixelSizeMin;
+    { get; set; } = 8;
 
     /// <summary>
     /// <inheritdoc cref="Loupe.SamplingMode"/>
