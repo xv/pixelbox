@@ -40,8 +40,8 @@ Quick Start
         xmlns:pb="clr-namespace:PixelBox;assembly=PixelBox">
     <Grid>
         <!-- The control size of Loupe is automatically determiend via its
-             GridSize, PixelSize, and ShowGrid properties. The control size
-             should not be set manually. -->
+             GridSize, PixelSize properties. The control size should not
+             be set manually! -->
         <pb:Loupe HorizontalAlignment="Left" VerticalAlignment="Top"
             GridSize="15"
             PixelSize="10"
