@@ -19,7 +19,7 @@ public partial class MainWindow : Window
         {
             // A lower value will result in a smoother experience, but will also result
             // in higher CPU usage due to the more frequent screen captures. An ideal
-            // value is between 15 throuh 30
+            // value is between 15 through 30
             RefreshInterval = 15,
 
             ShowInfoPanel = true

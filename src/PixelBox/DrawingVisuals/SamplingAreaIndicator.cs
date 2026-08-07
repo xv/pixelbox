@@ -8,7 +8,7 @@ using System.Windows;
 namespace PixelBox.DrawingVisuals;
 
 /// <summary>
-/// Renders two contrasting rectangle for use as sampling area visual indicators.
+/// Renders two contrasting rectangles for use as sampling area visual indicators.
 /// </summary>
 internal sealed class SamplingAreaIndicator : InverseScaledDrawingVisual
 {
@@ -72,7 +72,7 @@ internal sealed class SamplingAreaIndicator : InverseScaledDrawingVisual
 
         using var dc = RenderOpen();
 
-        dc.DrawRectangle(null, s_penWhite, _rects[0]);
-        dc.DrawRectangle(null, s_penBlack, _rects[1]);
+        dc.DrawRectangle(null, s_penBlack, _rects[0]);
+        dc.DrawRectangle(null, s_penWhite, _rects[1]);
     }
 }
