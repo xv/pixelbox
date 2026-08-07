@@ -626,11 +626,12 @@ public class Loupe : FrameworkElement, IDisposable
 
         if (mode == PixelSamplingMode.Single)
         {
-            var idx = (_gridSizeHalf * dibStride) + (_gridSizeHalf * 4);
+            var pixel = dibBits + (_gridSizeHalf * dibStride) + (_gridSizeHalf * 4);
+
             return Color.FromRgb(
-                *(dibBits + idx + 2 /* R */),
-                *(dibBits + idx + 1 /* G */),
-                *(dibBits + idx + 0 /* B */));
+                pixel[2],
+                pixel[1],
+                pixel[0]);
         }
 
         var kSize = (int)mode;
@@ -645,12 +646,16 @@ public class Loupe : FrameworkElement, IDisposable
 
         for (int y = 0; y < kSize; y++)
         {
+            var pixel = dibBits + ((first + y) * dibStride) + (first * 4);
+
             for (int x = 0; x < kSize; x++)
             {
-                var idx = (first + y) * dibStride + (first + x) * 4;
-                bSum += *(dibBits + idx + 0);
-                gSum += *(dibBits + idx + 1);
-                rSum += *(dibBits + idx + 2);
+                bSum += pixel[0];
+                gSum += pixel[1];
+                rSum += pixel[2];
+
+                // Advance to the next pixel since 4 bytes per pixel in BGRA
+                pixel += 4;
             }
         }
 
