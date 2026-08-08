@@ -105,7 +105,7 @@ public partial class LoupeWindow : Window
         set => SetValue(OverlayImageProperty, value);
     }
 
-    /// <inheritdoc cref="Loupe.PixelColor"/>
+    /// <inheritdoc cref="PixelChangedEventArgs.Color"/>
     public Color PixelColor
     {
         get => (Color)GetValue(PixelColorProperty);
@@ -142,7 +142,7 @@ public partial class LoupeWindow : Window
             typeof(LoupeWindow),
             new PropertyMetadata(new ColorToStringConverter()));
 
-    /// <inheritdoc cref="Loupe.PixelPosition"/>
+    /// <inheritdoc cref="PixelChangedEventArgs.ScreenPosition"/>
     public Point PixelPosition
     {
         get => (Point)GetValue(PixelPositionProperty);
