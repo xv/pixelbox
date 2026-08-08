@@ -469,9 +469,6 @@ public partial class LoupeWindow : Window
     {
         base.OnClosing(e);
 
-        PixelColor = Magnifier.PixelColor;
-        PixelPosition = Magnifier.PixelPosition;
-
         ExtractConfig();
     }
 

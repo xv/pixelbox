@@ -243,29 +243,6 @@ public class Loupe : FrameworkElement, IDisposable
     public bool IsCapturing => _refreshTimer.IsEnabled;
 
     /// <summary>
-    /// Gets the color corresponding to the pixel located at
-    /// the center of the grid.
-    ///
-    /// <para>
-    /// If <see cref="SamplingMode"/> is not <see cref="PixelSamplingMode.Single"/>,
-    /// then the average color of pixels in the sampling region is retrieved.
-    /// </para>
-    /// </summary>
-    [Browsable(false)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    [EditorBrowsable(EditorBrowsableState.Always)]
-    public Color PixelColor => _sampledColor;
-
-    /// <summary>
-    /// Gets the screen coordinates corresponding to the pixel located at
-    /// the center of the grid.
-    /// </summary>
-    [Browsable(false)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    [EditorBrowsable(EditorBrowsableState.Always)]
-    public Point PixelPosition => _mousePos;
-
-    /// <summary>
     /// Gets or sets whether both X and Y screen coordinates are locked.
     /// </summary>
     [Browsable(false)]
