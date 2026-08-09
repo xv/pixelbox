@@ -32,23 +32,37 @@ Quick Start
 ### Using the Control Directly
 
 > [!CAUTION]
-> `Loupe` uses unmanaged resources and implements `IDisposable`. Call `Dispose()` when the control is no longer needed to properly release resources it holds.
+> `Loupe` holds unmanaged resources for its lifetime and implements `IDisposable`. Call `Dispose()` when the control is no longer needed to properly release these resources.
 
 ```xml
 <Window x:Class="WpfApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:pb="clr-namespace:PixelBox;assembly=PixelBox">
     <Grid>
-        <!-- The control size of Loupe is automatically determiend via its
-             GridSize, PixelSize properties. The control size should not
-             be set manually! -->
+        <!-- The size of the Loupe control is automatically determined by its
+             GridSize and PixelSize properties. Do not set the control size
+             manually -->
         <pb:Loupe HorizontalAlignment="Left" VerticalAlignment="Top"
             GridSize="15"
             PixelSize="10"
             ShowGrid="True"
-            RefreshInterval="30"/>
+            RefreshInterval="30"
+            PixelChanged="OnPixelChanged"/>
     </Grid>
 </Window>
+```
+
+The `PixelChanged` event is raised whenever the sampled pixel changes. You can use this event to receive the new sampled color and screen position.
+
+```csharp
+private Color _color;
+private Point _position;
+
+private void OnPixelChanged(object? sender, PixelChangedEventArgs e)
+{
+    _color = e.Color;
+    _position = e.ScreenPosition;
+}
 ```
 
 ### Using the Built-In Window
@@ -83,7 +97,7 @@ The magnifier window uses the following keybinds by default:
 | `LoupeWindowCommands.Close`                     | <kbd>Enter</kbd>                     |                                     |
 
 > [!NOTE]
-> <kbd>OemPlus</kbd> and <kbd>OemMinus</kbd> are the <kbd>+</kbd> and <kbd>-</kbd> keys to the left of <kbd>Backspace</kbd>. However, they may vary on non-US keyboards.
+> <kbd>OemPlus</kbd> and <kbd>OemMinus</kbd> are the <kbd>+</kbd> and <kbd>-</kbd> keys to the left of <kbd>Backspace</kbd>. However, they may vary on non-US keyboard layouts.
 
 You can remap the keybinds for any of the listed commands before instantiating the window:
 ```csharp
