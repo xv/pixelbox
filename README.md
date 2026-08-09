@@ -66,6 +66,8 @@ private void OnPixelChanged(object? sender, PixelChangedEventArgs e)
 }
 ```
 
+The `Loupe` control does not automatically capture the screen. You must call `StartCapture()` to begin capturing, and `StopCapture()` to stop.
+
 ### Using the Built-In Window
 
 > [!TIP]
