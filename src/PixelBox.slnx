@@ -2,7 +2,6 @@
   <Folder Name="/Solution Items/">
     <File Path="../.editorconfig" />
     <File Path="../.gitignore" />
-    <File Path="../README.md" />
   </Folder>
   <Project Path="PixelBox.Demo/PixelBox.Demo.csproj" />
   <Project Path="PixelBox/PixelBox.csproj" />

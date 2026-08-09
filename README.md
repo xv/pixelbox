@@ -13,6 +13,7 @@ In a nutshell, what the control can provide is:
 
 Here's a quick demo of the built-in magnifier window:
 
+<!-- Full URL is used here to make it display properly on nuget.org -->
 ![demo](https://github.com/xv/PixelBox.WPF/blob/master/media/demo.gif)
 
 Requirements
