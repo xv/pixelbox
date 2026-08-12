@@ -251,7 +251,6 @@ public partial class LoupeWindow : Window
 
         Magnifier.SamplingMode = _config.SamplingMode;
         Magnifier.ShowGrid = _config.ShowGrid;
-        Magnifier.ShowGrid = _config.ShowGrid;
         ShowInfoPanel = _config.ShowInfoPanel;
     }
 
