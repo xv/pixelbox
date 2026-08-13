@@ -68,6 +68,37 @@ private void OnPixelChanged(object? sender, PixelChangedEventArgs e)
 
 The `Loupe` control does not automatically capture the screen. You must call `StartCapture()` to begin capturing, and `StopCapture()` to stop.
 
+#### Public API
+The `Loupe` control exposes the public APIs listed in the tables below.
+
+| **API**                 | **Type**            |
+|-------------------------|---------------------|
+| `Loupe.GridSize`        | Dependency Property |
+| `Loupe.PixelSize`       | Dependency Property |
+| `Loupe.RefreshInterval` | Dependency Property |
+| `Loupe.SamplingMode`    | Dependency Property |
+| `Loupe.ShowGrid`        | Dependency Property |
+
+| **API**                 | **Type**     |
+|-------------------------|--------------|
+| `Loupe.IsCapturing`     | CLR Property |
+| `Loupe.PositionLocked`  | CLR Property |
+| `Loupe.PositionXLocked` | CLR Property |
+| `Loupe.PositionYLocked` | CLR Property |
+
+| **API**                                 | **Type** |
+|-----------------------------------------|----------|
+| `Loupe.StartCapture()`                  | Method   |
+| `Loupe.StopCapture()`                   | Method   |
+| `Loupe.ToggleCapture()`                 | Method   |
+| `Loupe.LockPosition(Point)`             | Method   |
+| `Loupe.LockPosition(Point, bool, bool)` | Method   |
+| `Loupe.LockPositionX()`                 | Method   |
+| `Loupe.LockPositionY()`                 | Method   |
+| `Loupe.UnlockPositionX()`               | Method   |
+| `Loupe.UnlockPositionY()`               | Method   |
+| `Loupe.UnlockPosition()`                | Method   |
+
 ### Using the Built-In Window
 
 > [!TIP]
