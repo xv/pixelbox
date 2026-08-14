@@ -870,7 +870,9 @@ public class Loupe : FrameworkElement, IDisposable
         SetScaleTransform();
 
         RecalculateGridMetrics(GridMetricUpdateFlags.All);
+
         RenderSamplingAreaIndicator();
+        RenderPixelGridlines();
     }
 
     protected override void OnRender(DrawingContext dc)
