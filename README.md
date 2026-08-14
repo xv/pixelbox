@@ -1,4 +1,9 @@
-﻿About
+<p align="left">
+  <img src="https://github.com/xv/pixelbox/blob/master/assets/banner.svg" 
+       alt="banner" style="width: 300px; height: auto; text-align: left">
+</p>
+
+About
 -----
 PixelBox is a fast and customizable BitBlt-based pixel magnification control for WPF. The library contains the standalone magnifier control itself, and a ready-to-use mouse-tracked pixel magnifier and color picker window, similar to what you would find in browser developer tools.
 
