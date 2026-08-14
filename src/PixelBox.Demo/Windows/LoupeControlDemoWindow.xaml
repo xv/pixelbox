@@ -1,0 +1,21 @@
+﻿<Window x:Class="PixelBox.Demo.Windows.LoupeControlDemoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PixelBox.Demo"
+        xmlns:PixelBox="clr-namespace:PixelBox;assembly=PixelBox"
+        mc:Ignorable="d"
+        Title="Loupe Control Demo"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="CanMinimize"
+        AllowsTransparency="False">
+    <Grid>
+        <PixelBox:Loupe
+            x:Name="Magnifier"
+            PixelSize="9"
+            GridSize="35"
+            RefreshInterval="15"/>
+    </Grid>
+</Window>

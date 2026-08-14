@@ -2,16 +2,16 @@
 using System.Windows.Media;
 using System.Windows;
 
-namespace PixelBox.Demo;
+namespace PixelBox.Demo.Windows;
 
 /// <summary>
-/// Interaction logic for MainWindow.xaml
+/// Interaction logic for LoupeWindowDemoWindow.xaml
 /// </summary>
-public partial class MainWindow : Window
+public partial class LoupeWindowDemoWindow : Window
 {
     private readonly LoupeWindowConfig _loupeWindowCfg;
 
-    public MainWindow()
+    public LoupeWindowDemoWindow()
     {
         InitializeComponent();
 
@@ -59,8 +59,8 @@ public partial class MainWindow : Window
         var loupe = new LoupeWindow(_loupeWindowCfg);
 
         // ShowDialog() will return true if the window was closed via either ENTER key
-        // (by defalt) or MOUSE LEFT CLICK. You can use the return result to update your
-        // UI conditionally
+        // (by default) or MOUSE LEFT CLICK. You can use the return result to update
+        // your UI conditionally
         //
         // ESC key acts as a cancel button. It will close the window but ShowDialog()
         // will return false

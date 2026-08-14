@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 
+using PixelBox.Demo.Windows;
+
 namespace PixelBox.Demo;
 
 /// <summary>
@@ -11,7 +13,7 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        var main = new MainWindow();
+        var main = new LoupeWindowDemoWindow();
         main.ShowDialog();
     }
 }
