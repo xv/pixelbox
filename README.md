@@ -21,12 +21,14 @@ Requirements
 - **Operating System**: Windows 7 SP1 or later.
 - **.NET**: [8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) or later (uses C# 12 features).
 
+<!--
 Installation
 ------------
 You can install PixelBox either by downloading a release from this repository and referencing it manually in your project, or by using NuGet:
 ```console
 dotnet add package PixelBox
 ```
+-->
 
 Quick Start
 -----------
