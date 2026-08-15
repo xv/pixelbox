@@ -22,7 +22,6 @@ public class Loupe : FrameworkElement, IDisposable
     #region Fields
 
     private DpiScale _dpi;
-    private ScaleTransform? _scaleTrans;
 
     private readonly DispatcherTimer _refreshTimer;
 
@@ -485,17 +484,6 @@ public class Loupe : FrameworkElement, IDisposable
     public void UnlockPosition() => PositionLocked = false;
 
     /// <summary>
-    /// Configures the internal <see cref="ScaleTransform"/> so that the visual
-    /// is scaled properly regardless of the monitor's current DPI scaling.
-    /// </summary>
-    private void SetScaleTransform()
-    {
-        _scaleTrans ??= new ScaleTransform();
-        _scaleTrans.ScaleX = 1.0 / _dpi.DpiScaleX;
-        _scaleTrans.ScaleY = 1.0 / _dpi.DpiScaleY;
-    }
-
-    /// <summary>
     /// Recalculates grid metric values based on the specified update flags.
     /// </summary>
     /// 
@@ -748,8 +736,8 @@ public class Loupe : FrameworkElement, IDisposable
         _bitmap = new WriteableBitmap(
             _gridSize,
             _gridSize,
-            _dpi.DpiScaleX,
-            _dpi.DpiScaleY,
+            96.0 * _dpi.DpiScaleX,
+            96.0 * _dpi.DpiScaleY,
             PixelFormats.Bgra32,
             null);
     }
@@ -792,15 +780,8 @@ public class Loupe : FrameworkElement, IDisposable
     /// </param>
     private void DrawBitmap(DrawingContext dc)
     {
-        var useScale = _scaleTrans is not null;
-
-        if (useScale)
-            dc.PushTransform(_scaleTrans);
-
-        dc.DrawImage(_bitmap!, new Rect(0, 0, _bitmapDevSize, _bitmapDevSize));
-
-        if (useScale)
-            dc.Pop();
+        var sizeDip = _bitmapDevSize / _dpi.DpiScaleX;
+        dc.DrawImage(_bitmap!, new Rect(0, 0, sizeDip, sizeDip));
     }
 
     #endregion
@@ -822,7 +803,7 @@ public class Loupe : FrameworkElement, IDisposable
         _samplingAreaIndicator = new SamplingAreaIndicator(_dpi);
         _pixelGridlines = new PixelGridlines(_dpi);
 
-        _visuals = new VisualCollection(this) { _pixelGridlines, _samplingAreaIndicator  };
+        _visuals = new VisualCollection(this) { _pixelGridlines, _samplingAreaIndicator };
 
         _refreshTimer = new DispatcherTimer(DispatcherPriority.Render)
         {
@@ -833,9 +814,6 @@ public class Loupe : FrameworkElement, IDisposable
         RecalculateGridMetrics(GridMetricUpdateFlags.All);
         RenderSamplingAreaIndicator();
         RenderPixelGridlines();
-
-        if (_dpi.DpiScaleX != 1.0 || _dpi.DpiScaleY != 1.0)
-            SetScaleTransform();
 
         Loaded += (_, _) => _refreshTimer.Tick += OnRefreshTimerTick;
 
@@ -864,10 +842,9 @@ public class Loupe : FrameworkElement, IDisposable
         base.OnDpiChanged(oldDpi, newDpi);
 
         _dpi = newDpi;
+
         _samplingAreaIndicator.SetDpi(_dpi);
         _pixelGridlines.SetDpi(_dpi);
-
-        SetScaleTransform();
 
         RecalculateGridMetrics(GridMetricUpdateFlags.All);
 
