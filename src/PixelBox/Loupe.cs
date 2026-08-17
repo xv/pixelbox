@@ -792,8 +792,8 @@ public class Loupe : FrameworkElement, IDisposable
     public Loupe()
     {
         RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
+        RenderOptions.SetEdgeMode(this, EdgeMode.Aliased);
 
-        SnapsToDevicePixels = true;
         Focusable = false;
 
         _dpi = VisualTreeHelper.GetDpi(this);
