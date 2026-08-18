@@ -629,7 +629,7 @@ public class Loupe : FrameworkElement, IDisposable
                 gSum += pixel[1];
                 rSum += pixel[2];
 
-                // Advance to the next pixel since 4 bytes per pixel in BGRA
+                // Advance to the next pixel since 4 bytes per pixel in BGR32
                 pixel += 4;
             }
         }
@@ -750,7 +750,7 @@ public class Loupe : FrameworkElement, IDisposable
             _gridSize,
             _dpi.PixelsPerInchX,
             _dpi.PixelsPerInchY,
-            PixelFormats.Bgra32,
+            PixelFormats.Bgr32,
             null);
     }
 
@@ -766,9 +766,6 @@ public class Loupe : FrameworkElement, IDisposable
     {
         if (_bitmap is null || _dib.Bits is null)
             return;
-
-        // if (_dib.Width != _gridSize || _dib.Height != _gridSize)
-        //     return;
 
         _bitmap.Lock();
 
