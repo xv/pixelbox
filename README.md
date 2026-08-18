@@ -1,5 +1,5 @@
 <p align="left">
-  <img src="https://github.com/xv/pixelbox/blob/master/assets/banner.svg" 
+  <img src="https://github.com/xv/pixelbox/blob/master/assets/banner/banner.svg" 
        alt="banner" style="width: 300px; height: auto; text-align: left">
 </p>
 
@@ -19,7 +19,7 @@ In a nutshell, what the control can provide is:
 Here's a quick demo of the built-in magnifier window:
 
 <!-- Full URL is used here to make it display properly on nuget.org -->
-![demo](https://github.com/xv/pixelbox/blob/master/media/demo.gif)
+![demo](https://github.com/xv/pixelbox/blob/master/assets/media/demo.gif)
 
 Requirements
 ------------
