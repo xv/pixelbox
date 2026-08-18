@@ -25,7 +25,7 @@ public class Loupe : FrameworkElement, IDisposable
 
     private readonly DispatcherTimer _refreshTimer;
 
-    private int _pixelSize;
+    private Size _pixelSize;
     private int _gridSize;
     private int _gridSizeHalf;
 
@@ -37,7 +37,7 @@ public class Loupe : FrameworkElement, IDisposable
 
     private readonly PersistentDibSection _dib;
     private WriteableBitmap? _bitmap;
-    private int _bitmapDevSize = 0;
+    private Size _bitmapDevSize;
 
     private bool _recaptureNeeded;
 
@@ -493,7 +493,12 @@ public class Loupe : FrameworkElement, IDisposable
     private void RecalculateGridMetrics(GridMetricUpdateFlags flags)
     {
         if ((flags & GridMetricUpdateFlags.CellSize) != 0)
-            _pixelSize = (int)Math.Round(PixelSize * _dpi.DpiScaleX);
+        {
+            _pixelSize = new Size(
+                (int)Math.Round(PixelSize * _dpi.DpiScaleX),
+                (int)Math.Round(PixelSize * _dpi.DpiScaleY));
+
+        }
 
         if ((flags & GridMetricUpdateFlags.Dimension) != 0)
         {
@@ -508,20 +513,25 @@ public class Loupe : FrameworkElement, IDisposable
     private void RenderSamplingAreaIndicator()
     {
         var offset = ShowGrid ? 0 : 1;
-        var pxCenter = _pixelSize * _gridSizeHalf;
+
+        var pxCenter = new Point(
+            _pixelSize.Width * _gridSizeHalf,
+            _pixelSize.Height * _gridSizeHalf);
 
         var rect = new Rect(
-            pxCenter + offset,
-            pxCenter + offset,
-            _pixelSize - offset,
-            _pixelSize - offset);
+            pxCenter.X + offset,
+            pxCenter.Y + offset,
+            _pixelSize.Width - offset,
+            _pixelSize.Height - offset);
 
         if (SamplingMode != PixelSamplingMode.Single)
         {
             var radius = (int)SamplingMode / 2;
-            var samplingSize = _pixelSize * radius;
 
-            rect.Inflate(samplingSize, samplingSize);
+            var w = _pixelSize.Width * radius;
+            var h = _pixelSize.Height * radius;
+
+            rect.Inflate(w, h);
         }
 
         // Exaggerate the indicator size slightly for better visibility
@@ -726,7 +736,9 @@ public class Loupe : FrameworkElement, IDisposable
     /// </param>
     private void EnsureBitmapReady()
     {
-        var totalDev = (_pixelSize * _gridSize);
+        var totalDev = new Size(
+            _pixelSize.Width * _gridSize,
+            _pixelSize.Height * _gridSize);
 
         if (_bitmapDevSize == totalDev)
             return;
@@ -736,8 +748,8 @@ public class Loupe : FrameworkElement, IDisposable
         _bitmap = new WriteableBitmap(
             _gridSize,
             _gridSize,
-            96.0 * _dpi.DpiScaleX,
-            96.0 * _dpi.DpiScaleY,
+            _dpi.PixelsPerInchX,
+            _dpi.PixelsPerInchY,
             PixelFormats.Bgra32,
             null);
     }
@@ -780,8 +792,10 @@ public class Loupe : FrameworkElement, IDisposable
     /// </param>
     private void DrawBitmap(DrawingContext dc)
     {
-        var sizeDip = _bitmapDevSize / _dpi.DpiScaleX;
-        dc.DrawImage(_bitmap!, new Rect(0, 0, sizeDip, sizeDip));
+        var wDip = _bitmapDevSize.Width / _dpi.DpiScaleX;
+        var hDip = _bitmapDevSize.Height / _dpi.DpiScaleY;
+
+        dc.DrawImage(_bitmap!, new Rect(0, 0, wDip, hDip));
     }
 
     #endregion
@@ -830,11 +844,13 @@ public class Loupe : FrameworkElement, IDisposable
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        var sizeDev = _gridSize * _pixelSize;
+        var sizeDev = new Size(
+            _gridSize * _pixelSize.Width,
+            _gridSize * _pixelSize.Height);
 
         return new Size(
-            sizeDev / _dpi.DpiScaleX,
-            sizeDev / _dpi.DpiScaleY);
+            sizeDev.Width / _dpi.DpiScaleX,
+            sizeDev.Height / _dpi.DpiScaleY);
     }
 
     protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)

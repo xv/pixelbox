@@ -17,7 +17,7 @@ internal sealed class PixelGridlines : InverseScaledDrawingVisual
     private static readonly Pen s_pen = new(Brushes.Black, 1);
 
     private int _gridSize;
-    private int _pixelSize;
+    private Size _pixelSize;
 
     #endregion
 
@@ -49,7 +49,7 @@ internal sealed class PixelGridlines : InverseScaledDrawingVisual
     /// <param name="pixelSize">
     /// The size of each pixel in the grid.
     /// </param>
-    public void SetGrid(int gridSize, int pixelSize)
+    public void SetGrid(int gridSize, Size pixelSize)
     {
         if (_gridSize == gridSize &&
             _pixelSize == pixelSize)
@@ -71,26 +71,25 @@ internal sealed class PixelGridlines : InverseScaledDrawingVisual
 
         using var dc = RenderOpen();
 
-        double size = _gridSize * _pixelSize;
+        var w = _gridSize * _pixelSize.Width;
+        var h = _gridSize * _pixelSize.Height;
 
-        for (var x = 1; x < _gridSize; x++)
+        for (var row = 1; row < _gridSize; row++)
         {
-            double px = x * _pixelSize;
+            var y = row * _pixelSize.Height;
 
-            dc.DrawLine(
-                s_pen,
-                new Point(0, px),
-                new Point(size, px));
+            dc.DrawLine(s_pen,
+                new Point(0, y),
+                new Point(w, y));
         }
 
-        for (var y = 1; y < _gridSize; y++)
+        for (var col = 1; col < _gridSize; col++)
         {
-            double py = y * _pixelSize;
+            var x = col * _pixelSize.Width;
 
-            dc.DrawLine(
-                s_pen,
-                new Point(py, 0),
-                new Point(py, size));
+            dc.DrawLine(s_pen,
+                new Point(x, 0),
+                new Point(x, h));
         }
     }
 }
