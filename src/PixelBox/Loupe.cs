@@ -512,32 +512,7 @@ public class Loupe : FrameworkElement, IDisposable
     /// </summary>
     private void RenderSamplingAreaIndicator()
     {
-        var offset = ShowGrid ? 0 : 1;
-
-        var pxCenter = new Point(
-            _pixelSize.Width * _gridSizeHalf,
-            _pixelSize.Height * _gridSizeHalf);
-
-        var rect = new Rect(
-            pxCenter.X + offset,
-            pxCenter.Y + offset,
-            _pixelSize.Width - offset,
-            _pixelSize.Height - offset);
-
-        if (SamplingMode != PixelSamplingMode.Single)
-        {
-            var radius = (int)SamplingMode / 2;
-
-            var w = _pixelSize.Width * radius;
-            var h = _pixelSize.Height * radius;
-
-            rect.Inflate(w, h);
-        }
-
-        // Exaggerate the indicator size slightly for better visibility
-        rect.Inflate(2, 2);
-
-        _samplingAreaIndicator.SetArea(rect);
+        _samplingAreaIndicator.SetArea(_gridSize, _pixelSize, (int)SamplingMode, ShowGrid);
         _samplingAreaIndicator.Render();
     }
 

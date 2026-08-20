@@ -43,14 +43,50 @@ internal sealed class SamplingAreaIndicator : InverseScaledDrawingVisual
     }
 
     /// <summary>
-    /// Sets the area of the sampling indicator.
+    /// Sets the sampling indicator area.
     /// </summary>
     /// 
-    /// <param name="rect">
-    /// The rectangle representing the sampling area.
+    /// <param name="gridSize">
+    /// The size of the square grid.
     /// </param>
-    public void SetArea(Rect rect)
+    /// 
+    /// <param name="cellSize">
+    /// The size of each pixel cell in the grid.
+    /// </param>
+    /// 
+    /// <param name="kernelSize">
+    /// The size of the square sampling kernel.
+    /// </param>
+    /// 
+    /// <param name="gridDrawn"> 
+    /// Indicates whether gridlines are currently drawn.
+    /// </param>
+    public void SetArea(int gridSize, Size cellSize, int kernelSize, bool gridDrawn)
     {
+        var offset = gridDrawn ? 0 : 1;
+
+        var center = new Point(
+            cellSize.Width * (gridSize / 2),
+            cellSize.Height * (gridSize / 2));
+
+        var rect = new Rect(
+            center.X + offset,
+            center.Y + offset,
+            cellSize.Width - offset,
+            cellSize.Height - offset);
+
+        if (kernelSize > 1)
+        {
+            var radius = kernelSize / 2;
+
+            rect.Inflate(
+                cellSize.Width * radius,
+                cellSize.Height * radius);
+        }
+
+        // Exaggerate the indicator size slightly for better visibility
+        rect.Inflate(2, 2);
+
         _rects[0] = rect;
 
         // The second rectangle should be drawn in a different pen color
