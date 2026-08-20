@@ -44,7 +44,7 @@ public class Loupe : FrameworkElement, IDisposable
     public event EventHandler<PixelChangedEventArgs>? PixelChanged;
 
     private readonly SamplingAreaIndicator _samplingAreaIndicator;
-    private readonly PixelGridlines _pixelGridlines;
+    private readonly Gridlines _gridlines;
 
     private readonly VisualCollection _visuals;
 
@@ -358,7 +358,7 @@ public class Loupe : FrameworkElement, IDisposable
         if (sender is not Loupe mag)
             return;
 
-        mag._pixelGridlines.Opacity = (bool)e.NewValue ? 1.0 : 0.0;
+        mag._gridlines.Opacity = (bool)e.NewValue ? 1.0 : 0.0;
         mag.RenderSamplingAreaIndicator();
     }
 
@@ -521,8 +521,8 @@ public class Loupe : FrameworkElement, IDisposable
     /// </summary>
     private void RenderPixelGridlines()
     {
-        _pixelGridlines.SetGrid(_gridSize, _pixelSize);
-        _pixelGridlines.Render();
+        _gridlines.SetGrid(_gridSize, _pixelSize);
+        _gridlines.Render();
     }
 
     /// <summary>
@@ -787,9 +787,9 @@ public class Loupe : FrameworkElement, IDisposable
         _dib = new PersistentDibSection();
 
         _samplingAreaIndicator = new SamplingAreaIndicator(_dpi);
-        _pixelGridlines = new PixelGridlines(_dpi);
+        _gridlines = new Gridlines(_dpi);
 
-        _visuals = new VisualCollection(this) { _pixelGridlines, _samplingAreaIndicator };
+        _visuals = new VisualCollection(this) { _gridlines, _samplingAreaIndicator };
 
         _refreshTimer = new DispatcherTimer(DispatcherPriority.Render)
         {
@@ -832,7 +832,7 @@ public class Loupe : FrameworkElement, IDisposable
         _dpi = newDpi;
 
         _samplingAreaIndicator.SetDpi(_dpi);
-        _pixelGridlines.SetDpi(_dpi);
+        _gridlines.SetDpi(_dpi);
 
         RecalculateGridMetrics(GridMetricUpdateFlags.All);
 

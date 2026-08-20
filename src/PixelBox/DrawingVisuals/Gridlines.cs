@@ -10,7 +10,7 @@ namespace PixelBox.DrawingVisuals;
 /// <summary>
 /// Renders gridlines for use as a visual indicator of pixel boundaries.
 /// </summary>
-internal sealed class PixelGridlines : InverseScaledDrawingVisual
+internal sealed class Gridlines : InverseScaledDrawingVisual
 {
     #region Fields
 
@@ -23,19 +23,19 @@ internal sealed class PixelGridlines : InverseScaledDrawingVisual
 
     #endregion
 
-    static PixelGridlines()
+    static Gridlines()
     {
         s_pen.Freeze();
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PixelGridlines"/> class.
+    /// Initializes a new instance of the <see cref="Gridlines"/> class.
     /// </summary>
     /// 
     /// <param name="dpi">
     /// DPI scale information.
     /// </param>
-    public PixelGridlines(DpiScale dpi) : base(dpi)
+    public Gridlines(DpiScale dpi) : base(dpi)
     {
         VisualEdgeMode = EdgeMode.Aliased;
     }
