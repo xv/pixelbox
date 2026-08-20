@@ -17,7 +17,9 @@ internal sealed class SamplingAreaIndicator : InverseScaledDrawingVisual
     private static readonly Pen s_penWhite = new(Brushes.White, 1);
     private static readonly Pen s_penBlack = new(Brushes.Black, 1);
 
-    private readonly Rect[] _rects = new Rect[2];
+    private Rect _outerRect, _innerRect;
+
+    private bool _isDirty;
 
     #endregion
 
@@ -37,8 +39,6 @@ internal sealed class SamplingAreaIndicator : InverseScaledDrawingVisual
     /// </param>
     public SamplingAreaIndicator(DpiScale dpi) : base(dpi)
     {
-        // Small antialiased rects look super ass and this is actually one of
-        // the reasons why this class exists
         VisualEdgeMode = EdgeMode.Aliased;
     }
 
@@ -69,7 +69,7 @@ internal sealed class SamplingAreaIndicator : InverseScaledDrawingVisual
             cellSize.Width * (gridSize / 2),
             cellSize.Height * (gridSize / 2));
 
-        var rect = new Rect(
+        var outerRect = new Rect(
             center.X + offset,
             center.Y + offset,
             cellSize.Width - offset,
@@ -79,23 +79,30 @@ internal sealed class SamplingAreaIndicator : InverseScaledDrawingVisual
         {
             var radius = kernelSize / 2;
 
-            rect.Inflate(
+            outerRect.Inflate(
                 cellSize.Width * radius,
                 cellSize.Height * radius);
         }
 
         // Exaggerate the indicator size slightly for better visibility
-        rect.Inflate(2, 2);
+        outerRect.Inflate(2, 2);
 
-        _rects[0] = rect;
-
-        // The second rectangle should be drawn in a different pen color
+        // The inner rectangle should be drawn in a different pen color
         //
         // The idea here is creating contrast with the background the two
         // rectangles are on so that at least one of the rectangles is
         // always visible on screen
-        _rects[1] = rect;
-        _rects[1].Inflate(-1, -1);
+        var innerRect = outerRect;
+        innerRect.Inflate(-1, -1);
+
+        if (_outerRect == outerRect &&
+            _innerRect == innerRect)
+            return;
+
+        _outerRect = outerRect;
+        _innerRect = innerRect;
+
+        _isDirty = true;
     }
 
     /// <summary>
@@ -103,12 +110,14 @@ internal sealed class SamplingAreaIndicator : InverseScaledDrawingVisual
     /// </summary>
     public void Render()
     {
-        if (DesignerProperties.GetIsInDesignMode(this))
+        if (!_isDirty || DesignerProperties.GetIsInDesignMode(this))
             return;
 
         using var dc = RenderOpen();
 
-        dc.DrawRectangle(null, s_penBlack, _rects[0]);
-        dc.DrawRectangle(null, s_penWhite, _rects[1]);
+        dc.DrawRectangle(null, s_penBlack, _outerRect);
+        dc.DrawRectangle(null, s_penWhite, _innerRect);
+
+        _isDirty = false;
     }
 }

@@ -19,6 +19,8 @@ internal sealed class PixelGridlines : InverseScaledDrawingVisual
     private int _gridSize;
     private Size _cellSize;
 
+    private bool _isDirty;
+
     #endregion
 
     static PixelGridlines()
@@ -59,6 +61,8 @@ internal sealed class PixelGridlines : InverseScaledDrawingVisual
 
         _gridSize = gridSize;
         _cellSize = cellSize;
+
+        _isDirty = true;
     }
 
     /// <summary>
@@ -66,7 +70,7 @@ internal sealed class PixelGridlines : InverseScaledDrawingVisual
     /// </summary>
     public void Render()
     {
-        if (DesignerProperties.GetIsInDesignMode(this))
+        if (!_isDirty || DesignerProperties.GetIsInDesignMode(this))
             return;
 
         using var dc = RenderOpen();
@@ -91,5 +95,7 @@ internal sealed class PixelGridlines : InverseScaledDrawingVisual
                 new Point(x, 0),
                 new Point(x, h));
         }
+
+        _isDirty = false;
     }
 }
