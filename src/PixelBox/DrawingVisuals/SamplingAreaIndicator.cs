@@ -47,7 +47,7 @@ internal sealed class SamplingAreaIndicator : InverseScaledDrawingVisual
     /// </summary>
     /// 
     /// <param name="gridSize">
-    /// The size of the square grid.
+    /// The dimension of the square grid.
     /// </param>
     /// 
     /// <param name="cellSize">
