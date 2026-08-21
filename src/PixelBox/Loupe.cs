@@ -686,7 +686,12 @@ public class Loupe : FrameworkElement, IDisposable
         if (_dib.Bits is not null && !_recaptureNeeded)
             return true;
 
-        _mousePos = MousePosition;
+        // If this is the first capture, establish the position from the current
+        // cursor; otherwise, preserve the position of the last capture. This
+        // prevents actions that trigger a recapture like changing the grid or
+        // pixel size from using the current cursor position 
+        if (_dib.Bits is null)
+            _mousePos = MousePosition;
 
         if (!CaptureAt(_mousePos))
             return false;
