@@ -1,6 +1,6 @@
 <p align="left">
   <img src="https://github.com/xv/pixelbox/blob/master/assets/banner/banner.svg" 
-       alt="banner" style="width: 300px; height: auto; text-align: left">
+       alt="banner" style="width: 200px; height: auto; text-align: left">
 </p>
 
 About
