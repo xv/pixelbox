@@ -783,7 +783,6 @@ public class Loupe : FrameworkElement, IDisposable
     public Loupe()
     {
         RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
-        RenderOptions.SetEdgeMode(this, EdgeMode.Aliased);
 
         Focusable = false;
 

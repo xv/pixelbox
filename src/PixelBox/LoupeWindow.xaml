@@ -120,7 +120,6 @@
                 CornerRadius="{Binding ActualHeight, ElementName=Magnifier, Mode=OneWay}">
                 <local:Loupe
                     x:Name="Magnifier"
-                    RenderOptions.EdgeMode="Unspecified"
                     GridSize="15"
                     PixelSize="7"
                     PixelChanged="OnPixelChanged">
