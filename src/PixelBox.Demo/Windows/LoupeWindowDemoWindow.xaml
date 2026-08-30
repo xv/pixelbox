@@ -186,7 +186,7 @@
                     Background="Transparent"
                     BorderThickness="0"
                     IsReadOnly="True"
-                    Text="#" 
+                    Text="#??????" 
                     Foreground="White"/>
 
                 <TextBox 

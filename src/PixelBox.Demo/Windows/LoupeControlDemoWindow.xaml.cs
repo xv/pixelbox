@@ -1,4 +1,5 @@
 ﻿using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows;
 
 using Windows.Win32;
@@ -13,7 +14,11 @@ public partial class LoupeControlDemoWindow : Window
     #region Fields
 
     private Point _posOnMouseDown;
+
+    private Color _color;
     private Point _pixelPos;
+
+    private static readonly SolidColorBrush _colorBrush = new();
 
     #endregion
     #region Methods
@@ -41,6 +46,13 @@ public partial class LoupeControlDemoWindow : Window
     private void OnMagnifierPixelChanged(object? sender, PixelChangedEventArgs e)
     {
         _pixelPos = e.ScreenPosition;
+        _color = e.Color;
+
+        _colorBrush.Color = _color;
+        ColorPreviewBox.Fill = _colorBrush;
+
+        ColorTextBlock.Text = $"#{_color.R:X2}{_color.G:X2}{_color.B:X2}";
+        PositionTextBlock.Text = $"[{_pixelPos.X},{_pixelPos.Y}]";
     }
 
     private void OnMagnifierMouseDown(object sender, MouseButtonEventArgs e)
