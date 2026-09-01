@@ -373,20 +373,20 @@ public class Loupe : FrameworkElement, IDisposable
     private void OnRefreshTimerTick(object? sender, EventArgs e)
     {
         var cursorPos = MousePosition;
+        var isLocked = _lockedPos is Point lockedPos;
+
         Point currentPos;
 
-        if (!_lockedPos.HasValue)
+        if (!isLocked)
             currentPos = cursorPos;
         else
         {
-            var locked = _lockedPos.Value;
-
             currentPos = new Point(
-                _lockX ? locked.X : cursorPos.X,
-                _lockY ? locked.Y : cursorPos.Y);
+                _lockX ? lockedPos.X : cursorPos.X,
+                _lockY ? lockedPos.Y : cursorPos.Y);
         }
 
-        if (currentPos == _mousePos)
+        if (!isLocked && currentPos == _mousePos)
             return;
 
         _mousePos = currentPos;
