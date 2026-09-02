@@ -76,36 +76,33 @@ private void OnPixelChanged(object? sender, PixelChangedEventArgs e)
 The `Loupe` control does not automatically capture the screen. You must call `StartCapture()` to begin capturing, and `StopCapture()` to stop.
 
 #### Public API
-The `Loupe` control exposes the public APIs listed in the tables below.
+The `Loupe` control exposes the following public API:
 
-| **API**                   | **Type**            |
-|---------------------------|---------------------|
-| `Loupe.ContinuousCapture` | Dependency Property |
-| `Loupe.GridSize`          | Dependency Property |
-| `Loupe.PixelSize`         | Dependency Property |
-| `Loupe.RefreshInterval`   | Dependency Property |
-| `Loupe.SamplingMode`      | Dependency Property |
-| `Loupe.ShowGrid`          | Dependency Property |
+**Dependency Properties**
+- `Loupe.ContinuousCapture`
+- `Loupe.GridSize`
+- `Loupe.PixelSize`
+- `Loupe.RefreshInterval`
+- `Loupe.SamplingMode`
+- `Loupe.ShowGrid`
 
-| **API**                 | **Type**     |
-|-------------------------|--------------|
-| `Loupe.IsCapturing`     | CLR Property |
-| `Loupe.PositionLocked`  | CLR Property |
-| `Loupe.PositionXLocked` | CLR Property |
-| `Loupe.PositionYLocked` | CLR Property |
+**CLR Properties**
+- `Loupe.IsCapturing`
+- `Loupe.PositionLocked`
+- `Loupe.PositionXLocked`
+- `Loupe.PositionYLocked`
 
-| **API**                                 | **Type** |
-|-----------------------------------------|----------|
-| `Loupe.StartCapture()`                  | Method   |
-| `Loupe.StopCapture()`                   | Method   |
-| `Loupe.ToggleCapture()`                 | Method   |
-| `Loupe.LockPosition(Point)`             | Method   |
-| `Loupe.LockPosition(Point, bool, bool)` | Method   |
-| `Loupe.LockPositionX()`                 | Method   |
-| `Loupe.LockPositionY()`                 | Method   |
-| `Loupe.UnlockPositionX()`               | Method   |
-| `Loupe.UnlockPositionY()`               | Method   |
-| `Loupe.UnlockPosition()`                | Method   |
+**Methods**
+- `Loupe.StartCapture()`
+- `Loupe.StopCapture()`
+- `Loupe.ToggleCapture()`
+- `Loupe.LockPosition(Point)`
+- `Loupe.LockPosition(Point, bool, bool)`
+- `Loupe.LockPositionX()`
+- `Loupe.LockPositionY()`
+- `Loupe.UnlockPositionX()`
+- `Loupe.UnlockPositionY()`
+- `Loupe.UnlockPosition()`
 
 ### Using the Built-In Window
 
