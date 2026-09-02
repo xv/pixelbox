@@ -97,6 +97,8 @@ public class Loupe : FrameworkElement, IDisposable
     /// Gets or sets whether the control captures pixels continuously even when
     /// the mouse has not moved.
     /// </summary>
+    [Category("Behavior")]
+    [Description("Determines whether the screen is continuously captured when the mouse position has not changed.")]
     public bool ContinuousCapture
     {
         get => (bool)GetValue(ContinuousCaptureProperty);
