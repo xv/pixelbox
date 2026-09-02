@@ -29,6 +29,8 @@ public class Loupe : FrameworkElement, IDisposable
     private int _gridSize;
     private int _gridSizeHalf;
 
+    private bool _continuousCapture;
+
     private Color _sampledColor;
     private Point _mousePos;
 
@@ -80,6 +82,26 @@ public class Loupe : FrameworkElement, IDisposable
 
     #endregion
     #region Dependency Properties
+
+    /// <summary>
+    /// Dependency property for the <see cref="ContinuousCapture"/> property.
+    /// </summary>
+    public static readonly DependencyProperty ContinuousCaptureProperty =
+        DependencyProperty.Register(
+            nameof(ContinuousCapture),
+            typeof(bool),
+            typeof(Loupe),
+            new FrameworkPropertyMetadata(false, OnContinuousCaptureChanged));
+
+    /// <summary>
+    /// Gets or sets whether the control captures pixels continuously even when
+    /// the mouse has not moved.
+    /// </summary>
+    public bool ContinuousCapture
+    {
+        get => (bool)GetValue(ContinuousCaptureProperty);
+        set => SetValue(ContinuousCaptureProperty, value);
+    }
 
     /// <summary>
     /// Dependency property for the <see cref="GridSize"/> property.
@@ -234,7 +256,7 @@ public class Loupe : FrameworkElement, IDisposable
     }
 
     /// <summary>
-    /// Gets whether the control captures pixels on mouse movement.
+    /// Gets whether pixel capture is currently active.
     /// </summary>
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -320,6 +342,14 @@ public class Loupe : FrameworkElement, IDisposable
     #endregion
     #region Event Handling
 
+    private static void OnContinuousCaptureChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (sender is not Loupe mag)
+            return;
+
+        mag._continuousCapture = (bool)e.NewValue;
+    }
+
     private static void OnGridSizeChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
     {
         if (sender is not Loupe mag)
@@ -386,7 +416,7 @@ public class Loupe : FrameworkElement, IDisposable
                 _lockY ? lockedPos.Y : cursorPos.Y);
         }
 
-        if (!isLocked && currentPos == _mousePos)
+        if (!_continuousCapture && currentPos == _mousePos)
             return;
 
         _mousePos = currentPos;

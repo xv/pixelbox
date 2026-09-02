@@ -1,4 +1,4 @@
-<p align="left">
+﻿<p align="left">
   <img src="https://github.com/xv/pixelbox/blob/master/assets/banner/banner.svg" 
        alt="banner" style="width: 200px; height: auto; text-align: left">
 </p>
@@ -78,13 +78,14 @@ The `Loupe` control does not automatically capture the screen. You must call `St
 #### Public API
 The `Loupe` control exposes the public APIs listed in the tables below.
 
-| **API**                 | **Type**            |
-|-------------------------|---------------------|
-| `Loupe.GridSize`        | Dependency Property |
-| `Loupe.PixelSize`       | Dependency Property |
-| `Loupe.RefreshInterval` | Dependency Property |
-| `Loupe.SamplingMode`    | Dependency Property |
-| `Loupe.ShowGrid`        | Dependency Property |
+| **API**                   | **Type**            |
+|---------------------------|---------------------|
+| `Loupe.ContinuousCapture` | Dependency Property |
+| `Loupe.GridSize`          | Dependency Property |
+| `Loupe.PixelSize`         | Dependency Property |
+| `Loupe.RefreshInterval`   | Dependency Property |
+| `Loupe.SamplingMode`      | Dependency Property |
+| `Loupe.ShowGrid`          | Dependency Property |
 
 | **API**                 | **Type**     |
 |-------------------------|--------------|
