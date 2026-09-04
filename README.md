@@ -1,4 +1,4 @@
-﻿<p align="left">
+﻿﻿<p align="left">
   <img src="https://github.com/xv/pixelbox/blob/master/assets/banner/banner.svg" 
        alt="banner" style="width: 200px; height: auto; text-align: left">
 </p>
@@ -49,18 +49,22 @@ Quick Start
     <Grid>
         <!-- The size of the Loupe control is automatically determined by its
              GridSize and PixelSize properties. Do not set the control size
-             manually -->
+             manually. 
+             
+             GridSize must be an odd value. If an even value is set, it will be
+             automatically rounded up to the next odd value. -->
         <pb:Loupe HorizontalAlignment="Left" VerticalAlignment="Top"
             GridSize="15"
             PixelSize="10"
             ShowGrid="True"
-            RefreshInterval="30"
+            SamplingMode="Single"
+            RefreshInterval="15"
             PixelChanged="OnPixelChanged"/>
     </Grid>
 </Window>
 ```
 
-The `PixelChanged` event is raised whenever the sampled pixel changes. You can use this event to receive the new sampled color and screen position.
+The `PixelChanged` event is raised after each successful screen capture or `SamplingMode` property change. You can use this event to receive the new sampled color and screen position.
 
 ```csharp
 private Color _color;
@@ -73,7 +77,7 @@ private void OnPixelChanged(object? sender, PixelChangedEventArgs e)
 }
 ```
 
-The `Loupe` control does not automatically capture the screen. You must call `StartCapture()` to begin capturing, and `StopCapture()` to stop.
+The `Loupe` control performs an initial screen capture at the current mouse position when it is first rendered. This also raises the `PixelChanged` event. However, you must call `StartCapture()` to actually begin automatic screen capture, and `StopCapture()` to stop.
 
 #### Public API
 The `Loupe` control exposes the following public API:
