@@ -14,7 +14,7 @@ In a nutshell, what the control can provide is:
 Here's a quick demo of the built-in magnifier window:
 
 <!-- Full URL is used here to make it display properly on nuget.org -->
-![demo](https://github.com/xv/pixelbox/blob/master/assets/media/demo.gif)
+![demo](https://raw.githubusercontent.com/xv/pixelbox/refs/heads/master/assets/media/demo.gif)
 
 Requirements
 ------------
