@@ -22,10 +22,10 @@
 
   <!-- NuGet metadata -->
   <PropertyGroup>
-    <PackageId>$(MSBuildProjectName)</PackageId>
+    <PackageId>xv.$(MSBuildProjectName)</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>wpf;control;pixel;magnifier;colorpicker</PackageTags>
+    <PackageTags>wpf;control;pixel;magnifier;color;picker;capture</PackageTags>
     <RepositoryUrl>https://github.com/xv/pixelbox</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Description>Fast and customizable BitBlt-based pixel magnification WPF control and a ready-to-use mouse-tracked color picker window.</Description>
