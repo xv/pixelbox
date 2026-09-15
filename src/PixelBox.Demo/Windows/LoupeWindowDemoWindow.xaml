@@ -65,7 +65,7 @@
 
         <DropShadowEffect
             x:Key="KbdDropShadowEffect"
-            BlurRadius="1"
+            BlurRadius="0"
             Opacity=".5"
             ShadowDepth="2"
             Direction="270"
