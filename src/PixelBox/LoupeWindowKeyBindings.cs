@@ -11,54 +11,59 @@ namespace PixelBox;
 public class LoupeWindowKeyBindings
 {
     /// <summary>
-    /// Gets or sets the key binding used to toggle the visibility of the grid.
+    /// Gets or sets the key binding used to execute the
+    /// <see cref="LoupeWindowCommands.ToggleGrid"/> command.
     /// </summary>
     public required KeyBinding ToggleGrid
     { get; set; }
 
     /// <summary>
-    /// Gets or sets the key binding used increase the size of the pixel grid.
+    /// Gets or sets the key binding used to execute the
+    /// <see cref="LoupeWindowCommands.IncreaseGridSize"/> command.
     /// </summary>
     public required KeyBinding IncreaseGridSize
     { get; set; }
 
     /// <summary>
-    /// Gets or sets the key binding used decrease the size of the pixel grid.
+    /// Gets or sets the key binding used to execute the
+    /// <see cref="LoupeWindowCommands.DecreaseGridSize"/> command.
     /// </summary>
     public required KeyBinding DecreaseGridSize
     { get; set; }
 
     /// <summary>
-    /// Gets or sets the key binding used to increase the size of pixel cells in
-    /// the magnified view.
+    /// Gets or sets the key binding used to execute the
+    /// <see cref="LoupeWindowCommands.IncreasePixelSize"/> command.
     /// </summary>
     public required KeyBinding IncreasePixelSize
     { get; set; }
 
     /// <summary>
-    /// Gets or sets the key binding used to decrease the size of pixel cells in
-    /// the magnified view.
+    /// Gets or sets the key binding used to execute the
+    /// <see cref="LoupeWindowCommands.DecreasePixelSize"/> command.
     /// </summary>
     public required KeyBinding DecreasePixelSize
     { get; set; }
 
     /// <summary>
-    /// Gets or sets the key binding used to increase the size of color sampler.
+    /// Gets or sets the key binding used to execute the
+    /// <see cref="LoupeWindowCommands.IncreaseColorSamplerSize"/> command.
     /// </summary>
     public required KeyBinding IncreaseColorSamplerSize
     { get; set; }
 
     /// <summary>
-    /// Gets or sets the key binding used to decrease the size of color sampler.
+    /// Gets or sets the key binding used to execute the
+    /// <see cref="LoupeWindowCommands.DecreaseColorSamplerSize"/> command.
     /// </summary>
     public required KeyBinding DecreaseColorSamplerSize
     { get; set; }
 
     /// <summary>
-    /// Gets or sets the key binding used to confirm the selection of the pixel
-    /// and close the magnifier window.
+    /// Gets or sets the key binding used to execute the
+    /// <see cref="LoupeWindowCommands.Confirm"/> command.
     /// </summary>
-    public required KeyBinding Close
+    public required KeyBinding Confirm
     { get; set; }
 
     /// <summary>
@@ -97,6 +102,6 @@ public class LoupeWindowKeyBindings
         DecreasePixelSize = Bind(LoupeWindowCommands.DecreasePixelSize, Key.OemMinus, ModifierKeys.Control),
         IncreaseColorSamplerSize = Bind(LoupeWindowCommands.IncreaseColorSamplerSize, Key.OemPlus),
         DecreaseColorSamplerSize = Bind(LoupeWindowCommands.DecreaseColorSamplerSize, Key.OemMinus),
-        Close = Bind(LoupeWindowCommands.Close, Key.Enter)
+        Confirm = Bind(LoupeWindowCommands.Confirm, Key.Enter)
     };
 }

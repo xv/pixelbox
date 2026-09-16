@@ -36,9 +36,9 @@ public partial class LoupeWindowDemoWindow : Window
         // accelerate the movement
         LoupeWindow.ConfigureKeyBindings(bindings =>
         {
-            bindings.Close = new KeyBinding
+            bindings.Confirm = new KeyBinding
             {
-                Command = LoupeWindowCommands.Close,
+                Command = LoupeWindowCommands.Confirm,
                 Key = Key.Enter, // Just for demo; Enter is already the default
                 Modifiers = ModifierKeys.None
             };

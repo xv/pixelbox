@@ -132,7 +132,7 @@ The magnifier window uses the following keybinds by default:
 | `LoupeWindowCommands.DecreasePixelSize`         | <kbd>Ctrl</kbd> <kbd>OemMinus</kbd>  | <kbd>Ctrl</kbd> `Mouse Wheel Down`  |
 | `LoupeWindowCommands.IncreaseColorSamplerSize`  | <kbd>OemPlus</kbd>                   |                                     |
 | `LoupeWindowCommands.DecreaseColorSamplerSize`  | <kbd>OemMinus</kbd>                  |                                     |
-| `LoupeWindowCommands.Close`                     | <kbd>Enter</kbd>                     | `Mouse Left Click`                  |
+| `LoupeWindowCommands.Confirm`                   | <kbd>Enter</kbd>                     | `Mouse Left Click`                  |
 
 > [!NOTE]
 > <kbd>OemPlus</kbd> and <kbd>OemMinus</kbd> are the <kbd>+</kbd> and <kbd>-</kbd> keys to the left of <kbd>Backspace</kbd>. However, they may vary on non-US keyboard layouts.
@@ -141,9 +141,9 @@ You can remap the keybinds for any of the listed commands before instantiating t
 ```csharp
 LoupeWindow.ConfigureKeyBindings(bindings =>
 {
-    bindings.Close = new KeyBinding
+    bindings.Confirm = new KeyBinding
     {
-        Command = LoupeWindowCommands.Close,
+        Command = LoupeWindowCommands.Confirm,
         Key = Key.Space,
         Modifiers = ModifierKeys.None
     };

@@ -75,10 +75,10 @@
             Executed="OnDecreaseColorSamplerSizeExecuted"/>
         <CommandBinding
             Command="ApplicationCommands.Close"
-            Executed="OnCloseExecuted"/>
+            Executed="OnConfirmExecuted"/>
         <CommandBinding
-            Command="{x:Static local:LoupeWindowCommands.Close}"
-            Executed="OnCloseExecuted"/>
+            Command="{x:Static local:LoupeWindowCommands.Confirm}"
+            Executed="OnConfirmExecuted"/>
     </Window.CommandBindings>
 
     <Canvas

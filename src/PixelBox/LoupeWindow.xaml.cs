@@ -214,7 +214,7 @@ public partial class LoupeWindow : Window
         InputBindings.Add(_keyBindings.DecreasePixelSize);
         InputBindings.Add(_keyBindings.IncreaseColorSamplerSize);
         InputBindings.Add(_keyBindings.DecreaseColorSamplerSize);
-        InputBindings.Add(_keyBindings.Close);
+        InputBindings.Add(_keyBindings.Confirm);
 
         InputBindings.Add(new KeyBinding
         {
@@ -224,7 +224,7 @@ public partial class LoupeWindow : Window
 
         InputBindings.Add(new MouseBinding
         {
-            Command = LoupeWindowCommands.Close,
+            Command = LoupeWindowCommands.Confirm,
             MouseAction = MouseAction.LeftClick
         });
     }
@@ -591,9 +591,9 @@ public partial class LoupeWindow : Window
             Magnifier.SamplingMode = _samplingModes[idx - 1];
     }
 
-    private void OnCloseExecuted(object sender, ExecutedRoutedEventArgs e)
+    private void OnConfirmExecuted(object sender, ExecutedRoutedEventArgs e)
     {
-        if (e.Command == LoupeWindowCommands.Close)
+        if (e.Command == LoupeWindowCommands.Confirm)
             DialogResult = true;
 
         Close();
