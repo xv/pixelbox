@@ -10,43 +10,35 @@ namespace PixelBox;
 /// </summary>
 public static class LoupeWindowCommands
 {
-    public static readonly RoutedUICommand ToggleGrid =
-        new("Toggle Grid",
-            nameof(ToggleGrid),
+    public static readonly RoutedCommand ToggleGrid =
+        new(nameof(ToggleGrid),
             typeof(LoupeWindow));
 
-    public static readonly RoutedUICommand IncreaseGridSize =
-        new("Increase Grid Size",
-            nameof(IncreaseGridSize),
+    public static readonly RoutedCommand IncreaseGridSize =
+        new(nameof(IncreaseGridSize),
             typeof(LoupeWindow));
 
-    public static readonly RoutedUICommand DecreaseGridSize =
-        new("Decrease Grid Size",
-            nameof(DecreaseGridSize),
+    public static readonly RoutedCommand DecreaseGridSize =
+        new(nameof(DecreaseGridSize),
             typeof(LoupeWindow));
 
-    public static readonly RoutedUICommand IncreasePixelSize =
-        new("Increase Pixel Size",
-            nameof(IncreasePixelSize),
+    public static readonly RoutedCommand IncreasePixelSize =
+        new(nameof(IncreasePixelSize),
             typeof(LoupeWindow));
 
-    public static readonly RoutedUICommand DecreasePixelSize =
-        new("Decrease Pixel Size",
-            nameof(DecreasePixelSize),
+    public static readonly RoutedCommand DecreasePixelSize =
+        new(nameof(DecreasePixelSize),
             typeof(LoupeWindow));
 
-    public static readonly RoutedUICommand IncreaseColorSamplerSize =
-        new("Increase Color Sampler Size",
-            nameof(IncreaseColorSamplerSize),
+    public static readonly RoutedCommand IncreaseColorSamplerSize =
+        new(nameof(IncreaseColorSamplerSize),
             typeof(LoupeWindow));
 
-    public static readonly RoutedUICommand DecreaseColorSamplerSize =
-        new("Decrease Color Sampler Size",
-            nameof(DecreaseColorSamplerSize),
+    public static readonly RoutedCommand DecreaseColorSamplerSize =
+        new(nameof(DecreaseColorSamplerSize),
             typeof(LoupeWindow));
 
-    public static readonly RoutedUICommand Close =
-        new("Close",
-            nameof(Close),
+    public static readonly RoutedCommand Close =
+        new(nameof(Close),
             typeof(LoupeWindow));
 }
