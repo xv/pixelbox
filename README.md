@@ -1,4 +1,4 @@
-About
+﻿About
 -----
 PixelBox is a fast and customizable BitBlt-based pixel magnification control for WPF. The library contains the standalone magnifier control itself, and a ready-to-use mouse-tracked pixel magnifier and color picker window, similar to what you would find in browser developer tools.
 
@@ -132,7 +132,7 @@ The magnifier window uses the following keybinds by default:
 | `LoupeWindowCommands.DecreasePixelSize`         | <kbd>Ctrl</kbd> <kbd>OemMinus</kbd>  | <kbd>Ctrl</kbd> `Mouse Wheel Down`  |
 | `LoupeWindowCommands.IncreaseColorSamplerSize`  | <kbd>OemPlus</kbd>                   |                                     |
 | `LoupeWindowCommands.DecreaseColorSamplerSize`  | <kbd>OemMinus</kbd>                  |                                     |
-| `LoupeWindowCommands.Close`                     | <kbd>Enter</kbd>                     |                                     |
+| `LoupeWindowCommands.Close`                     | <kbd>Enter</kbd>                     | `Mouse Left Click`                  |
 
 > [!NOTE]
 > <kbd>OemPlus</kbd> and <kbd>OemMinus</kbd> are the <kbd>+</kbd> and <kbd>-</kbd> keys to the left of <kbd>Backspace</kbd>. However, they may vary on non-US keyboard layouts.
