@@ -12,6 +12,46 @@
         ResizeMode="CanMinimize"
         AllowsTransparency="False"
         Background="Black">
+
+    <Window.CommandBindings>
+        <CommandBinding
+            Command="{x:Static local:LoupeControlDemoWindowCommands.ToggleCapture}"
+            CanExecute="OnToggleCaptureCanExecute"
+            Executed="OnToggleCaptureExecuted"/>
+        <CommandBinding
+            Command="{x:Static local:LoupeControlDemoWindowCommands.ToggleContinuousCapture}"
+            CanExecute="OnToggleContinuousCaptureCanExecute"
+            Executed="OnToggleContinuousCaptureExecuted"/>
+        <CommandBinding
+            Command="{x:Static local:LoupeControlDemoWindowCommands.ToggleGrid}"
+            CanExecute="OnToggleGridCanExecute"
+            Executed="OnToggleGridExecuted"/>
+        <CommandBinding
+            Command="{x:Static local:LoupeControlDemoWindowCommands.SetSamplerSizeSingle}"
+            CanExecute="OnSetSamplerSizeSingleCanExecute"
+            Executed="OnSetSamplerSizeSingleExecuted"/>
+        <CommandBinding
+            Command="{x:Static local:LoupeControlDemoWindowCommands.SetSamplerSize3x3}"
+            CanExecute="OnSetSamplerSize3x3CanExecute"
+            Executed="OnSetSamplerSize3x3Executed"/>
+        <CommandBinding
+            Command="{x:Static local:LoupeControlDemoWindowCommands.SetSamplerSize5x5}"
+            CanExecute="OnSetSamplerSize5x5CanExecute"
+            Executed="OnSetSamplerSize5x5Executed"/>
+        <CommandBinding
+            Command="{x:Static local:LoupeControlDemoWindowCommands.ToggleLockPosition}"
+            CanExecute="OnToggleLockPositionCanExecute"
+            Executed="OnToggleLockPositionExecuted"/>
+        <CommandBinding
+            Command="{x:Static local:LoupeControlDemoWindowCommands.ToggleLockX}"
+            CanExecute="OnToggleLockXCanExecute"
+            Executed="OnToggleLockXExecuted"/>
+        <CommandBinding
+            Command="{x:Static local:LoupeControlDemoWindowCommands.ToggleLockY}"
+            CanExecute="OnToggleLockYCanExecute"
+            Executed="OnToggleLockYExecuted"/>
+    </Window.CommandBindings>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -23,7 +63,64 @@
                 x:Name="Magnifier"
                 PixelSize="13"
                 GridSize="23"
-                RefreshInterval="15"/>
+                RefreshInterval="15">
+                <PixelBox:Loupe.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem
+                            Header="Toggle Capture"
+                            IsCheckable="True"
+                            IsChecked="{Binding PlacementTarget.IsCapturing, RelativeSource={RelativeSource AncestorType=ContextMenu}, Mode=OneWay}"
+                            Command="{x:Static local:LoupeControlDemoWindowCommands.ToggleCapture}"
+                            CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                        <MenuItem
+                            Header="Continuous Capture"
+                            IsCheckable="True"
+                            IsChecked="{Binding PlacementTarget.ContinuousCapture, RelativeSource={RelativeSource AncestorType=ContextMenu}, Mode=OneWay}"
+                            Command="{x:Static local:LoupeControlDemoWindowCommands.ToggleContinuousCapture}"
+                            CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                        <Separator/>
+                        <MenuItem
+                            Header="Show Grid"
+                            IsCheckable="True"
+                            IsChecked="{Binding PlacementTarget.ShowGrid, RelativeSource={RelativeSource AncestorType=ContextMenu}, Mode=OneWay}"
+                            Command="{x:Static local:LoupeControlDemoWindowCommands.ToggleGrid}"
+                            CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                        <MenuItem Header="Sampler Size">
+                            <MenuItem
+                                Header="Single Pixel"
+                                Command="{x:Static local:LoupeControlDemoWindowCommands.SetSamplerSizeSingle}"
+                                CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                            <MenuItem
+                                Header="3x3"
+                                Command="{x:Static local:LoupeControlDemoWindowCommands.SetSamplerSize3x3}"
+                                CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                            <MenuItem
+                                Header="5x5"
+                                Command="{x:Static local:LoupeControlDemoWindowCommands.SetSamplerSize5x5}"
+                                CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem
+                            Header="Lock Position"
+                            IsCheckable="True"
+                            IsChecked="{Binding PlacementTarget.PositionLocked, RelativeSource={RelativeSource AncestorType=ContextMenu}, Mode=OneWay}"
+                            Command="{x:Static local:LoupeControlDemoWindowCommands.ToggleLockPosition}"
+                            CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                        <MenuItem
+                            Header="Lock X"
+                            IsCheckable="True"
+                            IsChecked="{Binding PlacementTarget.PositionXLocked, RelativeSource={RelativeSource AncestorType=ContextMenu}, Mode=OneWay}"
+                            Command="{x:Static local:LoupeControlDemoWindowCommands.ToggleLockX}"
+                            CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                        <MenuItem
+                            Header="Lock Y"
+                            IsCheckable="True"
+                            IsChecked="{Binding PlacementTarget.PositionYLocked, RelativeSource={RelativeSource AncestorType=ContextMenu}, Mode=OneWay}"
+                            Command="{x:Static local:LoupeControlDemoWindowCommands.ToggleLockY}"
+                            CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                    </ContextMenu>
+                </PixelBox:Loupe.ContextMenu>
+            </PixelBox:Loupe>
         </Border>
 
         <Border Grid.Row="1"

@@ -78,16 +78,91 @@ public partial class LoupeControlDemoWindow : Window
         Magnifier.StopCapture();
     }
 
-    protected override void OnKeyDown(KeyEventArgs e)
-    {
-        base.OnKeyDown(e);
+    #region Command Handlers
 
-        if (e.Key == Key.G)
-            Magnifier.ShowGrid = !Magnifier.ShowGrid;
+    #region ToggleCapture
 
-        if (e.Key == Key.Space)
-            Magnifier.ToggleCapture();
-    }
+    private void OnToggleCaptureCanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+        e.CanExecute = true;
+
+    private void OnToggleCaptureExecuted(object sender, ExecutedRoutedEventArgs e) =>
+        Magnifier.ToggleCapture();
+
+    #endregion
+    #region ToggleContinuousCapture
+
+    private void OnToggleContinuousCaptureCanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+        e.CanExecute = true;
+
+    private void OnToggleContinuousCaptureExecuted(object sender, ExecutedRoutedEventArgs e) =>
+        Magnifier.ContinuousCapture = !Magnifier.ContinuousCapture;
+
+    #endregion
+    #region ToggleGrid
+
+    private void OnToggleGridCanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+        e.CanExecute = true;
+
+    private void OnToggleGridExecuted(object sender, ExecutedRoutedEventArgs e) =>
+        Magnifier.ShowGrid = !Magnifier.ShowGrid;
+
+    #endregion
+    #region SetSamplerSizeSingle
+
+    private void OnSetSamplerSizeSingleCanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+        e.CanExecute = Magnifier.SamplingMode != PixelSamplingMode.Single;
+
+    private void OnSetSamplerSizeSingleExecuted(object sender, ExecutedRoutedEventArgs e) =>
+        Magnifier.SamplingMode = PixelSamplingMode.Single;
+
+    #endregion
+    #region SetSamplerSize3x3
+
+    private void OnSetSamplerSize3x3CanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+        e.CanExecute = Magnifier.SamplingMode != PixelSamplingMode.ThreeByThree;
+
+    private void OnSetSamplerSize3x3Executed(object sender, ExecutedRoutedEventArgs e) =>
+        Magnifier.SamplingMode = PixelSamplingMode.ThreeByThree;
+
+    #endregion
+    #region SetSamplerSize5x5
+
+    private void OnSetSamplerSize5x5CanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+        e.CanExecute = Magnifier.SamplingMode != PixelSamplingMode.FiveByFive;
+
+    private void OnSetSamplerSize5x5Executed(object sender, ExecutedRoutedEventArgs e) =>
+        Magnifier.SamplingMode = PixelSamplingMode.FiveByFive;
+
+    #endregion
+    #region ToggleLockPosition
+
+    private void OnToggleLockPositionCanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+        e.CanExecute = true;
+
+    private void OnToggleLockPositionExecuted(object sender, ExecutedRoutedEventArgs e) =>
+        Magnifier.PositionLocked = !Magnifier.PositionLocked;
+
+    #endregion
+    #region ToggleLockX
+
+    private void OnToggleLockXCanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+        e.CanExecute = true;
+
+    private void OnToggleLockXExecuted(object sender, ExecutedRoutedEventArgs e) =>
+        Magnifier.PositionXLocked = !Magnifier.PositionXLocked;
+
+    #endregion
+    #region ToggleLockY
+
+    private void OnToggleLockYCanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+        e.CanExecute = true;
+
+    private void OnToggleLockYExecuted(object sender, ExecutedRoutedEventArgs e) =>
+        Magnifier.PositionYLocked = !Magnifier.PositionYLocked;
+
+    #endregion
+
+    #endregion
 
     protected override void OnClosed(EventArgs e)
     {
