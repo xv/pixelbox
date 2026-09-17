@@ -111,8 +111,9 @@ The `Loupe` control exposes the following public API:
 ```csharp
 var picker = new PixelBox.LoupeWindow();
 
-// ShowDialog() will return true if the window was closed via either Enter key or
-// mouse left click. You can use the return result to update your UI conditionally
+// ShowDialog() will return true if the window was closed via either Enter key
+// (by default) or emouse left click. You can use the return result to update
+// your UI conditionally
 picker.ShowDialog();
 
 var color = picker.PixelColor;
@@ -132,6 +133,7 @@ The magnifier window uses the following keybinds by default:
 | `LoupeWindowCommands.DecreasePixelSize`         | <kbd>Ctrl</kbd> <kbd>OemMinus</kbd>  | <kbd>Ctrl</kbd> `Mouse Wheel Down`  |
 | `LoupeWindowCommands.IncreaseColorSamplerSize`  | <kbd>OemPlus</kbd>                   |                                     |
 | `LoupeWindowCommands.DecreaseColorSamplerSize`  | <kbd>OemMinus</kbd>                  |                                     |
+| `LoupeWindowCommands.Cancel`                    | <kbd>Esc</kbd>                       |                                     |
 | `LoupeWindowCommands.Confirm`                   | <kbd>Enter</kbd>                     | `Mouse Left Click`                  |
 
 > [!NOTE]

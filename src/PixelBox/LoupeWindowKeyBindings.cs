@@ -61,6 +61,13 @@ public class LoupeWindowKeyBindings
 
     /// <summary>
     /// Gets or sets the key binding used to execute the
+    /// <see cref="LoupeWindowCommands.Cancel"/> command.
+    /// </summary>
+    public required KeyBinding Cancel
+    { get; set; }
+
+    /// <summary>
+    /// Gets or sets the key binding used to execute the
     /// <see cref="LoupeWindowCommands.Confirm"/> command.
     /// </summary>
     public required KeyBinding Confirm
@@ -102,6 +109,7 @@ public class LoupeWindowKeyBindings
         DecreasePixelSize = Bind(LoupeWindowCommands.DecreasePixelSize, Key.OemMinus, ModifierKeys.Control),
         IncreaseColorSamplerSize = Bind(LoupeWindowCommands.IncreaseColorSamplerSize, Key.OemPlus),
         DecreaseColorSamplerSize = Bind(LoupeWindowCommands.DecreaseColorSamplerSize, Key.OemMinus),
+        Cancel = Bind(LoupeWindowCommands.Cancel, Key.Escape),
         Confirm = Bind(LoupeWindowCommands.Confirm, Key.Enter)
     };
 }

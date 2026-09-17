@@ -61,6 +61,19 @@ public static class LoupeWindowCommands
             typeof(LoupeWindow));
 
     /// <summary>
+    /// Command to cancel the current operation and close
+    /// <see cref="LoupeWindow"/>.
+    /// </summary>
+    ///
+    /// <remarks>
+    /// The <c>DialogResult</c> property of <see cref="LoupeWindow"/> should be
+    /// set to <see langword="false"/> when this command is executed.
+    /// </remarks>
+    public static readonly RoutedCommand Cancel =
+        new(nameof(Cancel),
+            typeof(LoupeWindow));
+
+    /// <summary>
     /// Command to confirm the pixel selection at the current position and close
     /// the <see cref="LoupeWindow"/>.
     /// </summary>

@@ -74,6 +74,9 @@
             Command="{x:Static local:LoupeWindowCommands.DecreaseColorSamplerSize}"
             Executed="OnDecreaseColorSamplerSizeExecuted"/>
         <CommandBinding
+            Command="{x:Static local:LoupeWindowCommands.Cancel}"
+            Executed="OnConfirmExecuted"/>
+        <CommandBinding
             Command="ApplicationCommands.Close"
             Executed="OnConfirmExecuted"/>
         <CommandBinding

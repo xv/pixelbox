@@ -214,13 +214,8 @@ public partial class LoupeWindow : Window
         InputBindings.Add(_keyBindings.DecreasePixelSize);
         InputBindings.Add(_keyBindings.IncreaseColorSamplerSize);
         InputBindings.Add(_keyBindings.DecreaseColorSamplerSize);
+        InputBindings.Add(_keyBindings.Cancel);
         InputBindings.Add(_keyBindings.Confirm);
-
-        InputBindings.Add(new KeyBinding
-        {
-            Command = ApplicationCommands.Close,
-            Key = Key.Escape
-        });
 
         InputBindings.Add(new MouseBinding
         {
