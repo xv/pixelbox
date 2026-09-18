@@ -273,7 +273,7 @@ public class Loupe : FrameworkElement, IDisposable
     [EditorBrowsable(EditorBrowsableState.Always)]
     public bool PositionLocked
     {
-        get => _lockedPos.HasValue;
+        get => _lockX && _lockY;
         set
         {
             if (value)
